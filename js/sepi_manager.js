@@ -221,6 +221,7 @@ chartHTML += `
         // Hover effects
         layer.on({
             mouseover: (e) => {
+                if (!e?.target?.setStyle) return;
                 e.target.setStyle({
                     weight: 4,
                     color: '#333',
@@ -228,7 +229,13 @@ chartHTML += `
                 });
             },
             mouseout: (e) => {
-                this.sepiLayer.resetStyle(e.target);
+                if (!this.sepiLayer?.resetStyle || !e?.target) return;
+                try {
+                    this.sepiLayer.resetStyle(e.target);
+                } catch (err) {
+                    // Feature can be detached during rapid hover/switch interactions.
+                    console.debug('Skipped SEPI resetStyle on detached feature:', err);
+                }
             }
         });
 

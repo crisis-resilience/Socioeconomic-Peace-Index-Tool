@@ -48,6 +48,7 @@ export function updateSEPILegend() {
                             </div>`
                     )
                     .join('')}
+                ${getNoDataLegendEntry()}
             </div>
             <div style="margin-top: 10px; font-size: 11px; color: #666;">
                 Click on districts for detailed information
@@ -120,10 +121,20 @@ export function updateLegend(layerName, colorScheme, description, labels) {
                             </div>`
                     )
                     .join('')}
+                ${getNoDataLegendEntry()}
             </div>
         </div>
     `;
     legend.style.display = 'block';
+}
+
+function getNoDataLegendEntry() {
+    return `
+        <div style="display:flex; align-items:center; margin-bottom:5px;">
+            <div style="background:#cccccc; width:20px; height:20px; margin-right:5px; border: 1px solid #999;"></div>
+            <span>No data</span>
+        </div>
+    `;
 }
 
 /**

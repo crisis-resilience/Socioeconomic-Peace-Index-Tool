@@ -237,17 +237,21 @@ function createButton(text, container) {
     button.style.transition = 'all 0.3s';
     button.style.fontWeight = 'normal';
     
-    // Add hover effect
-    button.onmouseover = function() { 
-        if (!this.classList.contains('active')) {
-            this.style.backgroundColor = '#e6e6e6'; 
+    // Add hover effect (guarded to avoid detached/undefined targets)
+    button.addEventListener('mouseover', (event) => {
+        const target = event?.currentTarget;
+        if (!target?.classList || !target?.style) return;
+        if (!target.classList.contains('active')) {
+            target.style.backgroundColor = '#e6e6e6';
         }
-    };
-    button.onmouseout = function() { 
-        if (!this.classList.contains('active')) {
-            this.style.backgroundColor = '#f8f8f8'; 
+    });
+    button.addEventListener('mouseout', (event) => {
+        const target = event?.currentTarget;
+        if (!target?.classList || !target?.style) return;
+        if (!target.classList.contains('active')) {
+            target.style.backgroundColor = '#f8f8f8';
         }
-    };
+    });
     
     return button;
 }
@@ -486,8 +490,17 @@ function toggleCountryOutline(countryId, map, countryOutlines) {
     // If a specific country is selected, add it to the map
     if (countryId && countryOutlines[countryId] && !map.hasLayer(countryOutlines[countryId])) {
         countryOutlines[countryId].addTo(map);
-        countryOutlines[countryId].bringToBack?.();
-        countryOutlines[countryId].eachLayer(layer => layer.bringToBack?.());
+        safelyBringLayerToBack(countryOutlines[countryId]);
+        countryOutlines[countryId].eachLayer(layer => safelyBringLayerToBack(layer));
+    }
+}
+
+function safelyBringLayerToBack(layer) {
+    if (!layer) return;
+    try {
+        layer.bringToBack?.();
+    } catch (err) {
+        console.debug('Skipped bringToBack for non-path or detached layer:', err);
     }
 }
 

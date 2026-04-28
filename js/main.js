@@ -499,8 +499,8 @@ function clearAllCountryOutlinesFromMap() {
 function addOutlineToMapBottom(outline) {
     if (!outline) return;
     outline.addTo(map);
-    outline.bringToBack?.();
-    outline.eachLayer(layer => layer.bringToBack?.());
+    safelySetLayerOrder(outline, 'back');
+    outline.eachLayer(layer => safelySetLayerOrder(layer, 'back'));
 }
 
 function showAllCountryOutlines(activeCountryKey) {
@@ -511,10 +511,24 @@ function showAllCountryOutlines(activeCountryKey) {
 
         // Keep the selected country's outline on top so context remains clear.
         if (key === activeCountryKey) {
-            outline.bringToFront?.();
-            outline.eachLayer(layer => layer.bringToFront?.());
+            safelySetLayerOrder(outline, 'front');
+            outline.eachLayer(layer => safelySetLayerOrder(layer, 'front'));
         }
     });
+}
+
+function safelySetLayerOrder(layer, direction) {
+    if (!layer) return;
+    try {
+        if (direction === 'front') {
+            layer.bringToFront?.();
+        } else {
+            layer.bringToBack?.();
+        }
+    } catch (err) {
+        // Some Leaflet layer types (or detached layers) don't support path z-order ops safely.
+        console.debug(`Skipped bringTo${direction === 'front' ? 'Front' : 'Back'} for layer:`, err);
+    }
 }
 
 function clearCountryDependentLayers() {

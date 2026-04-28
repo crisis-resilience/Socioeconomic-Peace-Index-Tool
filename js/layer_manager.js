@@ -615,6 +615,7 @@ export class SimplifiedPillarManager {
                 
                 layer.on({
                     mouseover: (e) => {
+                        if (!e?.target?.setStyle) return;
                         e.target.setStyle({
                             weight: 4,
                             color: '#2c5f2d',
@@ -622,7 +623,13 @@ export class SimplifiedPillarManager {
                         });
                     },
                     mouseout: (e) => {
-                        this.currentLayer.resetStyle(e.target);
+                        if (!this.currentLayer?.resetStyle || !e?.target) return;
+                        try {
+                            this.currentLayer.resetStyle(e.target);
+                        } catch (err) {
+                            // Layer can be replaced/removed while hover events are still in flight.
+                            console.debug('Skipped indicator resetStyle on detached feature:', err);
+                        }
                     }
                 });
             }

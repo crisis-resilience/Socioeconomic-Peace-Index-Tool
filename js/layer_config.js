@@ -23,9 +23,16 @@ export function getCurrentCountry() {
 }
 
 export function getCountryPath(filename, country = currentCountry) {
-    // South Sudan currently uses a newer pillars dataset filename.
-    if (country === 'South_Sudan' && filename === 'sepi_with_pillars_9_2.geojson') {
-        return `data/${country}/sepi_with_pillars_9_3.geojson`;
+    // Route all pillar/SEPI layer bindings to the Apr 28 refresh files.
+    if (filename === 'sepi_with_pillars_9_2.geojson') {
+        const refreshedPillarFiles = {
+            Somalia: 'sepi_with_pillars_Apr_28_Somalia.geojson',
+            Kenya: 'sepi_with_pillars_Apr_28_Kenya.geojson',
+            South_Sudan: 'sepi_with_pillars_Apr_28_South_Sudan.geojson'
+        };
+        if (refreshedPillarFiles[country]) {
+            return `data/${country}/${refreshedPillarFiles[country]}`;
+        }
     }
     return `data/${country}/${filename}`;
 }
@@ -204,13 +211,13 @@ export const PILLAR_CONFIG = {
         name: 'Education Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'education',
-        description: 'Composite measure of educational access,<br> attendance, and attainment across all levels'
+        description: 'Access to and participation in education'
     },
     food_security: {
         name: 'Food Security Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'Food_security',
-        description: 'Household food security based on food expenditure <br> share and total expenditure capacity'
+        description: 'Population-level food and nutrition adequacy'
     },
     pop_frac_3plus: {
         name: 'Food Security Sub-pillar: Fraction of population in IPC Phase 3 or higher',
@@ -253,7 +260,7 @@ export const PILLAR_CONFIG = {
         name: 'Poverty Reduction Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'poverty',
-        description: 'Non-poverty levels combining <br> general and extreme poverty measures'
+        description: 'Economic welfare per capita'
     },
     cooking_fuel: {
         name: 'Poverty Sub-pillar: Cooking Fuel Deprivation',
@@ -313,7 +320,7 @@ export const PILLAR_CONFIG = {
         name: 'Health Access Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'health',
-        description: 'Healthcare infrastructure access<br> based on facilities per population and density'
+        description: 'Healthcare services availability based on facilities per population and density'
     },
     health_fac_per_10k_pop: {
         name: 'Health Sub-pillar: Health facilities per 10,000 population',
@@ -355,7 +362,7 @@ export const PILLAR_CONFIG = {
         name: 'Climate Resilience Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'climate_vulnerability',
-        description: 'Climate resilience based on temperature, <br> vegetation change, and elevation factors'
+        description: 'Climate resilience based on temperature, vegetation change, and elevation factors'
     },
     soil_moist: {
         name: 'Climate Sub-pillar: Soil Moisture',
