@@ -56,73 +56,33 @@ export class LayerTemplates {
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="education">
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="years_of_schooling" data-countries="Kenya,Somalia">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="primary_school_net_attendance_total" data-countries="Kenya,Somalia">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Years of Schooling Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="primary_school_net_attendance_gp_index" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Primary school net attendance gender parity index</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="net_attendance_total" data-countries="Kenya">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Secondary Attendance (Total)</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="secondary_school_net_attendance_gp_index" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Secondary school net attendance gender parity index</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="school_access_pop" data-countries="Kenya,Somalia,Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Population with school access</span>
+                            <span class="sepi-subpillar-text">Primary school net attendance rate (total)</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="literacy_percent_total" data-countries="Somalia">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">Literacy percent total</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_no_formal_education" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Percent no formal education</span>
-                        </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_highest_level_secondary_education" data-countries="Somalia">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">Percent highest level secondary education</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_highest_level_primary_education" data-countries="Somalia">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="net_attendance_total" data-countries="Kenya">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Percent highest level primary education</span>
+                            <span class="sepi-subpillar-text">Secondary Attendance (Total)</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_highest_level_university_education" data-countries="Somalia">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="school_access_pop" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Percent highest level university education</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="school_attendance" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">School Attendance Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_enrollment_male" data-countries="Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Percent of male students</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_enrollment_female" data-countries="Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Percent of female students</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="gender_parity_index" data-countries="Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Gender parity index</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="dropout_pct" data-countries="Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Student dropout rate</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="pqtr_pct" data-countries="Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Pupil-qualified teacher ratio</span>
+                            <span class="sepi-subpillar-text">Population with school access</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="on_payroll_pct" data-countries="Ssd">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">Share of teachers on payroll</span>
+                        </button>
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="dropout_pct" data-countries="Ssd">
+                            <span class="sepi-subpillar-dot"></span>
+                            <span class="sepi-subpillar-text">Student dropout rate</span>
                         </button>
                     </div>
                     
@@ -133,7 +93,7 @@ export class LayerTemplates {
                     <div class="sepi-subpillars" data-parent-pillar="food_security">
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="pop_frac_3plus" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Fraction of population in IPC Phase 3 or higher</span>
+                            <span class="sepi-subpillar-text">IPC Phase 3+ population fraction</span>
                         </button>
                     </div>
                     
@@ -142,81 +102,21 @@ export class LayerTemplates {
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="poverty">
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="cooking_fuel" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Cooking Fuel Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="sanitation" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Sanitation Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="drinking_water" data-countries="Kenya">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Drinking Water Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="electricity" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Electricity Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="housing" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Housing Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="assets" data-countries="Kenya,Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Assets Deprivation</span>
-                        </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="poverty_headcount_pct" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Poverty headcount (population below poverty line)</span>
+                            <span class="sepi-subpillar-text">Poverty headcount (below poverty line)</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="gcp_pc" data-countries="Kenya">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">Gross County Product Per Capita</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="youth_bulge" data-countries="Kenya,Somalia,Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Share of male population aged 15 to 29</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="water" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Drinking Water Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="overcrowding" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Overcrowding Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="unemployment" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Unemployment Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="shocks" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Shocks Deprivation</span>
-                        </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="total_expenditure_usd" data-countries="Somalia">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Total expenditure usd</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="food_percentage_share_pct" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Food percentage share percent</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="extreme_poverty_headcount_pct" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Extreme poverty headcount</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="youth_unemployment" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Share of youth unemployed</span>
+                            <span class="sepi-subpillar-text">Total expenditure (USD)</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="annual_cmb_mean" data-countries="Ssd">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">Average annual CMB cost</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="non_agri_wage" data-countries="Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Average non-agricultural wage</span>
                         </button>
                     </div>
                     
@@ -225,41 +125,17 @@ export class LayerTemplates {
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="health">
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="health_fac_per_10k_pop" data-countries="Kenya,Somalia,Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Health facilities per 10,000 population</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="hp_hc_per_10k_pop" data-countries="Kenya,Somalia,Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Health posts plus health centres per 10,000 population</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="hospitals_per_100k_pop" data-countries="Kenya,Somalia,Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Hospitals per 100,000 population</span>
-                        </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="healthcare_access_pop" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">Population with healthcare access</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="nutrition" data-countries="Kenya">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="health_fac_per_10k_pop" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Nutrition Deprivation</span>
+                            <span class="sepi-subpillar-text">Health facilities per 10,000 population</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="child_mortality" data-countries="Kenya">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="hospitals_per_100k_pop" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Child Mortality Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="mch_ctr_per_10k_pop" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">MCH centres per 10,000 population</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="access_to_healthcare" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Access to Healthcare Deprivation</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="food_security_deprivation" data-countries="Somalia">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Food Security Deprivation</span>
+                            <span class="sepi-subpillar-text">Hospitals per 100,000 population</span>
                         </button>
                     </div>
                     
@@ -268,21 +144,21 @@ export class LayerTemplates {
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="climate_vulnerability">
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="soil_moist" data-countries="Kenya,Somalia,Ssd">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="rs_ndvi" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Soil Moisture</span>
+                            <span class="sepi-subpillar-text">NDVI</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="fapar" data-countries="Kenya,Somalia,Ssd">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="rs_soil_moist" data-countries="Kenya,Somalia,Ssd">
+                            <span class="sepi-subpillar-dot"></span>
+                            <span class="sepi-subpillar-text">Soil moisture anomaly</span>
+                        </button>
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="rs_fapar" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">FAPAR</span>
                         </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="pdsi" data-countries="Kenya,Somalia,Ssd">
+                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="rs_pdsi" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
                             <span class="sepi-subpillar-text">PDSI</span>
-                        </button>
-                        <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="ndvi" data-countries="Kenya,Somalia,Ssd">
-                            <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">NDVI</span>
                         </button>
                     </div>
 

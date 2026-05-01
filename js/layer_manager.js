@@ -1,6 +1,6 @@
 // layer_manager.js - Updated with aligned popup styling
 
-import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColor, getPillarDescription, getConflictDescription } from './layer_config.js';
+import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription } from './layer_config.js';
 import { loadTiff } from './zoom-adaptive-tiff-loader.js';
 import { SEPIManager } from './sepi_manager.js';
 import { loadVectorLayer, loadPointLayer, updateVectorLayerStyle, updatePointLayerStyle, populateAttributeSelector } from './vector_layers.js';
@@ -587,7 +587,7 @@ export class SimplifiedPillarManager {
                 return ({
                 fillColor: isConflictData 
                     ? this.getConflictColorDynamic(value)
-                    : getPillarColor(value),
+                    : getPillarColorForPolarity(value, config.polarity ?? 1),
                 weight: 2,
                 opacity: 1,
                 color: '#ffffff',
@@ -646,7 +646,7 @@ export class SimplifiedPillarManager {
         
         // Use consistent color scheme
         const headerColor = isConflictData ? '#dc3545' : '#2c5f2d';
-        const valueColor = isConflictData ? this.getConflictColorDynamic(value) : getPillarColor(value);
+        const valueColor = isConflictData ? this.getConflictColorDynamic(value) : getPillarColorForPolarity(value, config.polarity ?? 1);
         const conflictMetricType = this.currentPillarId?.includes('events') ? 'events' : 'fatalities';
         
         // Get additional properties (similar to SEPI)
@@ -665,7 +665,7 @@ export class SimplifiedPillarManager {
                         </span>
                     </div>
                     <div style="margin-top: 5px; font-size: 12px; color: ${headerColor}; font-weight: 500;">
-                        ${isConflictData ? getConflictDescription(value, conflictMetricType) : getPillarDescription(value)}
+                        ${isConflictData ? getConflictDescription(value, conflictMetricType) : getPillarDescriptionForPolarity(value, config.polarity ?? 1)}
                     </div>
                 </div>
                 
@@ -753,8 +753,7 @@ export class SimplifiedPillarManager {
                 labels
             );
         } else {
-            // Standard Green-to-Red legend for pillars
-            const colors = ['#d73027', '#fc8d59', '#ffffbf', '#91cf60', '#1a9850'];
+            const forwardColors = ['#d73027', '#fc8d59', '#ffffbf', '#91cf60', '#1a9850'];
             const labels = [
                 'Very Low (0.0 - 0.2)',
                 'Low (0.2 - 0.4)',
@@ -762,7 +761,9 @@ export class SimplifiedPillarManager {
                 'High (0.6 - 0.8)',
                 'Very High (0.8 - 1.0)'
             ];
-            
+            const pol = Number(config.polarity) === -1 ? -1 : 1;
+            const colors = pol === -1 ? [...forwardColors].reverse() : forwardColors;
+
             this.updateLegend(
                 config.name,
                 colors,
@@ -783,7 +784,7 @@ export class SimplifiedPillarManager {
                     return {
                 fillColor: isConflictData 
                     ? this.getConflictColorDynamic(value)
-                    : getPillarColor(value)
+                    : getPillarColorForPolarity(value, config.polarity ?? 1)
                     };
                 })(),
                 weight: 2,
