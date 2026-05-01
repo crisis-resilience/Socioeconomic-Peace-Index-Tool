@@ -1,6 +1,6 @@
 // layer_manager.js - Updated with aligned popup styling
 
-import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription } from './layer_config.js';
+import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription, conflictRawToNormalized, getConflictColorFromNormalized, conflictLegendRawEdges } from './layer_config.js';
 import { loadTiff } from './zoom-adaptive-tiff-loader.js';
 import { SEPIManager } from './sepi_manager.js';
 import { loadVectorLayer, loadPointLayer, updateVectorLayerStyle, updatePointLayerStyle, populateAttributeSelector } from './vector_layers.js';
@@ -474,6 +474,10 @@ export class SimplifiedPillarManager {
         this.currentPropertyName = null;
         this.pillarsData = null;
         this.conflictBreaks = null;
+        /** Loaded from data/conflict_pooled_breaks.json; null = use legacy per-map quantiles */
+        this.conflictPooledScale = null;
+        this._conflictPooledCatalog = undefined;
+        this._conflictPooledCatalogPromise = null;
         this.conflictYear = null;
         this.availableConflictYears = [];
         
@@ -499,7 +503,24 @@ export class SimplifiedPillarManager {
             'Lower Juba': 'Southernmost region with Kismayo port. Trade and fishing.'
         };
     }
-    
+
+    async ensureConflictPooledCatalog() {
+        if (this._conflictPooledCatalog !== undefined) {
+            return this._conflictPooledCatalog;
+        }
+        if (!this._conflictPooledCatalogPromise) {
+            this._conflictPooledCatalogPromise = fetch('data/conflict_pooled_breaks.json')
+                .then((r) => (r.ok ? r.json() : null))
+                .catch(() => null);
+        }
+        const data = await this._conflictPooledCatalogPromise;
+        this._conflictPooledCatalog = data?.pillarScales ?? null;
+        if (!this._conflictPooledCatalog) {
+            console.info('Conflict pooled scales not loaded; using district-level quantiles.');
+        }
+        return this._conflictPooledCatalog;
+    }
+
     async loadPillarsData() {
         if (this.pillarsData) return this.pillarsData;
     
@@ -534,6 +555,7 @@ export class SimplifiedPillarManager {
             this.currentPillarId = null;
             this.currentPropertyName = null;
             this.conflictBreaks = null;
+            this.conflictPooledScale = null;
             this.dispatchConflictYearsAvailable(false);
             return;
         }
@@ -548,6 +570,8 @@ export class SimplifiedPillarManager {
             await this.loadPillarsData();
             const isConflictData = pillarId.startsWith('conflict_');
             if (isConflictData) {
+                await this.ensureConflictPooledCatalog();
+                this.conflictPooledScale = this._conflictPooledCatalog?.[pillarId] ?? null;
                 this.availableConflictYears = this.getAvailableConflictYears(config.property);
                 if (!this.conflictYear || !this.availableConflictYears.includes(this.conflictYear)) {
                     this.conflictYear = this.availableConflictYears[this.availableConflictYears.length - 1] || null;
@@ -555,9 +579,12 @@ export class SimplifiedPillarManager {
                 const yearlyProperty = this.conflictYear ? `${config.property}_${this.conflictYear}` : null;
                 const desiredConflictProperty = yearlyProperty || config.fallbackProperty || config.property;
                 this.currentPropertyName = this.resolvePropertyName(desiredConflictProperty);
-                this.conflictBreaks = this.computeConflictBreaks(this.currentPropertyName);
+                this.conflictBreaks = this.conflictPooledScale
+                    ? null
+                    : this.computeConflictBreaks(this.currentPropertyName);
                 this.dispatchConflictYearsAvailable(true);
             } else {
+                this.conflictPooledScale = null;
                 const desiredProperty = this.pickAvailableProperty(config.property, config.fallbackProperty);
                 this.currentPropertyName = this.resolvePropertyName(desiredProperty);
                 this.conflictBreaks = null;
@@ -745,11 +772,14 @@ export class SimplifiedPillarManager {
             // Conflict data legend (Yellow to Red)
             const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
             const labels = this.getConflictLegendLabels();
-            
+            const desc = this.conflictPooledScale
+                ? `${config.description}<br><span style="font-size:11px;color:#555">Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).</span>`
+                : config.description;
+
             this.updateLegend(
                 config.name,
                 colors,
-                config.description,
+                desc,
                 labels
             );
         } else {
@@ -908,6 +938,11 @@ export class SimplifiedPillarManager {
     getConflictColorDynamic(value) {
         if (value == null || isNaN(value)) return '#cccccc';
 
+        if (this.conflictPooledScale) {
+            const n = conflictRawToNormalized(value, this.conflictPooledScale);
+            return getConflictColorFromNormalized(n);
+        }
+
         const numericValue = Number(value);
         const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
         const breaks = this.conflictBreaks || [0, 0, 0, 0];
@@ -920,6 +955,21 @@ export class SimplifiedPillarManager {
     }
 
     getConflictLegendLabels() {
+        if (this.conflictPooledScale) {
+            const edges = conflictLegendRawEdges(this.conflictPooledScale);
+            const per1k = this.currentPillarId?.includes('_per_1k');
+            const format = (v) =>
+                Number(v).toLocaleString(undefined, { maximumFractionDigits: per1k ? 4 : 0 });
+
+            return [
+                `Very Low (${format(edges[0])} — ${format(edges[1])})`,
+                `Low (${format(edges[1])} — ${format(edges[2])})`,
+                `Moderate (${format(edges[2])} — ${format(edges[3])})`,
+                `High (${format(edges[3])} — ${format(edges[4])})`,
+                `Very High (${format(edges[4])}+)`
+            ];
+        }
+
         const breaks = this.conflictBreaks || [0, 0, 0, 0];
         const format = (value) => Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 });
 

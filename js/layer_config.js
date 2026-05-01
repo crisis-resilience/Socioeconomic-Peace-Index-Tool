@@ -419,6 +419,47 @@ export const CONFLICT_COLOR_SCHEME = {
     colors: ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'], // Yellow to Red
     breaks: [0.2, 0.4, 0.6, 0.8] // Quantile breaks
 };
+
+/**
+ * Normalize raw conflict statistic to [0,1] using pooled transformLow/High
+ * from data/conflict_pooled_breaks.json (log1p for counts).
+ */
+export function conflictRawToNormalized(raw, pooled) {
+    if (pooled == null || raw == null) return null;
+    const v = Number(raw);
+    if (!Number.isFinite(v) || v < 0) return null;
+    const transformed = pooled.useLog1p ? Math.log1p(v) : v;
+    const lo = Number(pooled.transformLow);
+    const hi = Number(pooled.transformHigh);
+    const span = hi - lo;
+    if (!(span > 0)) return 0.5;
+    return Math.min(1, Math.max(0, (transformed - lo) / span));
+}
+
+/** Map normalized [0..1] to five-class yellow→red ramp (uniform inner breaks). */
+export function getConflictColorFromNormalized(n) {
+    if (n == null || !Number.isFinite(n)) return '#cccccc';
+    const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
+    const { breaks } = CONFLICT_COLOR_SCHEME;
+    if (n >= breaks[3]) return colors[4];
+    if (n >= breaks[2]) return colors[3];
+    if (n >= breaks[1]) return colors[2];
+    if (n >= breaks[0]) return colors[1];
+    return colors[0];
+}
+
+/** Legend edges on the raw-value axis (fractions span transformLow→transformHigh after log1p). */
+export function conflictLegendRawEdges(pooled) {
+    const lo = Number(pooled.transformLow);
+    const hi = Number(pooled.transformHigh);
+    const span = hi - lo;
+    const fracToRaw = (f) => {
+        const transformed = lo + f * span;
+        return pooled.useLog1p ? Math.max(0, Math.expm1(transformed)) : transformed;
+    };
+    return [0, 0.2, 0.4, 0.6, 0.8, 1].map(fracToRaw);
+}
+
 export function getConflictColor(value) {
     if (value == null || isNaN(value)) return '#cccccc';
     
