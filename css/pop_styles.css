@@ -14,6 +14,9 @@
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     border: 1px solid #e0e0e0;
+    /* Keep popup readable across all countries (prevents narrow/squished layout). */
+    width: min(450px, calc(100vw - 120px));
+    min-width: min(360px, calc(100vw - 120px));
     max-width: 450px;
 }
 
@@ -26,26 +29,37 @@
     overflow-y: auto;
 }
 
-/* Make the Leaflet close button clearly visible on styled popups */
+/* Make the Leaflet close button clearly visible on all popups */
+.leaflet-popup .leaflet-popup-close-button,
 .sepi-popup .leaflet-popup-close-button,
 .pillar-popup .leaflet-popup-close-button {
-    color: #1f2937 !important;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #cbd5e1;
+    color: #ffffff !important;
+    background: rgba(44, 95, 45, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.45);
     border-radius: 999px;
     width: 24px;
     height: 24px;
-    line-height: 22px;
+    line-height: 20px;
     text-align: center;
     font-size: 18px;
     font-weight: 700;
-    right: 8px;
-    top: 8px;
+    position: absolute !important;
+    right: 10px !important;
+    top: 10px !important;
     opacity: 1 !important;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28);
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    z-index: 1001;
 }
 
+/* Align close button with popup header content row. */
+.leaflet-popup .leaflet-popup-content-wrapper,
+.sepi-popup .leaflet-popup-content-wrapper,
+.pillar-popup .leaflet-popup-content-wrapper {
+    position: relative !important;
+}
+
+.leaflet-popup .leaflet-popup-close-button:hover,
 .sepi-popup .leaflet-popup-close-button:hover,
 .pillar-popup .leaflet-popup-close-button:hover {
     background: #1f2937;

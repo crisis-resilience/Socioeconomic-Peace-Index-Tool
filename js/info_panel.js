@@ -10,6 +10,8 @@ export class InfoPanel {
             width: options.width || '400px',
             maxHeight: options.maxHeight || '70vh',
             title: options.title || 'Layer Analysis & Reports',
+            docked: options.docked !== undefined ? options.docked : false,
+            mountTarget: options.mountTarget || '#info-panel-slot',
             ...options
         };
         
@@ -45,122 +47,167 @@ export class InfoPanel {
     createPanel() {
         // Create main container
         this.container = document.createElement('div');
-        this.container.className = 'info-panel-container';
+        this.container.className = `info-panel-container ${this.options.docked ? 'docked' : 'floating'}`;
         this.container.id = 'info-panel';
         
-        // Apply positioning
-        this.container.style.cssText = `
-            position: fixed;
-            top: 15%;
-            right: 10px;
-            width: ${this.options.width};
-            height: 400px;
-            min-width: 300px;
-            min-height: 200px;
-            max-height: none;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 2001;
-            display: none;
-            overflow: hidden;
-            font-family: Calibri, sans-serif;
-            border: 1px solid #ddd;
-            resize: both;
-        `;
+        if (!this.options.docked) {
+            // Apply floating positioning
+            this.container.style.cssText = `
+                position: fixed;
+                top: 15%;
+                right: 10px;
+                width: ${this.options.width};
+                height: 400px;
+                min-width: 300px;
+                min-height: 200px;
+                max-height: none;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                z-index: 2001;
+                display: none;
+                overflow: hidden;
+                font-family: Calibri, sans-serif;
+                border: 1px solid #ddd;
+                resize: both;
+            `;
+        } else {
+            this.container.style.display = 'none';
+        }
         
-        // Create header
-        const header = document.createElement('div');
-        header.className = 'info-panel-header';
-        header.innerHTML = `
-            <div class="info-panel-title">${this.options.title}</div>
-            <div class="info-panel-controls">
-                <button class="info-panel-btn minimize-btn" title="Minimize/Maximize">−</button>
-                <button class="info-panel-btn close-btn" title="Close">×</button>
-            </div>
-        `;
+        let header = null;
+        if (!this.options.docked) {
+            // Floating mode keeps full header controls.
+            header = document.createElement('div');
+            header.className = 'info-panel-header';
+            header.innerHTML = `
+                <div class="info-panel-title">${this.options.title}</div>
+                <div class="info-panel-controls">
+                    <button class="info-panel-btn minimize-btn" title="Minimize/Maximize">−</button>
+                    <button class="info-panel-btn close-btn" title="Close">×</button>
+                </div>
+            `;
+        }
         
         // Create content area
         const content = document.createElement('div');
         content.className = 'info-panel-content';
-        content.style.display = 'none'; // Start minimized
+        content.style.display = this.options.docked ? 'flex' : 'none'; // Docked starts expanded
         content.innerHTML = `
-            <div class="info-panel-section">
-                <div class="section-header">
-                    <h4>Active Layers</h4>
-                    <span class="layer-count">0 layers</span>
-                </div>
-                <div class="layers-list" id="layers-list">
-                    <p class="no-layers-message">No layers currently active</p>
-                </div>
+            <div class="info-panel-tabs" role="tablist" aria-label="Info panel sections">
+                <button class="info-panel-tab active" type="button" data-tab="welcome" role="tab" aria-selected="true">
+                    Welcome
+                </button>
+                <button class="info-panel-tab" type="button" data-tab="layers" role="tab" aria-selected="false">
+                    Active Layers
+                </button>
+                <button class="info-panel-tab" type="button" data-tab="analysis" role="tab" aria-selected="false">
+                    Analysis
+                </button>
             </div>
-            
-            <div class="info-panel-section analysis-section">
-                <div class="section-header">
-                    <h4>Analysis & Reports</h4>
-                </div>
-                <div class="analysis-content">
-                    <div class="analysis-tool">
-                        <h5>Create Summary Report</h5>
-                        <p>Generate correlation analysis between SEPI index and subnational statistics with visualizations</p>
-                        <button class="run-analysis-btn" data-analysis="summary">Generate Report</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="info-panel-section results-section">
-                <div class="section-header">
-                    <h4>Report Results</h4>
-                </div>
-                <div class="results-content">
-                    <div class="welcome-content">
-                        <h5>🎯 Welcome to the SEPI Analysis Tool</h5>
-                        
-                        <h6>📊 Getting Started</h6>
-                        <p>This tool helps you analyze relationships between the <strong>Socioeconomic Peace Index (SEPI)</strong> and various subnational indicators across Somalia.</p>
-                        
-                        <h6>🔍 How to Use</h6>
-                        <p>To generate correlation reports:</p>
-                        <ul>
-                            <li>Activate the <strong>SEPI layer</strong> from the main menu</li>
-                            <li>Select a <strong>Subnational Statistics</strong> layer</li>
-                            <li>Choose an <strong>attribute</strong> to analyze</li>
-                            <li>Click <strong>"Generate Report"</strong> above</li>
-                        </ul>
-                        
-                        <div class="sepi-intro">
-                            <h6>💡 About SEPI</h6>
-                            <p>The Socioeconomic Peace Index (SEPI) measures regional peace and stability by combining multiple socioeconomic indicators. Higher values indicate better peace conditions.</p>
+
+            <div class="info-panel-tab-panels">
+                <section class="info-panel-tab-panel active" data-panel="welcome" role="tabpanel">
+                    <div class="info-panel-section">
+                        <div class="welcome-content">
+                            <h5>🎯 Welcome to the SEPI Analysis Tool</h5>
+                            
+                            <h6>📊 Getting Started</h6>
+                            <p>This tool helps you analyze relationships between the <strong>Socioeconomic Peace Index (SEPI)</strong> and various subnational indicators across Somalia.</p>
+                            
+                            <h6>🔍 How to Use</h6>
+                            <p>To generate correlation reports:</p>
+                            <ul>
+                                <li>Activate the <strong>SEPI layer</strong> from the main menu</li>
+                                <li>Select a <strong>Subnational Statistics</strong> layer</li>
+                                <li>Choose an <strong>attribute</strong> to analyze</li>
+                                <li>Click <strong>"Generate Report"</strong> in the Analysis tab</li>
+                            </ul>
+                            
+                            <div class="sepi-intro">
+                                <h6>💡 About SEPI</h6>
+                                <p>The Socioeconomic Peace Index (SEPI) measures regional peace and stability by combining multiple socioeconomic indicators. Higher values indicate better peace conditions.</p>
+                            </div>
+                            
+                            <h6>📈 Analysis Features</h6>
+                            <ul>
+                                <li><strong>Correlation Analysis:</strong> Statistical relationships between SEPI and other indicators</li>
+                                <li><strong>Visual Charts:</strong> Scatter plots and bar charts for data exploration</li>
+                                <li><strong>Regional Comparisons:</strong> District-level breakdowns and rankings</li>
+                                <li><strong>Policy Insights:</strong> Interpretation and recommendations</li>
+                            </ul>
                         </div>
-                        
-                        <h6>📈 Analysis Features</h6>
-                        <ul>
-                            <li><strong>Correlation Analysis:</strong> Statistical relationships between SEPI and other indicators</li>
-                            <li><strong>Visual Charts:</strong> Scatter plots and bar charts for data exploration</li>
-                            <li><strong>Regional Comparisons:</strong> District-level breakdowns and rankings</li>
-                            <li><strong>Policy Insights:</strong> Interpretation and recommendations</li>
-                        </ul>
-                        
-                        <p style="text-align: center; margin-top: 20px; font-style: italic; color: #666;">
-                            Press <strong>I</strong> to toggle this panel • <strong>H</strong> for help
-                        </p>
                     </div>
-                </div>
+                </section>
+
+                <section class="info-panel-tab-panel" data-panel="layers" role="tabpanel" hidden>
+                    <div class="info-panel-section">
+                        <div class="section-header">
+                            <h4>Active Layers</h4>
+                            <span class="layer-count">0 layers</span>
+                        </div>
+                        <div class="layers-list" id="layers-list">
+                            <p class="no-layers-message">No layers currently active</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="info-panel-tab-panel" data-panel="analysis" role="tabpanel" hidden>
+                    <div class="info-panel-section analysis-section">
+                        <div class="section-header">
+                            <h4>Analysis & Reports</h4>
+                        </div>
+                        <div class="analysis-content">
+                            <div class="analysis-tool">
+                                <h5>Create Summary Report</h5>
+                                <p>Generate correlation analysis between SEPI index and subnational statistics with visualizations</p>
+                                <button class="run-analysis-btn" data-analysis="summary">Generate Report</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-panel-section results-section">
+                        <div class="section-header">
+                            <h4>Report Results</h4>
+                        </div>
+                        <div class="results-content">
+                            <p class="no-results-message">No reports generated yet</p>
+                        </div>
+                    </div>
+                </section>
             </div>
         `;
         
-        // Create resize handles
-        this.createResizeHandles();
+        // Create resize handles only for floating mode
+        if (!this.options.docked) {
+            this.createResizeHandles();
+        }
         
         // Assemble panel
-        this.container.appendChild(header);
+        if (header) {
+            this.container.appendChild(header);
+        }
         this.container.appendChild(content);
         
         // Add to page
-        document.body.appendChild(this.container);
+        if (this.options.docked) {
+            const mount = document.querySelector(this.options.mountTarget);
+            if (mount) {
+                mount.appendChild(this.container);
+            } else {
+                document.body.appendChild(this.container);
+            }
+        } else {
+            document.body.appendChild(this.container);
+        }
         
-        // Start in minimized state
-        this.updateMinimizeState();
+        // Start in minimized state only for floating mode
+        if (!this.options.docked) {
+            this.updateMinimizeState();
+        } else {
+            this.isMinimized = false;
+            this.updateMinimizeState();
+        }
     }
     
     /**
@@ -277,64 +324,98 @@ export class InfoPanel {
      * Setup event listeners for panel interactions
      */
     setupEventListeners() {
-        // Header controls
+        // Header controls (floating mode only)
         const minimizeBtn = this.container.querySelector('.minimize-btn');
         const closeBtn = this.container.querySelector('.close-btn');
         
-        // Handle minimize button click
-        minimizeBtn.addEventListener('click', () => {
-            this.isMinimized = !this.isMinimized;
-            
-            if (this.isMinimized) {
-                // Save current height before minimizing
-                this.originalHeight = this.container.style.height || '400px';
+        if (minimizeBtn) {
+            // Handle minimize button click
+            minimizeBtn.addEventListener('click', () => {
+                this.isMinimized = !this.isMinimized;
                 
-                // Minimize panel
-                this.container.classList.add('minimized');
-                this.container.style.height = '48px';
-                this.container.style.minHeight = '48px';
-                this.container.style.maxHeight = '48px';
-                this.container.style.resize = 'none';
-                
-                const content = this.container.querySelector('.info-panel-content');
-                content.style.display = 'none';
-                
-                minimizeBtn.textContent = '+';
-                minimizeBtn.title = 'Restore';
-                
-                // Round header corners when minimized
-                const header = this.container.querySelector('.info-panel-header');
-                header.style.borderRadius = '8px';
-                
-            } else {
-                // Restore panel
-                this.container.classList.remove('minimized');
-                this.container.style.height = this.originalHeight || '400px';
-                this.container.style.minHeight = '200px';
-                this.container.style.maxHeight = 'none';
-                this.container.style.resize = 'both';
-                
-                const content = this.container.querySelector('.info-panel-content');
-                content.style.display = 'flex';
-                
-                minimizeBtn.textContent = '−';
-                minimizeBtn.title = 'Minimize';
-                
-                // Restore header corners
-                const header = this.container.querySelector('.info-panel-header');
-                header.style.borderRadius = '8px 8px 0 0';
-            }
+                if (this.isMinimized) {
+                    // Save current height before minimizing
+                    this.originalHeight = this.container.style.height || '400px';
+                    
+                    // Minimize panel
+                    this.container.classList.add('minimized');
+                    this.container.style.height = '48px';
+                    this.container.style.minHeight = '48px';
+                    this.container.style.maxHeight = '48px';
+                    this.container.style.resize = 'none';
+                    
+                    const content = this.container.querySelector('.info-panel-content');
+                    content.style.display = 'none';
+                    
+                    minimizeBtn.textContent = '+';
+                    minimizeBtn.title = 'Restore';
+                    
+                    // Round header corners when minimized
+                    const headerEl = this.container.querySelector('.info-panel-header');
+                    if (headerEl) {
+                        headerEl.style.borderRadius = '8px';
+                    }
+                    
+                } else {
+                    // Restore panel
+                    this.container.classList.remove('minimized');
+                    this.container.style.height = this.originalHeight || '400px';
+                    this.container.style.minHeight = '200px';
+                    this.container.style.maxHeight = 'none';
+                    this.container.style.resize = 'both';
+                    
+                    const content = this.container.querySelector('.info-panel-content');
+                    content.style.display = 'flex';
+                    
+                    minimizeBtn.textContent = '−';
+                    minimizeBtn.title = 'Minimize';
+                    
+                    // Restore header corners
+                    const headerEl = this.container.querySelector('.info-panel-header');
+                    if (headerEl) {
+                        headerEl.style.borderRadius = '8px 8px 0 0';
+                    }
+                }
+            });
+        }
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hide());
+        }
+        
+        const tabs = this.container.querySelectorAll('.info-panel-tab');
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => this.setActiveTab(tab.dataset.tab));
         });
-        
-        closeBtn.addEventListener('click', () => this.hide());
-        
+
         // Analysis button
         const analysisBtn = this.container.querySelector('.run-analysis-btn');
-        analysisBtn.addEventListener('click', () => this.generateSummaryReport());
+        if (analysisBtn) {
+            analysisBtn.addEventListener('click', () => this.generateSummaryReport());
+        }
         
-        // Make panel draggable and resizable
-        this.makeDraggable();
-        this.makeResizable();
+        // Make panel draggable and resizable only in floating mode
+        if (!this.options.docked) {
+            this.makeDraggable();
+            this.makeResizable();
+        }
+    }
+
+    setActiveTab(tabName) {
+        const tabs = this.container.querySelectorAll('.info-panel-tab');
+        const panels = this.container.querySelectorAll('.info-panel-tab-panel');
+
+        tabs.forEach((tab) => {
+            const isActive = tab.dataset.tab === tabName;
+            tab.classList.toggle('active', isActive);
+            tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+
+        panels.forEach((panel) => {
+            const isActive = panel.dataset.panel === tabName;
+            panel.classList.toggle('active', isActive);
+            panel.hidden = !isActive;
+        });
     }
     
     /**
@@ -387,7 +468,7 @@ export class InfoPanel {
      * Show the info panel
      */
     show() {
-        this.container.style.display = 'block';
+        this.container.style.display = this.options.docked ? 'flex' : 'block';
         this.isVisible = true;
         this.updateLayersList();
     }
@@ -425,8 +506,19 @@ export class InfoPanel {
     updateMinimizeState() {
         const content = this.container.querySelector('.info-panel-content');
         const minimizeBtn = this.container.querySelector('.minimize-btn');
+        const header = this.container.querySelector('.info-panel-header');
         
         if (this.isMinimized) {
+            if (this.options.docked) {
+                this.container.classList.add('minimized');
+                content.style.display = 'none';
+                if (minimizeBtn) {
+                    minimizeBtn.textContent = '+';
+                    minimizeBtn.title = 'Restore';
+                }
+                return;
+            }
+
             // Save current height before minimizing
             if (!this.originalHeight) {
                 this.originalHeight = this.container.style.height || '400px';
@@ -443,10 +535,19 @@ export class InfoPanel {
             minimizeBtn.title = 'Restore';
             
             // Round header corners when minimized
-            const header = this.container.querySelector('.info-panel-header');
             header.style.borderRadius = '8px';
             
         } else {
+            if (this.options.docked) {
+                this.container.classList.remove('minimized');
+                content.style.display = 'flex';
+                if (minimizeBtn) {
+                    minimizeBtn.textContent = '−';
+                    minimizeBtn.title = 'Minimize';
+                }
+                return;
+            }
+
             this.container.classList.remove('minimized');
             this.container.style.height = this.originalHeight || '400px';
             this.container.style.minHeight = '200px';
@@ -458,7 +559,6 @@ export class InfoPanel {
             minimizeBtn.title = 'Minimize';
             
             // Restore header corners
-            const header = this.container.querySelector('.info-panel-header');
             header.style.borderRadius = '8px 8px 0 0';
         }
     }

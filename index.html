@@ -40,13 +40,17 @@
         <div class="navbar-logo navbar-logo-left">
             <img src="assets/pigeon2.png" alt="SDG AI Logo" class="logo-image_left">
         </div>
+
+        <div class="navbar-logo navbar-logo-left">
+    <img src="assets/icpsd_logo.png" alt="ICPSD Logo" class="logo-image_left">
+</div>
         <div class="navbar-logo navbar-logo-left">
             <h2 class="tool-title">Socioeconomic Peace Index Tool</h2>
         </div>
         
-        <!-- <ul class="navbar-menu">
+        <ul class="navbar-menu">
             <li><a href="html/about.html" class="larger-nav-link">About Us</a></li>
-        </ul> -->
+        </ul>
         <div class="navbar-logo navbar-logo-right">
             <img src="assets/undp_logo.png" alt="UNDP Logo" class="logo-image_right">
         </div>
@@ -60,12 +64,18 @@
         </div>
         
         <!-- Map container -->
-        <div id="map"></div>
+        <div id="map">
+            <!-- Legend -->
+            <div id="legend" class="legend"></div>
+        </div>
+
+        <!-- Docked analysis sidebar -->
+        <aside id="analysis-sidebar" class="analysis-sidebar">
+            <div class="analysis-sidebar-resize-handle" role="separator" aria-orientation="vertical" aria-label="Resize analysis panel"></div>
+            <div id="info-panel-slot" class="info-panel-slot"></div>
+        </aside>
     </div>
  
-    <!-- Legend -->
-    <div id="legend" class="legend"></div>
-    
     <!-- External library scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" 
   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" 

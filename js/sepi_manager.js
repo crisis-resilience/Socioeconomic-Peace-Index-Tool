@@ -241,6 +241,7 @@ chartHTML += `
 
         // Bind popup with draggable option
         layer.bindPopup(this.createPopupContent(properties), {
+            minWidth: 360,
             maxWidth: 450,
             className: 'sepi-popup',
             autoPan: true,

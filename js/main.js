@@ -567,10 +567,13 @@ function setupInfoPanel() {
         infoPanel = new InfoPanel({
             position: 'topright',
             width: '420px',
-            title: 'SEPI Analysis & Layer Information'
+            title: 'SEPI Analysis & Layer Information',
+            docked: true,
+            mountTarget: '#info-panel-slot'
         });
         
         infoPanel.setMap(map);
+        setupAnalysisSidebarResizer();
         
         // Update info panel with current layer state
         setInterval(updateInfoPanelWithSEPI, 2000);
@@ -580,13 +583,48 @@ function setupInfoPanel() {
         window.infoPanelInstance = infoPanel;
         
         infoPanel.show();
-        infoPanel.toggleMinimize();
         
         console.log('SEPI Info panel initialized');
         
     } catch (error) {
         console.error('Failed to initialize info panel:', error);
     }
+}
+
+function setupAnalysisSidebarResizer() {
+    const sidebar = document.getElementById('analysis-sidebar');
+    const handle = sidebar?.querySelector('.analysis-sidebar-resize-handle');
+    if (!sidebar || !handle) return;
+    if (handle.dataset.bound === '1') return;
+    handle.dataset.bound = '1';
+
+    let startX = 0;
+    let startWidth = 0;
+    let dragging = false;
+
+    const onMouseMove = (event) => {
+        if (!dragging) return;
+        const delta = startX - event.clientX;
+        const newWidth = Math.max(300, Math.min(window.innerWidth * 0.5, startWidth + delta));
+        sidebar.style.width = `${newWidth}px`;
+    };
+
+    const onMouseUp = () => {
+        dragging = false;
+        document.body.style.userSelect = '';
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    handle.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+        dragging = true;
+        startX = event.clientX;
+        startWidth = sidebar.getBoundingClientRect().width;
+        document.body.style.userSelect = 'none';
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
 }
 /**
  * Update info panel with current layer state

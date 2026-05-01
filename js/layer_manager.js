@@ -630,8 +630,12 @@ export class SimplifiedPillarManager {
                 
                 // Updated to use SEPI-style popup
                 layer.bindPopup(this.createIndicatorPopup(config, feature.properties, district, value, isConflictData), {
+                    minWidth: 360,
                     maxWidth: 450,
-                    className: 'sepi-popup' // Using SEPI popup class for consistent styling
+                    className: 'sepi-popup', // Using SEPI popup class for consistent styling
+                    autoPan: true,
+                    autoPanPadding: L.point(50, 50),
+                    offset: L.point(20, 0)
                 });
                 
                 layer.bindTooltip(`${config.name}: ${value !== undefined ? Number(value).toFixed(isConflictData ? conflictDecimals : 2) : 'No data'}`, {
@@ -685,9 +689,9 @@ export class SimplifiedPillarManager {
             </div>
             <div style="padding: 15px;">
                 <div style="background: ${isConflictData ? '#fff5f5' : '#e8f5e8'}; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid ${headerColor};">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="color: ${headerColor}; font-size: 14px;">${config.name}:</strong>
-                        <span style="font-size: 18px; font-weight: bold; color: ${valueColor};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <strong style="color: ${headerColor}; font-size: 14px; flex: 1 1 180px; min-width: 0; overflow-wrap: anywhere;">${config.name}:</strong>
+                        <span style="font-size: 18px; font-weight: bold; color: ${valueColor}; flex: 0 0 auto; text-align: right;">
                             ${formattedValue}
                         </span>
                     </div>
@@ -717,7 +721,7 @@ export class SimplifiedPillarManager {
                         <h4 style="margin: 0 0 8px 0; color: #6c757d; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #6c757d; padding-bottom: 3px;">
                             Additional Data
                         </h4>
-                        <div style="max-height: 150px; overflow-y: auto;">
+                        <div style="max-height: 150px; overflow-y: auto; overflow-x: hidden;">
                             ${additionalInfo.join('')}
                         </div>
                     </div>
@@ -740,9 +744,9 @@ export class SimplifiedPillarManager {
             .filter(([key, value]) => !skipFields.includes(key) && value != null && value !== '')
             .slice(0, 8)
             .map(([key, value]) => `
-                <div style="margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f0f0f0;">
-                    <span style="color: #495057; font-weight: 500; flex: 1;">${this.formatPropertyName(key)}:</span>
-                    <span style="color: #212529; margin-left: 10px; flex: 1; text-align: right;">${this.formatPropertyValue(value)}</span>
+                <div style="margin-bottom: 6px; font-size: 12px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 4px 0; border-bottom: 1px solid #f0f0f0; flex-wrap: wrap;">
+                    <span style="color: #495057; font-weight: 500; flex: 1 1 45%; min-width: 120px; overflow-wrap: anywhere;">${this.formatPropertyName(key)}:</span>
+                    <span style="color: #212529; flex: 1 1 45%; min-width: 120px; text-align: right; overflow-wrap: anywhere;">${this.formatPropertyValue(value)}</span>
                 </div>
             `);
         

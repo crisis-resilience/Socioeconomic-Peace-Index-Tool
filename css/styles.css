@@ -67,6 +67,7 @@ body {
 /* Sidebar */
 #sidebar {
     width: 20%;
+    min-width: 280px;
     background: #e0e0e0;
     padding: 20px;
     overflow-y: auto;
@@ -606,10 +607,42 @@ body {
 
 /* Map Layout */
 #map {
-    width: 80%;
+    width: auto;
+    flex: 1;
     height: 100%;
     position: relative;
     z-index: 1;
+}
+
+/* Right docked analysis sidebar */
+#analysis-sidebar {
+    width: 380px;
+    min-width: 300px;
+    max-width: 50vw;
+    background: #f7f9fb;
+    border-left: 1px solid #d6dde6;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    overflow: hidden;
+}
+
+.analysis-sidebar-resize-handle {
+    width: 8px;
+    cursor: col-resize;
+    background: linear-gradient(to right, #cfd6df, #e8ecf0);
+    border-right: 1px solid #c6ced8;
+    flex: 0 0 8px;
+}
+
+.analysis-sidebar-resize-handle:hover {
+    background: linear-gradient(to right, #b8c2d0, #dce2ea);
+}
+
+.info-panel-slot {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
 }
 
 .leaflet-container {
