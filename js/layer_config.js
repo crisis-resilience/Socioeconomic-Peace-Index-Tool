@@ -22,6 +22,23 @@ export function getCurrentCountry() {
     return currentCountry;
 }
 
+/**
+ * District SEPI bundles used by Map Controls "Show labels" (group districts → ADM1).
+ * Kenya uses `sepi_with_pillars_9_2.geojson`; Somalia / South Sudan use Apr 28 files (ADM1_EN).
+ */
+export function getSepiDistrictGeoJSONPathForAdm1Labels(country = currentCountry) {
+    switch (country) {
+        case 'Kenya':
+            return `data/Kenya/sepi_with_pillars_9_2.geojson`;
+        case 'Somalia':
+            return `data/Somalia/sepi_with_pillars_Apr_28_Somalia.geojson`;
+        case 'South_Sudan':
+            return `data/South_Sudan/sepi_with_pillars_Apr_28_South_Sudan.geojson`;
+        default:
+            return getCountryPath('sepi_with_pillars_9_2.geojson', country);
+    }
+}
+
 export function getCountryPath(filename, country = currentCountry) {
     // Route all pillar/SEPI layer bindings to the Apr 28 refresh files.
     if (filename === 'sepi_with_pillars_9_2.geojson') {
@@ -108,6 +125,7 @@ export const LAYER_CONFIG = {
         id: 'sepiLayer',
         name: 'Socioeconomic Peace Index (SEPI)',
         type: 'sepi',
+        description: 'Composite socioeconomic peace scores (0–1) by district, combining education, food security, poverty reduction, health access, and climate resilience pillars.',
         url: () => getCountryPath('sepi2.geojson'),
         property: 'peacebuilding_index',
         style: { color: "#2c5f2d", weight: 2, opacity: 1, fillOpacity: 0.7 },
@@ -379,14 +397,14 @@ export const PILLAR_CONFIG = {
     },
 
     conflict_events: {
-        name: 'Conflict Events (2020-2025)',
+        name: 'Conflict Events',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'count_conflict_events',
         fallbackProperty: 'ACLED_count_conflict_events',
         description: 'Number of recorded conflict events by year'
     },
     conflict_fatalities: {
-        name: 'Conflict Fatalities (2020-2025)',
+        name: 'Conflict Fatalities',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'total_fatalities',
         fallbackProperty: 'total_fatalities',

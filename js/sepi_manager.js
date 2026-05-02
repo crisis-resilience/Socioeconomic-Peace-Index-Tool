@@ -190,6 +190,19 @@ chartHTML += `
         return 'Very Low Peace Level';
     }
     
+    /** Reset hover styling / tooltips for every SEPI polygon (fast moves can skip `mouseout`). */
+    clearHoverArtifacts() {
+        if (!this.sepiLayer?.eachLayer) return;
+        this.sepiLayer.eachLayer((lyr) => {
+            try {
+                lyr.closeTooltip?.();
+                this.sepiLayer.resetStyle(lyr);
+            } catch (_err) {
+                // path detached
+            }
+        });
+    }
+
     /**
      * Setup feature interactions (popups, tooltips, hover) - UPDATED
      */
@@ -208,9 +221,7 @@ chartHTML += `
         layer.bindTooltip(`
             <div style="text-align: center; font-family: Calibri, sans-serif;">
                 <strong>${districtName}</strong><br>
-                <span style="color: ${this.getColor(sepiValue)}; font-weight: bold;">
-                    SEPI: ${scoreText}
-                </span>
+                <span style="font-weight: bold;">SEPI: ${scoreText}</span>
             </div>
         `, {
             permanent: false,
@@ -218,11 +229,19 @@ chartHTML += `
             className: 'sepi-tooltip'
         });
         
-        // Hover effects
         layer.on({
             mouseover: (e) => {
-                if (!e?.target?.setStyle) return;
-                e.target.setStyle({
+                const path = e.target;
+                if (!path?.setStyle) return;
+                this.sepiLayer?.eachLayer((lyr) => {
+                    if (lyr === path) return;
+                    try {
+                        lyr.closeTooltip?.();
+                        this.sepiLayer.resetStyle(lyr);
+                    } catch (_e) {}
+                });
+                path.bringToFront?.();
+                path.setStyle({
                     weight: 4,
                     color: '#333',
                     fillOpacity: 0.9

@@ -5,7 +5,7 @@ import { initializeLegend, updateLegend, hideLegend } from './legend.js';
 import { LayerManager } from './layer_manager.js';
 import { createAdminLabelLayers, loadCountryOutline } from './admin_labels.js';
 import { InfoPanel } from './info_panel.js';
-import { populateColorRampSelector, setConfigCountry, COUNTRY_VIEWS, getCountryOutlineCandidates, getCountryPath, getCurrentCountry, SUPPORTED_COUNTRIES } from './layer_config.js';
+import { populateColorRampSelector, setConfigCountry, COUNTRY_VIEWS, getCountryOutlineCandidates, getCountryPath, getCurrentCountry, SUPPORTED_COUNTRIES, LAYER_CONFIG, PILLAR_CONFIG } from './layer_config.js';
 // We only import loadTiff. We handle removal manually to ensure compatibility.
 import { loadTiff } from './zoom-adaptive-tiff-loader.js'; 
 import { WelcomePopup } from './welcome_popup.js';
@@ -16,7 +16,6 @@ let infoPanel = null;
 let map = null;
 let activeLayers = new Set();
 let tiffLayers = {}; // Global TIFF layers storage for proper cleanup
-const ENABLE_STARTUP_WELCOME_POPUP = false; // Keep popup feature but disable auto-show on restart.
 
 // Track async loading states to prevent race conditions
 const loadingTracker = {};
@@ -69,7 +68,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Initialize layer management system
         layerManager = new LayerManager(map, updateLegend, hideLegend);
-        
+        window.switchApplicationCountry = switchApplicationCountry;
+
         // Setup admin labels
         const labelLayers = createAdminLabelLayers(map, layerManager.getActiveLayers().vector, countryOutlines, null);
         layerManager.setLabelLayers(labelLayers);
@@ -80,12 +80,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Setup layer controls (consolidated)
         setupAllLayerControls();
         
-        // Auto-enable SEPI layer and show welcome
+        // Auto-enable SEPI layer (welcome popup disabled on startup)
         setTimeout(() => {
             enableDefaultLayers();
-            if (ENABLE_STARTUP_WELCOME_POPUP) {
-                new WelcomePopup();
-            }
         }, 1000);
         
         // Initialize opacity displays
@@ -363,43 +360,66 @@ function updateLegendBasedOnActiveLayers() {
  */
 
 
+function syncCountrySelectorUi() {
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
+    const currentCountry = getCurrentCountry();
+    sidebar.querySelectorAll('.country-dot-option').forEach((option) => {
+        option.classList.toggle('active', option.dataset.country === currentCountry);
+    });
+}
+
+async function switchApplicationCountry(selectedCountry) {
+    if (!SUPPORTED_COUNTRIES.includes(selectedCountry)) return;
+    if (selectedCountry === getCurrentCountry()) return;
+
+    console.log(`Switching to country: ${selectedCountry}`);
+    setConfigCountry(selectedCountry);
+    document.dispatchEvent(new CustomEvent('countryChanged', { detail: { country: selectedCountry } }));
+    syncCountrySelectorUi();
+
+    clearCountryDependentLayers();
+    layerManager?.resetCountryScopedData();
+
+    const countryView = COUNTRY_VIEWS[selectedCountry] || COUNTRY_VIEWS.Somalia;
+    map.setView(countryView.center, countryView.zoom);
+
+    await loadOutlineWithFallbacks(selectedCountry);
+    await activateDefaultSEPISelection();
+    handleLayerChange();
+}
+
 function setupCountrySelector() {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
 
-    const syncCountrySelectorUI = () => {
-        const currentCountry = getCurrentCountry();
-        sidebar.querySelectorAll('.country-dot-option').forEach(option => {
-            option.classList.toggle('active', option.dataset.country === currentCountry);
-        });
-    };
-
-    // Initial sync and post-render sync for template-injected controls.
-    syncCountrySelectorUI();
-    setTimeout(syncCountrySelectorUI, 0);
+    syncCountrySelectorUi();
+    setTimeout(syncCountrySelectorUi, 0);
 
     sidebar.addEventListener('click', async (event) => {
+        const infoTrigger = event.target.closest('.country-info-trigger');
+        if (infoTrigger && sidebar.contains(infoTrigger)) {
+            if (typeof window.showSEPIInfo === 'function') {
+                window.showSEPIInfo();
+            }
+            return;
+        }
+
         const clickedOption = event.target.closest('.country-dot-option');
         if (!clickedOption || !sidebar.contains(clickedOption)) return;
 
         const selectedCountry = clickedOption.dataset.country;
         if (!selectedCountry || selectedCountry === getCurrentCountry()) return;
 
-        console.log(`Switching to country: ${selectedCountry}`);
-        setConfigCountry(selectedCountry);
-        document.dispatchEvent(new CustomEvent('countryChanged', { detail: { country: selectedCountry } }));
-        syncCountrySelectorUI();
-
-        clearCountryDependentLayers();
-        layerManager?.resetCountryScopedData();
-
-        const countryView = COUNTRY_VIEWS[selectedCountry] || COUNTRY_VIEWS.Somalia;
-        map.setView(countryView.center, countryView.zoom);
-
-        await loadOutlineWithFallbacks(selectedCountry);
-        await activateDefaultSEPISelection();
-        handleLayerChange();
+        await switchApplicationCountry(selectedCountry);
     });
+}
+
+function resetSepiSubpillarSelectionUi() {
+    document.querySelectorAll('.sepi-subpillar-option').forEach((el) => el.classList.remove('active'));
+    document.querySelectorAll('.sepi-subpillars').forEach((el) => el.classList.remove('show'));
+    const conflictYearControl = document.getElementById('conflictYearControl');
+    if (conflictYearControl) conflictYearControl.style.display = 'none';
 }
 
 async function activateDefaultSEPISelection() {
@@ -410,6 +430,8 @@ async function activateDefaultSEPISelection() {
     sepiOptions.forEach(option => option.classList.remove('active'));
     defaultOption.classList.add('active');
     document.querySelector('.sepi-section')?.classList.remove('no-active-layers');
+
+    resetSepiSubpillarSelectionUi();
 
     await layerManager?.handleSEPIOptionChange('main', null);
 }
@@ -629,6 +651,20 @@ function setupAnalysisSidebarResizer() {
         document.addEventListener('mouseup', onMouseUp);
     });
 }
+
+function findLayerConfigByDomId(domId) {
+    for (const cfg of Object.values(LAYER_CONFIG)) {
+        if (cfg && cfg.id === domId) return cfg;
+    }
+    return null;
+}
+
+function getConfigSidebarDescription(domId) {
+    const cfg = findLayerConfigByDomId(domId);
+    const s = cfg?.legend?.description ?? cfg?.description ?? '';
+    return typeof s === 'string' ? s.trim() : '';
+}
+
 /**
  * Update info panel with current layer state
  */
@@ -644,7 +680,8 @@ function updateInfoPanelWithSEPI() {
                 name: getLayerDisplayName(id),
                 type: 'raster',
                 layer: layer,
-                opacity: layer.options?.opacity || 1
+                opacity: layer.options?.opacity || 1,
+                description: getConfigSidebarDescription(id)
             });
         } else {
             infoPanel.removeLayer(id);
@@ -661,7 +698,8 @@ function updateInfoPanelWithSEPI() {
                 type: 'vector',
                 layer: layer,
                 selectedAttribute: selectedAttribute,
-                featureCount: layer.getLayers ? layer.getLayers().length : 0
+                featureCount: layer.getLayers ? layer.getLayers().length : 0,
+                description: getConfigSidebarDescription(id)
             });
         } else {
             infoPanel.removeLayer(id);
@@ -675,7 +713,8 @@ function updateInfoPanelWithSEPI() {
             type: 'sepi',
             layer: layerManager.sepiManager.sepiLayer,
             selectedAttribute: 'peacebuilding_index',
-            featureCount: layerManager.sepiManager.sepiLayer?.getLayers?.()?.length || 0
+            featureCount: layerManager.sepiManager.sepiLayer?.getLayers?.()?.length || 0,
+            description: getConfigSidebarDescription('sepiLayer')
         });
     } else {
         infoPanel.removeLayer('sepi');
@@ -690,13 +729,22 @@ function updateInfoPanelWithSEPI() {
             const displayName = isConflictData 
                 ? `Conflict: ${getPillarDisplayName(currentPillar)}`
                 : `Pillar: ${getPillarDisplayName(currentPillar)}`;
-            
+
+            const pillarCfg = PILLAR_CONFIG[currentPillar];
+            let pillarDescription = pillarCfg?.description || '';
+            if (isConflictData && layerManager.pillarManager?.conflictPooledScale) {
+                const note =
+                    'Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).';
+                pillarDescription = pillarDescription ? `${pillarDescription} ${note}` : note;
+            }
+
             infoPanel.addLayer(layerType, {
                 name: displayName,
                 type: layerType,
                 layer: layerManager.pillarManager.getCurrentLayer(),
                 selectedAttribute: currentPillar,
-                featureCount: layerManager.pillarManager.getCurrentLayer()?.getLayers?.()?.length || 0
+                featureCount: layerManager.pillarManager.getCurrentLayer()?.getLayers?.()?.length || 0,
+                description: pillarDescription
             });
         }
     } else {
