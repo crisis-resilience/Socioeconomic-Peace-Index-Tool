@@ -1,7 +1,22 @@
-// admin_labels.js - Fixed to properly show district labels from ADM2_EN
+// admin_labels.js — Map control labels + outline dropdown can switch active country
 
 import { basemaps, basemapOptions } from './basemaps.js';
-import { LAYER_CONFIG } from './layer_config.js';
+import {
+    LAYER_CONFIG,
+    getCountryPath,
+    getCurrentCountry,
+    getSepiDistrictGeoJSONPathForAdm1Labels
+} from './layer_config.js';
+
+/** Outline `<select>` value → app country strings (`setConfigCountry`). */
+const OUTLINE_SELECT_VALUE_TO_APP_COUNTRY = Object.freeze({
+    somalia: 'Somalia',
+    kenya: 'Kenya',
+    south_sudan: 'South_Sudan'
+});
+
+/** Invalidates in-flight ADM1 label fetches after country switches */
+let adm1LabelFetchGeneration = 0;
 
 /**
  * Create label layers for administrative boundaries and combined control panel
@@ -12,10 +27,8 @@ import { LAYER_CONFIG } from './layer_config.js';
  * @returns {Object} - Object containing label layers
  */
 export function createAdminLabelLayers(map, vectorLayers, countryOutlines, compareMap) {
-    // Initialize label layers container
     const labelLayers = {
-        adm1: L.layerGroup(),
-        adm2: L.layerGroup()
+        adm1: L.layerGroup()
     };
     
     // Remove the default zoom control since we're using the top-left corner
@@ -58,11 +71,9 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
             // Add outline options
             addOutlineOptions(outlineSelect);
             
-            // Add ADM1 button (Regions)
-            const adm1Button = createButton('Show Regions', contentContainer);
-            
-            // Add ADM2 button (Districts) 
-            const adm2Button = createButton('Show Districts', contentContainer);
+            const showLabelsButton = createButton('Show labels', contentContainer);
+            showLabelsButton.title =
+                'Show ADM1 (first-level admin) region names for the current country';
             
             // Map Basemaps Section
             const leftMapLabel = L.DomUtil.create('label', 'basemap-label', contentContainer);
@@ -104,23 +115,47 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
                 }
             });
             
-            // Set click handlers for features
             L.DomEvent.on(outlineSelect, 'change', function(e) {
                 L.DomEvent.preventDefault(e);
                 L.DomEvent.stopPropagation(e);
-                toggleCountryOutline(this.value, map, countryOutlines);
+
+                const value = this.value;
+                const appCountry = OUTLINE_SELECT_VALUE_TO_APP_COUNTRY[value];
+
+                if (
+                    appCountry &&
+                    typeof window.switchApplicationCountry === 'function' &&
+                    getCurrentCountry() !== appCountry
+                ) {
+                    void window.switchApplicationCountry(appCountry);
+                    return;
+                }
+
+                toggleCountryOutline(value, map, countryOutlines);
             });
-            
-            L.DomEvent.on(adm1Button, 'click', function(e) {
+
+            L.DomEvent.on(showLabelsButton, 'click', function(e) {
                 L.DomEvent.preventDefault(e);
                 L.DomEvent.stopPropagation(e);
-                toggleLabels('adm1', adm1Button, labelLayers, map);
+                toggleAdm1Labels(showLabelsButton, labelLayers, map);
             });
-            
-            L.DomEvent.on(adm2Button, 'click', function(e) {
-                L.DomEvent.preventDefault(e);
-                L.DomEvent.stopPropagation(e);
-                toggleLabels('adm2', adm2Button, labelLayers, map);
+
+            document.addEventListener('countryChanged', () => {
+                const wantLabels =
+                    map.hasLayer(labelLayers.adm1) || showLabelsButton.classList.contains('active');
+                labelLayers.adm1.clearLayers();
+                if (map.hasLayer(labelLayers.adm1)) {
+                    map.removeLayer(labelLayers.adm1);
+                }
+                if (!wantLabels) return;
+                loadAdm1LabelsForCurrentCountry(labelLayers.adm1)
+                    .then(() => {
+                        if (!showLabelsButton.classList.contains('active')) return;
+                        labelLayers.adm1.addTo(map);
+                    })
+                    .catch((err) =>
+                        console.error('ADM1 labels reload after country change failed:', err)
+                    );
             });
             
             // Set event handler for left map
@@ -256,166 +291,223 @@ function createButton(text, container) {
     return button;
 }
 
+function pickAdm1Name(properties) {
+    if (!properties) return '';
+    const candidateKeys = [
+        'ADM1_EN',
+        'NAME_1',
+        'name_1',
+        'Adm_1_Name',
+        'admin1_name',
+        'REGION',
+        'Region',
+        'ADM1NAME'
+    ];
+    for (const key of candidateKeys) {
+        const v = properties[key];
+        if (typeof v === 'string' && v.trim()) return v.trim();
+    }
+    return '';
+}
+
+function adm1GroupKey(properties) {
+    const gid = properties?.GID_1 ?? properties?.gid_1 ?? properties?.adm1_gid ?? properties?.ADM1_CODE;
+    if (gid != null && String(gid).trim() !== '') {
+        return `gid:${String(gid).trim()}`;
+    }
+    const name = pickAdm1Name(properties);
+    return name ? `nm:${name.toLowerCase()}` : '';
+}
+
+function centroidFromGeoJSONFeature(feature) {
+    const geo = feature?.geometry;
+    if (!geo) return null;
+
+    if (geo.type === 'Polygon') {
+        return calculatePolygonCentroid(geo.coordinates[0]);
+    }
+    if (geo.type === 'MultiPolygon') {
+        let largestRing = geo.coordinates[0]?.[0];
+        let largestArea = 0;
+        for (const polygon of geo.coordinates) {
+            const ring = polygon[0];
+            const area = calculatePolygonArea(ring);
+            if (area > largestArea) {
+                largestArea = area;
+                largestRing = ring;
+            }
+        }
+        return calculatePolygonCentroid(largestRing);
+    }
+    return null;
+}
+
+function averageCentroids(points) {
+    if (!points.length) return null;
+    let lat = 0;
+    let lng = 0;
+    for (const p of points) {
+        lat += p.lat;
+        lng += p.lng;
+    }
+    return { lat: lat / points.length, lng: lng / points.length };
+}
+
+function adm1Marker(center, htmlName) {
+    return L.marker([center.lat, center.lng], {
+        icon: L.divIcon({
+            className: 'admin-label-icon',
+            html: `<div class="admin-label adm1-label">${htmlName}</div>`,
+            iconSize: [120, 25],
+            iconAnchor: [60, 12]
+        }),
+        interactive: false
+    });
+}
+
+function escapeHtmlLite(s) {
+    return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+function addAdm1MarkersGroupedFromDistrictGeoJSON(geojsonData, labelLayer) {
+    labelLayer.clearLayers();
+    const groups = new Map();
+
+    if (!geojsonData?.features?.length) {
+        console.warn('ADM1 labels: GeoJSON has no features');
+        return;
+    }
+
+    for (const feature of geojsonData.features) {
+        const props = feature.properties || {};
+        const key = adm1GroupKey(props);
+        if (!key) continue;
+        const c = centroidFromGeoJSONFeature(feature);
+        if (!c) continue;
+        const nm = pickAdm1Name(props);
+        let entry = groups.get(key);
+        if (!entry) {
+            entry = { name: nm || key, centers: [] };
+            groups.set(key, entry);
+        }
+        entry.centers.push(c);
+        if (nm) entry.name = nm;
+    }
+
+    let n = 0;
+    for (const [_k, entry] of groups) {
+        const center = averageCentroids(entry.centers);
+        if (!center) continue;
+        labelLayer.addLayer(adm1Marker(center, escapeHtmlLite(entry.name)));
+        n++;
+    }
+    console.log(`ADM1 labels: ${n} regions (grouped from district GeoJSON)`);
+}
+
+function addAdm1MarkersDirectFromGeoJSON(geojsonData, labelLayer) {
+    labelLayer.clearLayers();
+    if (!geojsonData?.features?.length) return;
+
+    let labelsGenerated = 0;
+    for (const feature of geojsonData.features) {
+        const props = feature.properties || {};
+        const name = pickAdm1Name(props) || props.NAME_1;
+        if (!name) continue;
+        const center = centroidFromGeoJSONFeature(feature);
+        if (!center) continue;
+        labelLayer.addLayer(adm1Marker(center, escapeHtmlLite(name)));
+        labelsGenerated++;
+    }
+    console.log(`ADM1 labels: ${labelsGenerated} features (ADM1 polygons)`);
+}
+
+async function fetchGeoJSON(url) {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+    }
+    return response.json();
+}
+
 /**
- * Toggle the visibility of labels for an admin level
- * @param {string} level - Admin level (adm1 or adm2)
- * @param {HTMLElement} button - Button element that triggered the toggle
- * @param {Object} labelLayers - Label layer groups
- * @param {Object} map - Leaflet map instance
+ * Populate `labelLayer` with ADM1 names for the active config country — SEPI districts first,
+ * then `adm1_subnational_statistics` if grouping yields nothing.
  */
-function toggleLabels(level, button, labelLayers, map) {
+function loadAdm1LabelsForCurrentCountry(labelLayer) {
+    const fetchId = ++adm1LabelFetchGeneration;
+    const stillValid = () => fetchId === adm1LabelFetchGeneration;
+
+    const sepiUrl = getSepiDistrictGeoJSONPathForAdm1Labels();
+    const fallbackUrl =
+        typeof LAYER_CONFIG.admin1?.url === 'function'
+            ? LAYER_CONFIG.admin1.url()
+            : LAYER_CONFIG.admin1?.url;
+
+    labelLayer.clearLayers();
+
+    const runFallback = () => {
+        if (!fallbackUrl) {
+            console.warn(`ADM1 labels: no fallback URL (${getCurrentCountry()})`);
+            return Promise.resolve();
+        }
+        return fetchGeoJSON(fallbackUrl).then((data) => {
+            if (!stillValid()) return;
+            addAdm1MarkersDirectFromGeoJSON(data, labelLayer);
+        });
+    };
+
+    if (!sepiUrl) return runFallback();
+
+    return fetchGeoJSON(sepiUrl)
+        .then((data) => {
+            if (!stillValid()) return;
+            addAdm1MarkersGroupedFromDistrictGeoJSON(data, labelLayer);
+            if (labelLayer.getLayers().length === 0) {
+                return runFallback();
+            }
+        })
+        .catch((err) => {
+            console.warn('ADM1 labels: SEPI bundle fetch failed, trying admin1:', err);
+            return runFallback();
+        });
+}
+
+function toggleAdm1Labels(button, labelLayers, map) {
     const isActive = button.classList.contains('active');
-    
+
     if (isActive) {
-        // Turn off labels
         button.classList.remove('active');
         button.style.backgroundColor = '#f8f8f8';
         button.style.fontWeight = 'normal';
-        
-        map.removeLayer(labelLayers[level]);
-    } else {
-        // Turn on labels
-        button.classList.add('active');
-        button.style.backgroundColor = '#d4edda';
-        button.style.fontWeight = 'bold';
-        
-        // Check if labels are already generated
-        if (labelLayers[level].getLayers().length === 0) {
-            // Labels not yet generated, load the data and generate them
-            loadAndGenerateLabels(level, labelLayers[level], map);
-        }
-        
-        labelLayers[level].addTo(map);
-    }
-}
-
-/**
- * FIXED: Load and generate labels for admin boundaries with correct file paths and field names
- * @param {string} level - Admin level (adm1 or adm2)
- * @param {Object} labelLayer - Label layer group to add markers to
- * @param {Object} map - Leaflet map instance
- */
-function loadAndGenerateLabels(level, labelLayer, map) {
-    // Resolve admin boundary files from country-aware layer config.
-    const adm1Url = typeof LAYER_CONFIG.admin1?.url === 'function' ? LAYER_CONFIG.admin1.url() : LAYER_CONFIG.admin1?.url;
-    const adm2Url = typeof LAYER_CONFIG.admin2?.url === 'function' ? LAYER_CONFIG.admin2.url() : LAYER_CONFIG.admin2?.url;
-    const url = level === 'adm1' ? adm1Url : adm2Url;
-    
-    console.log(`Loading ${level} labels from: ${url}`);
-    
-    // Fetch the GeoJSON file directly
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log(`${level} data loaded successfully:`, data);
-            generateLabelsFromData(data, level, labelLayer);
-        })
-        .catch(error => {
-            console.error(`Error loading ${level} data:`, error);
-            // Show user-friendly error message
-            alert(`Could not load ${level} labels. Please check that the file ${url} exists.`);
-        });
-}
-
-/**
- * FIXED: Generate labels from GeoJSON data with correct field names
- * @param {Object} geojsonData - GeoJSON data object
- * @param {string} level - Admin level (adm1 or adm2)
- * @param {Object} labelLayer - Label layer group to add markers to
- */
-function generateLabelsFromData(geojsonData, level, labelLayer) {
-    // Clear existing labels
-    labelLayer.clearLayers();
-    
-    // FIXED: Use correct field names for each level
-    const nameField = level === 'adm1' ? 'NAME_1' : 'ADM2_EN'; // ADM1 uses NAME_1, ADM2 uses ADM2_EN
-    
-    console.log(`Generating ${level} labels using field: ${nameField}`);
-    
-    if (!geojsonData.features || geojsonData.features.length === 0) {
-        console.error(`No features found in ${level} data`);
+        map.removeLayer(labelLayers.adm1);
         return;
     }
-    
-    // Debug: Check what fields are available in the first feature
-    if (geojsonData.features[0]?.properties) {
-        console.log(`Available fields in ${level} data:`, Object.keys(geojsonData.features[0].properties));
-    }
-    
-    let labelsGenerated = 0;
-    
-    try {
-        geojsonData.features.forEach(feature => {
-            if (!feature.properties) {
-                console.warn('Feature missing properties:', feature);
-                return;
-            }
-            
-            const name = feature.properties[nameField];
-            if (!name) {
-                console.warn(`Missing ${nameField} field in feature:`, feature.properties);
-                return;
-            }
-            
-            // Calculate center point for label placement
-            let center;
-            if (feature.geometry.type === 'Polygon') {
-                // For polygon, calculate centroid
-                center = calculatePolygonCentroid(feature.geometry.coordinates[0]);
-            } else if (feature.geometry.type === 'MultiPolygon') {
-                // For multipolygon, use centroid of largest polygon
-                let largestPolygon = feature.geometry.coordinates[0];
-                let largestArea = 0;
-                
-                feature.geometry.coordinates.forEach(polygon => {
-                    const area = calculatePolygonArea(polygon[0]);
-                    if (area > largestArea) {
-                        largestArea = area;
-                        largestPolygon = polygon;
-                    }
-                });
-                
-                center = calculatePolygonCentroid(largestPolygon[0]);
-            } else {
-                console.warn('Unsupported geometry type:', feature.geometry.type);
-                return;
-            }
-            
-            if (!center) {
-                console.warn('Could not calculate center for feature:', name);
-                return;
-            }
-            
-            // Create a marker with a label
-            const marker = L.marker([center.lat, center.lng], {
-                icon: L.divIcon({
-                    className: 'admin-label-icon',
-                    html: `<div class="admin-label ${level}-label">${name}</div>`,
-                    iconSize: level === 'adm1' ? [120, 25] : [100, 20], // Slightly larger for regions
-                    iconAnchor: level === 'adm1' ? [60, 12] : [50, 10]
-                }),
-                interactive: false // Prevent the label from being clickable
+
+    button.classList.add('active');
+    button.style.backgroundColor = '#d4edda';
+    button.style.fontWeight = 'bold';
+
+    if (labelLayers.adm1.getLayers().length === 0) {
+        loadAdm1LabelsForCurrentCountry(labelLayers.adm1)
+            .then(() => {
+                if (button.classList.contains('active')) {
+                    labelLayers.adm1.addTo(map);
+                }
+            })
+            .catch((err) => {
+                console.error('ADM1 labels load failed:', err);
+                button.classList.remove('active');
+                button.style.backgroundColor = '#f8f8f8';
+                button.style.fontWeight = 'normal';
             });
-            
-            labelLayer.addLayer(marker);
-            labelsGenerated++;
-        });
-        
-        console.log(`✓ Generated ${labelsGenerated} ${level} labels successfully`);
-        
-        if (labelsGenerated === 0) {
-            alert(`No labels could be generated for ${level}. Check the console for details.`);
-        }
-        
-    } catch (err) {
-        console.error(`Error generating ${level} labels:`, err);
-        alert(`Error generating ${level} labels: ${err.message}`);
+        return;
     }
+
+    labelLayers.adm1.addTo(map);
 }
 
 /**
@@ -539,59 +631,30 @@ export async function loadCountryOutline(countryId, filepath) {
 }
 
 /**
- * Generate labels for admin boundaries - used when vector layers are loaded
- * This is called from layer_controls.js when a vector layer is activated
- * @param {Object} layer - GeoJSON layer with admin boundaries
- * @param {string} level - Admin level (adm1 or adm2)
- * @param {Object} labelLayer - Label layer group to add markers to
+ * Generate labels for admin boundaries — ADM1 only (LayerManager refreshes markers when Admin 1 stats load).
  */
 export function generateAdminLabels(layer, level, labelLayer) {
-    // Clear existing labels
     labelLayer.clearLayers();
-    
-    // FIXED: Use correct field names
-    const nameField = level === 'adm1' ? 'NAME_1' : 'ADM2_EN';
-    
-    if (!layer || !layer.getLayers) {
-        console.error("Invalid layer provided to generateAdminLabels");
+    if (level !== 'adm1') return;
+
+    if (!layer?.getLayers) {
+        console.error('Invalid layer provided to generateAdminLabels');
         return;
     }
-    
-    console.log(`Generating ${level} labels from loaded layer using field: ${nameField}`);
-    
+
     let labelsGenerated = 0;
-    
     try {
-        layer.eachLayer(function(featureLayer) {
-            if (!featureLayer.feature || !featureLayer.feature.properties) return;
-            
-            const name = featureLayer.feature.properties[nameField];
-            if (!name) {
-                console.warn(`Missing ${nameField} in feature:`, featureLayer.feature.properties);
-                return;
-            }
-            
-            // Get the center of the polygon for label placement
+        layer.eachLayer(function (featureLayer) {
+            const props = featureLayer.feature?.properties;
+            const name = pickAdm1Name(props) || props?.NAME_1;
+            if (!name) return;
             const bounds = featureLayer.getBounds();
             const center = bounds.getCenter();
-            
-            // Create a marker with a label
-            const marker = L.marker(center, {
-                icon: L.divIcon({
-                    className: 'admin-label-icon',
-                    html: `<div class="admin-label ${level}-label">${name}</div>`,
-                    iconSize: level === 'adm1' ? [120, 25] : [100, 20],
-                    iconAnchor: level === 'adm1' ? [60, 12] : [50, 10]
-                }),
-                interactive: false // Prevent the label from being clickable
-            });
-            
-            labelLayer.addLayer(marker);
+            labelLayer.addLayer(adm1Marker(center, escapeHtmlLite(name)));
             labelsGenerated++;
         });
-        
-        console.log(`✓ Generated ${labelsGenerated} ${level} labels from loaded layer`);
+        console.log(`ADM1 labels: ${labelsGenerated} markers from loaded admin1 vector layer`);
     } catch (err) {
-        console.error(`Error generating ${level} labels:`, err);
+        console.error('Error generating adm1 labels from vector layer:', err);
     }
 }

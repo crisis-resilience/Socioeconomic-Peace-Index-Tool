@@ -35,7 +35,6 @@ export function updateSEPILegend() {
     
     legend.innerHTML = `
         <h4>Socioeconomic Peace Index (SEPI)</h4>
-        <p>Peace level indicators by district</p>
         <div class="color-scheme">
             <p>SEPI Score Ranges:</p>
             <div class="color-boxes">
@@ -105,10 +104,9 @@ export function updateLegend(layerName, colorScheme, description, labels) {
         }
     }
 
-    // Build legend content
+    // Descriptions live in the Active Layers sidebar (config still passes description for future use).
     legend.innerHTML = `
         <h4>${layerName}</h4>
-        <p>${description}</p>
         <div class="color-scheme">
             <p>Color Scheme:</p>
             <div class="color-boxes">

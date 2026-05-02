@@ -48,6 +48,20 @@ export class LayerManager {
         this.setupOpacityControls();
         this.setupAttributeControls();
         this.setupCombinedSEPIEventListeners();
+        this.attachMapChoroplethHoverSafetyOnce();
+    }
+
+    attachMapChoroplethHoverSafetyOnce() {
+        if (this._mapPointerLeaveBound) return;
+        this._mapPointerLeaveBound = true;
+        this.map?.getContainer?.()?.addEventListener('pointerleave', () => {
+            try {
+                this.sepiManager?.clearHoverArtifacts?.();
+                this.pillarManager?.clearHoverArtifacts?.();
+            } catch (_e) {
+                // ignore
+            }
+        });
     }
 
     /**
@@ -68,6 +82,7 @@ export class LayerManager {
 
             this.pillarManager.setConflictYear(year);
             await this.pillarManager.switchPillar(currentPillar);
+            this.applySepiCombinedOpacityFromSlider();
         });
         
         // Listen for SEPI opacity changes
@@ -97,10 +112,19 @@ export class LayerManager {
                 // Load conflict data
                 await this.loadConflictLayer(pillarId);
             }
-            
+
+            this.applySepiCombinedOpacityFromSlider();
         } catch (error) {
             console.error(`Error handling SEPI option change:`, error);
         }
+    }
+
+    applySepiCombinedOpacityFromSlider() {
+        const slider = document.getElementById('sepiOpacity');
+        if (!slider) return;
+        const raw = parseFloat(slider.value);
+        const opacity = Number.isFinite(raw) ? raw : 0.7;
+        this.updateSEPIOpacity(opacity);
     }
 
     /**
@@ -215,6 +239,9 @@ export class LayerManager {
                 layer.addTo(this.map);
                 this.activeLayers.add(key);
                 console.log(`Layer ${config.name} loaded successfully`);
+                if (config.type === 'sepi') {
+                    this.applySepiCombinedOpacityFromSlider();
+                }
             }
             
         } catch (error) {
@@ -234,8 +261,6 @@ export class LayerManager {
             
             if (key === 'admin1' && this.labelLayers) {
                 generateAdminLabels(this.layers.vector[key], 'adm1', this.labelLayers.adm1);
-            } else if (key === 'admin2' && this.labelLayers) {
-                generateAdminLabels(this.layers.vector[key], 'adm2', this.labelLayers.adm2);
             }
         }
         
@@ -601,70 +626,124 @@ export class SimplifiedPillarManager {
             console.error(`Error loading indicator ${pillarId}:`, error);
         }
     }
-    
+
+    clearHoverArtifacts() {
+        if (!this.currentLayer?.eachLayer) return;
+        this.currentLayer.eachLayer((lyr) => {
+            try {
+                lyr.closeTooltip?.();
+                this.currentLayer.resetStyle(lyr);
+            } catch (_e) {
+                // detached path
+            }
+        });
+    }
+
+    getDistrictDisplayName(properties) {
+        const p = properties || {};
+        const name =
+            p.ADM1_EN ||
+            p.NAME_1 ||
+            p.admin1_name ||
+            p.region ||
+            p.district ||
+            null;
+        return typeof name === 'string' && name.trim() ? name.trim() : 'Unknown District';
+    }
+
+    buildIndicatorTooltipHtml(config, districtName, value, isConflictData) {
+        const decimals =
+            isConflictData ? (this.currentPillarId?.includes('_per_1k') ? 3 : 0) : 2;
+        const num = value !== undefined ? Number(value) : NaN;
+        const scoreText = Number.isFinite(num) ? num.toFixed(decimals) : 'No data';
+        const metric = typeof config?.name === 'string' ? config.name : 'Indicator';
+        return `
+            <div style="text-align: center; font-family: Calibri, sans-serif;">
+                <strong>${districtName}</strong><br>
+                <span style="font-weight: bold;">${metric}: ${scoreText}</span>
+            </div>
+        `;
+    }
+
     async createIndicatorLayer(pillarId, config) {
         const data = this.pillarsData;
-        
-        // Determine if this is conflict data
+
         const isConflictData = pillarId.startsWith('conflict_');
-        
-        return L.geoJSON(data, {
+
+        let indicatorLayer;
+        indicatorLayer = L.geoJSON(data, {
             style: (feature) => {
                 const value = this.getFeatureValue(feature, this.currentPropertyName);
-                return ({
-                fillColor: isConflictData 
-                    ? this.getConflictColorDynamic(value)
-                    : getPillarColorForPolarity(value, config.polarity ?? 1),
-                weight: 2,
-                opacity: 1,
-                color: '#ffffff',
-                fillOpacity: 0.7
-                });
+                return {
+                    fillColor: isConflictData
+                        ? this.getConflictColorDynamic(value)
+                        : getPillarColorForPolarity(value, config.polarity ?? 1),
+                    weight: 2,
+                    opacity: 1,
+                    color: '#ffffff',
+                    fillOpacity: 0.7
+                };
             },
             onEachFeature: (feature, layer) => {
                 layer.getElement()?.setAttribute('data-pillar', 'true');
-                
+
                 const value = this.getFeatureValue(feature, this.currentPropertyName);
-                const district = feature.properties.ADM1_EN || feature.properties.NAME_1 || 'Unknown District';
-                const conflictDecimals = this.currentPillarId?.includes('_per_1k') ? 3 : 0;
-                
-                // Updated to use SEPI-style popup
-                layer.bindPopup(this.createIndicatorPopup(config, feature.properties, district, value, isConflictData), {
-                    minWidth: 360,
-                    maxWidth: 450,
-                    className: 'sepi-popup', // Using SEPI popup class for consistent styling
-                    autoPan: true,
-                    autoPanPadding: L.point(50, 50),
-                    offset: L.point(20, 0)
-                });
-                
-                layer.bindTooltip(`${config.name}: ${value !== undefined ? Number(value).toFixed(isConflictData ? conflictDecimals : 2) : 'No data'}`, {
-                    permanent: false,
-                    direction: 'auto',
-                    className: 'sepi-tooltip' // Using SEPI tooltip class
-                });
-                
+                const district = this.getDistrictDisplayName(feature.properties);
+
+                layer.bindPopup(
+                    this.createIndicatorPopup(config, feature.properties, district, value, isConflictData),
+                    {
+                        minWidth: 360,
+                        maxWidth: 450,
+                        className: 'sepi-popup',
+                        autoPan: true,
+                        autoPanPadding: L.point(50, 50),
+                        offset: L.point(20, 0)
+                    }
+                );
+
+                layer.bindTooltip(
+                    this.buildIndicatorTooltipHtml(config, district, value, isConflictData),
+                    {
+                        permanent: false,
+                        direction: 'auto',
+                        className: 'sepi-tooltip'
+                    }
+                );
+
                 layer.on({
                     mouseover: (e) => {
-                        if (!e?.target?.setStyle) return;
-                        e.target.setStyle({
+                        const path = e.target;
+                        if (!path?.setStyle) return;
+                        indicatorLayer.eachLayer((lyr) => {
+                            if (lyr === path) return;
+                            try {
+                                lyr.closeTooltip?.();
+                                indicatorLayer.resetStyle(lyr);
+                            } catch (_err) {}
+                        });
+                        path.bringToFront?.();
+                        path.setStyle({
                             weight: 4,
                             color: '#2c5f2d',
                             fillOpacity: 0.9
                         });
                     },
                     mouseout: (e) => {
-                        if (!this.currentLayer?.resetStyle || !e?.target) return;
+                        if (!indicatorLayer?.resetStyle || !e?.target) return;
                         try {
-                            this.currentLayer.resetStyle(e.target);
+                            indicatorLayer.resetStyle(e.target);
                         } catch (err) {
-                            // Layer can be replaced/removed while hover events are still in flight.
-                            console.debug('Skipped indicator resetStyle on detached feature:', err);
+                            console.debug(
+                                'Skipped indicator resetStyle on detached feature:',
+                                err
+                            );
                         }
                     }
                 });
             }
         });
+        return indicatorLayer;
     }
 
     /**

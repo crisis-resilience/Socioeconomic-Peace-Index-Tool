@@ -93,8 +93,8 @@ export const basemapOptions = [
     { value: 'openTopoMap', label: 'OpenTopoMap' },
     { value: 'osmHOT', label: 'Humanitarian' },
     { value: 'mapboxStreets', label: 'Mapbox Streets' },
-    { value: 'stadiaMaps', label: 'Stadia Maps' },
-    { value: 'stadiaMapsDark', label: 'Stadia Maps Dark' },
+    // { value: 'stadiaMaps', label: 'Stadia Maps' },
+    // { value: 'stadiaMapsDark', label: 'Stadia Maps Dark' },
     { value: 'thunderforestLandscape', label: 'Thunderforest Landscape' }
 ];
 

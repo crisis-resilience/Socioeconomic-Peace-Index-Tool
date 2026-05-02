@@ -1,5 +1,14 @@
 // info_panel.js - Updated with SEPI integration and correlation analysis
 
+function escapeHtml(text) {
+    if (text == null) return '';
+    return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 /**
  * InfoPanel class - Creates and manages a floating info/analysis panel
  */
@@ -628,17 +637,26 @@ export class InfoPanel {
             return;
         }
         
-        const layersHTML = Array.from(this.activeLayers.values()).map(layer => `
-            <div class="layer-item" data-layer-id="${layer.id}">
+        const layersHTML = Array.from(this.activeLayers.values())
+            .map((layer) => {
+                const desc =
+                    layer.description && String(layer.description).trim()
+                        ? `<div class="layer-description">${escapeHtml(layer.description)}</div>`
+                        : '';
+                return `
+            <div class="layer-item" data-layer-id="${escapeHtml(layer.id)}">
                 <div class="layer-header">
-                    <span class="layer-name">${layer.name}</span>
-                    <span class="layer-type">${layer.type}</span>
+                    <span class="layer-name">${escapeHtml(layer.name)}</span>
+                    <span class="layer-type">${escapeHtml(layer.type)}</span>
                 </div>
+                ${desc}
                 <div class="layer-details">
                     ${this.generateLayerDetails(layer)}
                 </div>
             </div>
-        `).join('');
+        `;
+            })
+            .join('');
         
         layersList.innerHTML = layersHTML;
     }
@@ -666,7 +684,8 @@ export class InfoPanel {
             details.push(`Color Scheme: ${layer.colorRamp}`);
         }
         
-        return details.length > 0 ? details.join(' • ') : 'Layer active';
+        if (details.length === 0) return 'Layer active';
+        return details.map((d) => escapeHtml(d)).join(' • ');
     }
     
     /**
