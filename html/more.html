@@ -18,6 +18,11 @@
             overflow-x: hidden !important;
         }
 
+        #navbar {
+            height: auto !important;
+            flex-shrink: 0;
+        }
+
         /* Ensure the content container allows scrolling */
         .content-container {
             min-height: 100vh;
@@ -143,18 +148,29 @@
     </style>
 </head>
 <body>
-    <!-- Top Navigation Bar - Same as main page -->
     <nav id="navbar">
-        <div class="navbar-logo navbar-logo-left">
-            <img src="../assets/sdgai.png" alt="SDG AI Logo" class="logo-image">
-        </div>
-        <ul class="navbar-menu">
-            <li><a href="../index.html" class="larger-nav-link">Map</a></li>
-            <li><a href="about.html" class="larger-nav-link">About Us</a></li>
-            <li><a href="more.html" class="larger-nav-link">More Information</a></li>
-        </ul>
-        <div class="navbar-logo navbar-logo-right">
-            <img src="../assets/undp_logo.png" alt="UNDP Logo" class="logo-image">
+        <div class="navbar-inner">
+            <div class="navbar-cluster-left">
+                <div class="navbar-logo">
+                    <img src="../assets/pigeon2.png" alt="SDG AI Lab" class="logo-image_left">
+                </div>
+                <div class="navbar-logo">
+                    <img src="../assets/icpsd_logo.png" alt="ICPSD" class="logo-image_left">
+                </div>
+            </div>
+            <div class="navbar-center">
+                <h2 class="tool-title">Socioeconomic Peace Index Tool</h2>
+                <ul class="navbar-menu">
+                    <li><a href="../index.html" class="larger-nav-link">Map</a></li>
+                    <li><a href="more.html" class="larger-nav-link nav-link-current" aria-current="page">More</a></li>
+                    <li><a href="about.html" class="larger-nav-link">About Us</a></li>
+                </ul>
+            </div>
+            <div class="navbar-cluster-right">
+                <div class="navbar-logo">
+                    <img src="../assets/undp_logo.png" alt="UNDP" class="logo-image_right">
+                </div>
+            </div>
         </div>
     </nav>
 

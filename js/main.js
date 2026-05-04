@@ -22,6 +22,9 @@ const loadingTracker = {};
 let activeCountryOutline = null;
 const countryOutlines = {};
 
+/** `sidebarInitialized` can fire while this module is still awaiting outline preload — avoid double load. */
+let initialSepiActivationDone = false;
+
 function resolveConfigUrl(pathOrResolver) {
     return typeof pathOrResolver === 'function' ? pathOrResolver() : pathOrResolver;
 }
@@ -70,18 +73,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         layerManager = new LayerManager(map, updateLegend, hideLegend);
         window.switchApplicationCountry = switchApplicationCountry;
 
-        /** Sidebar HTML + controls are built in `index.html` (second DOMContentLoaded handler).
-         * Fire-and-forget timeouts race LayerManager + fetch on slow hosts (e.g. GitHub Pages). */
-        document.addEventListener(
-            'sidebarInitialized',
-            () => {
-                void activateDefaultSEPISelection().catch((err) =>
-                    console.error('Initial Somalia / SEPI activation failed:', err)
-                );
-            },
-            { once: true }
-        );
-
         // Setup admin labels
         const labelLayers = createAdminLabelLayers(map, layerManager.getActiveLayers().vector, countryOutlines, null);
         layerManager.setLabelLayers(labelLayers);
@@ -91,6 +82,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         // Setup layer controls (consolidated)
         setupAllLayerControls();
+
+        /** SEPI default (Somalia): `index.html` dispatches `sidebarInitialized` from its DOMContentLoaded.
+         * This handler runs async and awaits outline preload first, so that event often fires *before*
+         * we could register a listener — then no SEPI layer loads. Re-run if sidebar is already built. */
+        scheduleInitialSepiActivation();
         
         // Auto-enable SEPI layer (welcome popup disabled on startup)
         setTimeout(() => {
@@ -432,6 +428,20 @@ function resetSepiSubpillarSelectionUi() {
     document.querySelectorAll('.sepi-subpillars').forEach((el) => el.classList.remove('show'));
     const conflictYearControl = document.getElementById('conflictYearControl');
     if (conflictYearControl) conflictYearControl.style.display = 'none';
+}
+
+function scheduleInitialSepiActivation() {
+    const run = () => {
+        if (initialSepiActivationDone) return;
+        initialSepiActivationDone = true;
+        void activateDefaultSEPISelection().catch((err) =>
+            console.error('Initial Somalia / SEPI activation failed:', err)
+        );
+    };
+    document.addEventListener('sidebarInitialized', run, { once: true });
+    if (document.querySelector('.sepi-option[data-sepi-type="main"]')) {
+        run();
+    }
 }
 
 async function activateDefaultSEPISelection() {

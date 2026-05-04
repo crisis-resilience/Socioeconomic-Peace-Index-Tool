@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - DSVI Data Visualization</title>
+    <title>About Us - Socioeconomic Peace Index Tool</title>
     
     <!-- CSS styles -->
     <link rel="stylesheet" href="../css/styles.css">
     
-    <meta name="description" content="About the DSVI Data Visualization tool and team">
+    <meta name="description" content="About the Socioeconomic Peace Index Tool and team">
     
     <!-- Additional styles for content pages -->
     <style>
@@ -16,6 +16,12 @@
             height: auto !important;
             overflow: auto !important;
             overflow-x: hidden !important;
+        }
+
+        /* Match map app: compact bar; global #navbar uses height:10% which breaks with body height:auto */
+        #navbar {
+            height: auto !important;
+            flex-shrink: 0;
         }
 
         /* Ensure the content container allows scrolling */
@@ -50,25 +56,50 @@
         }
         
         .team-members {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 28px;
         }
         
         .team-member {
-            flex: 0 0 calc(33.333% - 30px);
-            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
             background: #f8f9fa;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        
-        .team-member img {
+
+        /* Portrait (vertical) frame for photos */
+        .team-member-photo-wrap {
+            aspect-ratio: 3 / 4;
             width: 100%;
-            height: 200px;
-            object-fit: scale-down;
+            overflow: hidden;
+            background: #e9ecef;
+            flex-shrink: 0;
+        }
+        
+        .team-member-photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 22%;
+            display: block;
+        }
+
+        .team-member-placeholder-figure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(165deg, #e9ecef 0%, #ced4da 100%);
+        }
+
+        .team-member-placeholder-initials {
+            font-size: clamp(2rem, 8vw, 3rem);
+            font-weight: 600;
+            color: #6c757d;
+            letter-spacing: 0.04em;
+            user-select: none;
         }
         
         .team-member-info {
@@ -85,131 +116,134 @@
             margin-bottom: 10px;
         }
         
-        @media (max-width: 992px) {
-            .team-member {
-                flex: 0 0 calc(50% - 20px);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .team-member {
-                flex: 0 0 100%;
+        @media (max-width: 600px) {
+            .team-members {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Top Navigation Bar - Same as main page -->
     <nav id="navbar">
-        <div class="navbar-logo navbar-logo-left">
-            <img src="../assets/sdgai.png" alt="SDG AI Logo" class="logo-image">
-        </div>
-        <ul class="navbar-menu">
-            <li><a href="../index.html" class="larger-nav-link">Map</a></li>
-            <li><a href="about.html" class="larger-nav-link">About Us</a></li>
-            <li><a href="more.html" class="larger-nav-link">More Information</a></li>
-        </ul>
-        <div class="navbar-logo navbar-logo-right">
-            <img src="../assets/undp_logo.png" alt="UNDP Logo" class="logo-image">
+        <div class="navbar-inner">
+            <div class="navbar-cluster-left">
+                <div class="navbar-logo">
+                    <img src="../assets/pigeon2.png" alt="SDG AI Lab" class="logo-image_left">
+                </div>
+                <div class="navbar-logo">
+                    <img src="../assets/icpsd_logo.png" alt="ICPSD" class="logo-image_left">
+                </div>
+            </div>
+            <div class="navbar-center">
+                <h2 class="tool-title">Socioeconomic Peace Index Tool</h2>
+                <ul class="navbar-menu">
+                    <li><a href="../index.html" class="larger-nav-link">Map</a></li>
+                    <li><a href="more.html" class="larger-nav-link">More</a></li>
+                    <li><a href="about.html" class="larger-nav-link nav-link-current" aria-current="page">About Us</a></li>
+                </ul>
+            </div>
+            <div class="navbar-cluster-right">
+                <div class="navbar-logo">
+                    <img src="../assets/undp_logo.png" alt="UNDP" class="logo-image_right">
+                </div>
+            </div>
         </div>
     </nav>
 
     <!-- Main content container -->
     <div class="content-container">
         <div class="content-section">
-            <h1>About the DSVI Data Visualization Tool</h1>
+            <h1>About the Socioeconomic Peace Index Tool</h1>
             <p>
-                The Development and Social Vulnerability Index (DSVI) Data Visualization Tool is designed to help researchers, policymakers, and NGOs analyze and understand socioeconomic and vulnerability data across regions. By combining multiple data sources and providing intuitive visualization capabilities, our tool enables users to identify patterns, make data-driven decisions, and better target interventions where they're needed most.
+                The Socioeconomic Peace Index (SEPI) online tool helps researchers, policymakers, and practitioners explore and interpret socioeconomic and peace-related indicators on an interactive map. By combining curated data with clear visualization, it supports evidence-based discussion and planning in fragile and development contexts.
             </p>
         </div>
         
         <div class="content-section">
-            <h2>Our Mission</h2>
+            <h2>Our mission</h2>
             <p>
-                Our mission is to democratize access to critical development data, making it easier for stakeholders at all levels to understand complex socioeconomic patterns. By providing user-friendly visualization tools, we aim to bridge the gap between data collection and actionable insights, ultimately contributing to more effective development initiatives and better outcomes for vulnerable populations.
+                We aim to make complex socioeconomic and peace data easier to access and understand, so stakeholders can see patterns, compare areas, and connect analysis to action—especially where institutions and communities are under stress.
             </p>
         </div>
         
         <div class="content-section">
-            <h2>Development team and Partners</h2>
+            <h2>Team</h2>
             <div class="team-members">
                 <div class="team-member">
-                    <img src="../assets/Szigeti.jpg" alt="Team Member">
+                    <div class="team-member-photo-wrap">
+                        <img src="../assets/szigeti.jfif" alt="Portrait of Martin Szigeti">
+                    </div>
                     <div class="team-member-info">
-                        <h3>M.Sc. Martin Szigeti</h3>
-                        <p><strong>GIS Specialist</strong></p>
-                        <p>Works for UNDP SDG AI Lab since 2020. Lead developer of DSVI and the DSVI tool.</p>
+                        <h3>Martin Szigeti</h3>
+                        <p><strong>GIS specialist, UNDP SDG AI Lab</strong></p>
+                        <p>With the SDG AI Lab since 2020. Lead developer of the Socioeconomic Peace Index tool and related geospatial workflows.</p>
                     </div>
                 </div>
-                
+
                 <div class="team-member">
-                    <img src="../assets/Makhan_Sacko.PNG" alt="Team Member">
+                    <div class="team-member-photo-wrap">
+                        <img src="../assets/johannes_Sahmland_bowling.jpg" alt="Portrait of Johannes Sahmland">
+                    </div>
                     <div class="team-member-info">
-                        <h3>M.Sc. Makhan Sacko</h3>
-                        <p><strong>Responsable Exploration Accelerator Lab CO/ML</strong></p>
-                        <p>Lead Advisor from CO Mali for the DSVI implementation in Mali</p>
+                        <h3>Johannes Sahmland Bowling</h3>
+                        <p><strong>Fragile contexts &amp; MSME support</strong></p>
+                        <p>Leads a team of researchers and technical experts on MSME support for fragile and conflict-affected settings. Nine years of experience in economic research, humanitarian and development programming, and interagency coordination with UNDP, international NGOs, and the private sector across countries including Syria, Libya, Ukraine, Afghanistan, and Somalia. Focuses on analysis and recommendations for economic recovery in fragile and conflict-affected countries.</p>
                     </div>
                 </div>
-                
+
                 <div class="team-member">
-                    <img src="../assets/Ademonkoun_Missinhoun.jpg" alt="Team Member">
+                    <div class="team-member-photo-wrap">
+                        <img src="../assets/ela_dogan.jfif" alt="Portrait of Ela Dogan">
+                    </div>
                     <div class="team-member-info">
-                        <h3>Ademonkoun Missinhoun</h3>
-                        <p><strong>UNDP Economics Advisor CO/ML</strong></p>
-                        <p></p>
+                        <h3>Ela Dogan</h3>
+                        <p><strong>Research intern, ICPSD Crisis &amp; Resilience team</strong></p>
+                        <p>Works on crisis resilience topics at the Istanbul International Center for Private Sector in Development (ICPSD). Holds an MSc in Policy Economics from Erasmus School of Economics.</p>
                     </div>
                 </div>
-                
+
                 <div class="team-member">
-                    <img src="../assets/issa_bamba.jpg" alt="Team Member">
+                    <div class="team-member-photo-wrap">
+                        <img src="../assets/viddhi_Thrakker.jpeg" alt="Portrait of Viddhi Thakker">
+                    </div>
                     <div class="team-member-info">
-                        <h3>Issa Bamba</h3>
-                        <p><strong>UNDP Data Scientist</strong></p>
-                        <p></p>
+                        <h3>Viddhi Thakker</h3>
+                        <p><strong>Analyst, ICPSD Crisis &amp; Resilience team</strong></p>
+                        <p>Provided review support on the Socioeconomic Peace Index.</p>
                     </div>
                 </div>
-                
+
                 <div class="team-member">
-                    <img src="../assets/dikmener.JPG" alt="Team Member">
-                    <div class="team-member-info">
-                        <h3>Gokhan Dikmener</h3>
-                        <p><strong>UNDP Technical Specialist</strong></p>
-                        <p></p>
+                    <div class="team-member-photo-wrap team-member-placeholder-figure" role="img" aria-label="Photo placeholder for Paul Vercoustre">
+                        <span class="team-member-placeholder-initials">PV</span>
                     </div>
-                </div>
-                
-                <div class="team-member">
-                    <img src="../assets/dina.JPG" alt="Team Member">
                     <div class="team-member-info">
-                        <h3>Dina Akylbekova</h3>
-                        <p><strong>UNDP Coordinator</strong></p>
-                        <p></p>
+                        <h3>Paul Vercoustre</h3>
+                        <p><strong>Photo and bio coming soon</strong></p>
+                        <p>Team member — details to be added.</p>
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="content-section">
-            <h2>Our Partners</h2>
+            <h2>Partners</h2>
             <p>
-                The DSVI Data Visualization Tool is the result of collaboration between multiple organizations committed to improving development outcomes through better data and analysis. Our key partners include:
+                The Socioeconomic Peace Index tool is developed in collaboration with partners committed to stronger data and analysis for peace and development. Key partners include:
             </p>
             <ul>
                 <li>United Nations Development Programme (UNDP)</li>
-                <li>Accelerator Lab Mali</li>
                 <li>Istanbul International Center for Private Sector in Development (ICPSD)</li>
+                <li>Sustainable Development Goals AI Lab (SDG AI Lab)</li>
                 <li>Bureau for Programme and Policy Support (BPPS)</li>
-                <li>Sustainable Finance Hub (SFH)</li>
-                <li>Sustainable Development Goals AI Lab (SDG AI LAB)</li>
-                <li>National Statistical Offices in partner countries</li>
-
+                <li>National statistical offices and in-country partners contributing data or review</li>
             </ul>
         </div>
     </div>
     
     <!-- Simple footer -->
     <footer style="background-color: #343a40; color: white; text-align: center; padding: 20px; margin-top: 40px;">
-        <p>© 2025 DSVI Data Visualization Tool | All Rights Reserved</p>
+        <p>© 2026 Socioeconomic Peace Index Tool | All rights reserved</p>
     </footer>
 </body>
 </html>
