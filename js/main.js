@@ -736,7 +736,7 @@ function updateInfoPanelWithSEPI() {
             name: 'Socioeconomic Peace Index (SEPI)',
             type: 'sepi',
             layer: layerManager.sepiManager.sepiLayer,
-            selectedAttribute: 'peacebuilding_index',
+            selectedAttribute: layerManager.sepiManager?.config?.property || 'peacebuilding_index',
             featureCount: layerManager.sepiManager.sepiLayer?.getLayers?.()?.length || 0,
             description: getConfigSidebarDescription('sepiLayer')
         });

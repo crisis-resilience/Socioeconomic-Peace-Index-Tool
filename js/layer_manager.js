@@ -643,6 +643,7 @@ export class SimplifiedPillarManager {
         const p = properties || {};
         const name =
             p.ADM1_EN ||
+            p.adm1_name ||
             p.NAME_1 ||
             p.admin1_name ||
             p.region ||
@@ -815,7 +816,7 @@ export class SimplifiedPillarManager {
     
     getAdditionalProperties(properties, currentProperty) {
         const skipFields = [
-            currentProperty, 'ADM1_EN', 'NAME_1', 'GID_0', 'GID_1', 'geometry', 
+            currentProperty, 'ADM1_EN', 'adm1_name', 'NAME_1', 'GID_0', 'GID_1', 'geometry',
             'fid', 'OBJECTID', 'Shape_Length', 'Shape_Area'
         ];
         
@@ -928,8 +929,18 @@ export class SimplifiedPillarManager {
         if (Object.prototype.hasOwnProperty.call(props, primaryProperty)) {
             return primaryProperty;
         }
+        const normalizedPrimary = `${primaryProperty}_norm`;
+        if (Object.prototype.hasOwnProperty.call(props, normalizedPrimary)) {
+            return normalizedPrimary;
+        }
         if (fallbackProperty && Object.prototype.hasOwnProperty.call(props, fallbackProperty)) {
             return fallbackProperty;
+        }
+        if (fallbackProperty) {
+            const normalizedFallback = `${fallbackProperty}_norm`;
+            if (Object.prototype.hasOwnProperty.call(props, normalizedFallback)) {
+                return normalizedFallback;
+            }
         }
         return primaryProperty;
     }

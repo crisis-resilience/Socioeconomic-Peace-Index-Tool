@@ -280,6 +280,7 @@ function pickAdm1Name(properties) {
     if (!properties) return '';
     const candidateKeys = [
         'ADM1_EN',
+        'adm1_name',
         'NAME_1',
         'name_1',
         'Adm_1_Name',

@@ -106,13 +106,13 @@ export class SEPIManager {
     
     
     createSEPIBreakdownChart(properties) {
-        // UPDATED: Use new column names
+        // Support both legacy and refreshed (May) Somalia keys.
         const pillars = [
-            { name: 'Education', value: properties['education'] || 0, color: '#28a745' },
-            { name: 'Food Security', value: properties['Food_security'] || 0, color: '#ffc107' },
-            { name: 'Poverty', value: properties['poverty'] || 0, color: '#17a2b8' },
-            { name: 'Health', value: properties['health'] || 0, color: '#dc3545' },
-            { name: 'Climate', value: properties['climate_vulnerability'] || 0, color: '#6f42c1' }
+            { name: 'Education', value: this.getFirstNumericProperty(properties, ['education', 'pillar_education']), color: '#28a745' },
+            { name: 'Food Security', value: this.getFirstNumericProperty(properties, ['Food_security', 'food_security', 'pillar_food_security']), color: '#ffc107' },
+            { name: 'Poverty', value: this.getFirstNumericProperty(properties, ['poverty', 'pillar_economic']), color: '#17a2b8' },
+            { name: 'Health', value: this.getFirstNumericProperty(properties, ['health', 'pillar_health']), color: '#dc3545' },
+            { name: 'Climate', value: this.getFirstNumericProperty(properties, ['climate_vulnerability', 'pillar_climate']), color: '#6f42c1' }
         ];
         
         // Sort pillars by value (descending)
@@ -138,7 +138,7 @@ chartHTML += `
         });
         
         // Add overall SEPI score - UPDATED: Use dynamic property
-        const overallSEPI = properties[this.config.property] || 0;
+        const overallSEPI = this.getFirstNumericProperty(properties, [this.config.property, 'sepi', 'peacebuilding_index']) || 0;
         const overallPercentage = Math.round(overallSEPI * 100);
         
         chartHTML += `
@@ -225,7 +225,7 @@ chartHTML += `
         const properties = feature.properties;
         
         // Try multiple possible field names for district
-        const districtName = properties.ADM1_EN || properties.NAME_1 || 
+        const districtName = properties.ADM1_EN || properties.adm1_name || properties.NAME_1 || 
                            properties.admin1_name || properties.region || 
                            properties.district || 'Unknown District';
         
@@ -291,7 +291,7 @@ chartHTML += `
         const sepiValue = properties[this.config.property];
         
         // Try multiple possible field names for district
-        const districtName = properties.ADM1_EN || properties.NAME_1 || 
+        const districtName = properties.ADM1_EN || properties.adm1_name || properties.NAME_1 || 
                            properties.admin1_name || properties.region || 
                            properties.district || 'Unknown District';
         
@@ -332,7 +332,7 @@ chartHTML += `
      * Create additional properties section
      */
     createAdditionalPropertiesSection(properties) {
-        const skipFields = [this.config.property, 'ADM1_EN', 'NAME_1', 'geometry'];
+        const skipFields = [this.config.property, 'ADM1_EN', 'adm1_name', 'NAME_1', 'geometry'];
         const additionalProps = Object.entries(properties)
             .filter(([key, value]) => !skipFields.includes(key) && value != null)
             .map(([key, value]) => `
@@ -363,6 +363,15 @@ chartHTML += `
             .replace(/([A-Z])/g, ' $1')
             .replace(/\b\w/g, l => l.toUpperCase())
             .trim();
+    }
+
+    getFirstNumericProperty(properties, keys) {
+        for (const key of keys) {
+            if (!Object.prototype.hasOwnProperty.call(properties, key)) continue;
+            const numeric = Number(properties[key]);
+            if (Number.isFinite(numeric)) return numeric;
+        }
+        return 0;
     }
     
     /**

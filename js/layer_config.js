@@ -24,28 +24,28 @@ export function getCurrentCountry() {
 
 /**
  * District SEPI bundles used by Map Controls "Show labels" (group districts → ADM1).
- * Kenya uses `sepi_with_pillars_9_2.geojson`; Somalia / South Sudan use Apr 28 files (ADM1_EN).
+ * Country district SEPI bundles used by map controls "Show labels" (group districts → ADM1).
  */
 export function getSepiDistrictGeoJSONPathForAdm1Labels(country = currentCountry) {
     switch (country) {
         case 'Kenya':
-            return `data/Kenya/sepi_with_pillars_9_2.geojson`;
+            return `data/Kenya/sepi_with_pillars_May_04_Kenya.geojson`;
         case 'Somalia':
-            return `data/Somalia/sepi_with_pillars_Apr_28_Somalia.geojson`;
+            return `data/Somalia/sepi_with_pillars_May_04_Somalia.geojson`;
         case 'South_Sudan':
-            return `data/South_Sudan/sepi_with_pillars_Apr_28_South_Sudan.geojson`;
+            return `data/South_Sudan/sepi_with_pillars_May_04_South_Sudan.geojson`;
         default:
             return getCountryPath('sepi_with_pillars_9_2.geojson', country);
     }
 }
 
 export function getCountryPath(filename, country = currentCountry) {
-    // Route all pillar/SEPI layer bindings to the Apr 28 refresh files.
+    // Route all pillar/SEPI layer bindings to refreshed country bundles.
     if (filename === 'sepi_with_pillars_9_2.geojson') {
         const refreshedPillarFiles = {
-            Somalia: 'sepi_with_pillars_Apr_28_Somalia.geojson',
-            Kenya: 'sepi_with_pillars_Apr_28_Kenya.geojson',
-            South_Sudan: 'sepi_with_pillars_Apr_28_South_Sudan.geojson'
+            Somalia: 'sepi_with_pillars_May_04_Somalia.geojson',
+            Kenya: 'sepi_with_pillars_May_04_Kenya.geojson',
+            South_Sudan: 'sepi_with_pillars_May_04_South_Sudan.geojson'
         };
         if (refreshedPillarFiles[country]) {
             return `data/${country}/${refreshedPillarFiles[country]}`;
@@ -236,30 +236,35 @@ export const PILLAR_CONFIG = {
         name: 'Education Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'education',
+        fallbackProperty: 'pillar_education',
         description: 'Access to and participation in education'
     },
     food_security: {
         name: 'Food Security Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'Food_security',
+        fallbackProperty: 'pillar_food_security',
         description: 'Population-level food and nutrition adequacy'
     },
     poverty: {
         name: 'Poverty Reduction Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'poverty',
+        fallbackProperty: 'pillar_economic',
         description: 'Economic welfare per capita'
     },
     health: {
         name: 'Health Access Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'health',
+        fallbackProperty: 'pillar_health',
         description: 'Healthcare services availability based on facilities per population and density'
     },
     climate_vulnerability: {
         name: 'Climate Resilience Index',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'climate_vulnerability',
+        fallbackProperty: 'pillar_climate',
         description: 'Climate resilience based on temperature, vegetation change, and elevation factors'
     },
 
