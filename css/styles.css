@@ -316,7 +316,6 @@ body {
 }
 
 .sepi-section:hover {
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(44, 95, 45, 0.4);
 }
 
@@ -325,7 +324,6 @@ body {
 }
 
 .sepi-section.collapsed:hover {
-    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
 }
 
@@ -532,10 +530,10 @@ body {
     width: 100%;
 }
 
-/* SEPI Opacity Container */
+/* SEPI Opacity Container — square top corners flush with .sepi-selector (rounded inner corners showed green behind) */
 .sepi-opacity-container {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+    border-radius: 0;
     padding: 15px 20px;
     margin: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.3);

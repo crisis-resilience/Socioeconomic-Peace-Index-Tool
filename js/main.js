@@ -884,12 +884,11 @@ function initializeColorRampSelectors() {
         'vectorColorRamp1', 'vectorColorRamp2',
         'pointColorRamp', 'pointColorRamp2'
     ];
-    
-    colorRampSelectors.forEach(selectorId => {
-        populateColorRampSelector(selectorId);
+    colorRampSelectors.forEach((selectorId) => {
+        if (document.getElementById(selectorId)) {
+            populateColorRampSelector(selectorId);
+        }
     });
-    
-    console.log('Color ramp selectors initialized');
 }
 
 function enableDefaultLayers() {

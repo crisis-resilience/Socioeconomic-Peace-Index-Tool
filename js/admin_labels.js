@@ -100,21 +100,6 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
                 });
             }
             
-            // Add info panel toggle button
-            const analysisSectionLabel = L.DomUtil.create('label', 'basemap-label', contentContainer);
-            analysisSectionLabel.textContent = 'Analysis Section:';
-            const infoPanelButton = createButton('📊 Layer Info', contentContainer);
-
-            // Set click handler for info panel button
-            L.DomEvent.on(infoPanelButton, 'click', function(e) {
-                L.DomEvent.preventDefault(e);
-                L.DomEvent.stopPropagation(e);
-                // Access the global infoPanelManager
-                if (window.infoPanelManager) {
-                    window.infoPanelManager.getInfoPanel().toggle();
-                }
-            });
-            
             L.DomEvent.on(outlineSelect, 'change', function(e) {
                 L.DomEvent.preventDefault(e);
                 L.DomEvent.stopPropagation(e);
@@ -605,8 +590,11 @@ function safelyBringLayerToBack(layer) {
 export async function loadCountryOutline(countryId, filepath) {
     try {
         const response = await fetch(filepath);
+        if (!response.ok) {
+            return null;
+        }
         const data = await response.json();
-        
+
         const outlineLayer = L.geoJSON(data, {
             style: {
                 color: "#8a8a8a",
@@ -625,7 +613,8 @@ export async function loadCountryOutline(countryId, filepath) {
         console.log(`Loaded ${countryId} outline from ${filepath}`);
         return outlineLayer;
     } catch (error) {
-        console.error(`Failed to load ${countryId} outline:`, error);
+        // Missing file / HTML error page — callers try further candidates; avoid console.error noise.
+        console.debug(`Outline skip (${filepath}):`, error?.message || error);
         return null;
     }
 }

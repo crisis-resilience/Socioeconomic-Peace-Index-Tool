@@ -57,15 +57,22 @@ export function getCountryPath(filename, country = currentCountry) {
 export function getCountryOutlineCandidates(country = currentCountry) {
     const lowerCountry = country.toLowerCase();
     const countrySpecificOutline = `${lowerCountry}_outline.geojson`;
-    return [
+    const atRoot = getCountryPath(countrySpecificOutline, country);
+    const underOld = getCountryPath(`old/${countrySpecificOutline}`, country);
+
+    // Order by paths that exist in-repo first to avoid noisy 404 + JSON parse on HTML error pages.
+    const legacy = [
         getCountryPath('outline.geojson', country),
-        getCountryPath(countrySpecificOutline, country),
         getCountryPath('cutline.geojson', country),
-        // Legacy fallback locations used by older country bundles.
-        getCountryPath(`old/${countrySpecificOutline}`, country),
         getCountryPath('old/outline.geojson', country),
         getCountryPath('old/cutline.geojson', country)
     ];
+
+    if (country === 'Somalia') {
+        return [underOld, atRoot, ...legacy];
+    }
+
+    return [atRoot, underOld, ...legacy];
 }
 
 /**

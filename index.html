@@ -428,25 +428,24 @@ function hideSEPIInfo() {
         }
 
         function initializeColorRampSelectors() {
-            // Only initialize color ramp selectors that actually exist and are needed
+            /* IDs match layer-templates vector/point sections; those blocks may be omitted from
+               generateAllLayerControls() — populate only when the select is present. */
             const colorRampSelectors = [
-                'vectorColorRamp1',    // Subnational (Regional) Statistics
-                'vectorColorRamp2',    // Subnational (District) Statistics  
-                'pointColorRamp',      // DHS Statistics
-                'pointColorRamp2'      // Cities
+                'vectorColorRamp1',
+                'vectorColorRamp2',
+                'pointColorRamp',
+                'pointColorRamp2'
             ];
-            
-            colorRampSelectors.forEach(selectorId => {
-                const selector = document.getElementById(selectorId);
-                if (selector) {
+            let populated = 0;
+            colorRampSelectors.forEach((selectorId) => {
+                if (document.getElementById(selectorId)) {
                     populateColorRampSelector(selectorId);
-                    console.log(`Populated color ramp selector: ${selectorId}`);
-                } else {
-                    console.warn(`Color ramp selector not found: ${selectorId}`);
+                    populated += 1;
                 }
             });
-            
-            console.log('Color ramp selectors initialized (minimal set)');
+            if (populated > 0) {
+                console.log(`Color ramp selectors initialized (${populated})`);
+            }
         }
     </script>
                         <!-- ADD: Info popup HTML (add anywhere in body) -->
