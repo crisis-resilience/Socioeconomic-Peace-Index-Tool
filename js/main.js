@@ -9,6 +9,7 @@ import { populateColorRampSelector, setConfigCountry, COUNTRY_VIEWS, getCountryO
 // We only import loadTiff. We handle removal manually to ensure compatibility.
 import { loadTiff } from './zoom-adaptive-tiff-loader.js'; 
 import { WelcomePopup } from './welcome_popup.js';
+import { attachDraggableSepiPopups } from './draggable_sepi_popup.js';
 
 // Global references
 let layerManager = null;
@@ -55,6 +56,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         map = setupMap('map');
         window.map = map;
         window.tiffLayers = tiffLayers;
+        attachDraggableSepiPopups(map);
         
         setupCountrySelector();
 

@@ -90,6 +90,8 @@
     color: #ffffff; /* Ensures all header text is white */
     padding: 8px 15px; /* FIX: Reduced padding for a narrower header */
     cursor: move;
+    user-select: none;
+    -webkit-user-select: none;
     display: flex;
     justify-content: space-between;
     align-items: center;
