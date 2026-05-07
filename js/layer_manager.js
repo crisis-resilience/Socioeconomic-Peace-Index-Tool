@@ -1,6 +1,6 @@
 // layer_manager.js - Updated with aligned popup styling
 
-import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription, conflictRawToNormalized, getConflictColorFromNormalized, conflictLegendRawEdges } from './layer_config.js';
+import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription, conflictRawToNormalized, getConflictColorFromNormalized, conflictLegendRawEdges, getCurrentCountry } from './layer_config.js';
 import { loadTiff } from './zoom-adaptive-tiff-loader.js';
 import { SEPIManager } from './sepi_manager.js';
 import { loadVectorLayer, loadPointLayer, updateVectorLayerStyle, updatePointLayerStyle, populateAttributeSelector } from './vector_layers.js';
@@ -83,6 +83,9 @@ export class LayerManager {
             this.pillarManager.setConflictYear(year);
             await this.pillarManager.switchPillar(currentPillar);
             this.applySepiCombinedOpacityFromSlider();
+            window.dispatchEvent(
+                new CustomEvent('sepiDataLayersDisplayed', { detail: { country: getCurrentCountry() } })
+            );
         });
         
         // Listen for SEPI opacity changes
@@ -114,6 +117,9 @@ export class LayerManager {
             }
 
             this.applySepiCombinedOpacityFromSlider();
+            window.dispatchEvent(
+                new CustomEvent('sepiDataLayersDisplayed', { detail: { country: getCurrentCountry() } })
+            );
         } catch (error) {
             console.error(`Error handling SEPI option change:`, error);
         }

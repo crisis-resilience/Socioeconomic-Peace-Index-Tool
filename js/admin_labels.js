@@ -117,6 +117,9 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
                 }
 
                 toggleCountryOutline(value, map, countryOutlines);
+                if (typeof window.hideDataCountryOutlineIfSepiDisplayed === 'function') {
+                    window.hideDataCountryOutlineIfSepiDisplayed();
+                }
             });
 
             L.DomEvent.on(showLabelsButton, 'click', function(e) {
@@ -151,7 +154,10 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
             // Ensure default outline selection is applied on startup.
             // This avoids requiring a manual dropdown change.
             toggleCountryOutline(outlineSelect.value, map, countryOutlines);
-            
+            if (typeof window.hideDataCountryOutlineIfSepiDisplayed === 'function') {
+                window.hideDataCountryOutlineIfSepiDisplayed();
+            }
+
             // Set toggle handler
             L.DomEvent.on(toggleButton, 'click', function(e) {
                 L.DomEvent.preventDefault(e);

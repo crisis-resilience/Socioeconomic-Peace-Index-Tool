@@ -75,6 +75,25 @@ document.addEventListener('DOMContentLoaded', async function() {
         layerManager = new LayerManager(map, updateLegend, hideLegend);
         window.switchApplicationCountry = switchApplicationCountry;
 
+        function isSepiDistrictDataDisplayed() {
+            return Boolean(
+                layerManager &&
+                (layerManager.sepiManager?.isActive() || layerManager.pillarManager?.isActive())
+            );
+        }
+
+        function hideDataCountryOutlineIfSepiDisplayed() {
+            if (!map || !isSepiDistrictDataDisplayed()) return;
+            const key = toCountryOutlineKey(getCurrentCountry());
+            const outline = countryOutlines[key];
+            if (outline && map.hasLayer(outline)) {
+                map.removeLayer(outline);
+            }
+        }
+
+        window.hideDataCountryOutlineIfSepiDisplayed = hideDataCountryOutlineIfSepiDisplayed;
+        window.addEventListener('sepiDataLayersDisplayed', hideDataCountryOutlineIfSepiDisplayed);
+
         // Setup admin labels
         const labelLayers = createAdminLabelLayers(map, layerManager.getActiveLayers().vector, countryOutlines, null);
         layerManager.setLabelLayers(labelLayers);
