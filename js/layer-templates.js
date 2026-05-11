@@ -47,6 +47,9 @@ export class LayerTemplates {
                         <span class="sepi-option-text">Overall Peace Index</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
+                    <button type="button" id="primaryConflictDriverBtn" class="sepi-action-btn" disabled>
+                        Show Primary Conflict Driver
+                    </button>
 
                     <!-- Individual Pillars -->
                     <div class="sepi-pillars-label">Peacebuilding Pillars:</div>

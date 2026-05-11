@@ -1,7 +1,7 @@
 // sepi_manager.js - Fixed for sepi_with_pillars_7.geojson
 // Replaces: sepi_integration.js + sepi_popups.js
 
-import { updateSEPILegend } from './legend.js';
+import { updateSEPILegend, updatePrimaryConflictDriverLegend } from './legend.js';
 import { getCountryPath } from './layer_config.js';
 
 /**
@@ -30,12 +30,21 @@ export class SEPIManager {
         this.map = map;
         this.layers = layers;
         this.sepiLayer = null;
+        this.primaryConflictDriverLayer = L.layerGroup();
+        this.primaryConflictDriverEnabled = false;
         this.config = {
             dataUrl: '',
             property: 'peacebuilding_index', // Check if this exists in new file, might need to be 'index'
             colors: ['#dc3545', '#fd7e14', '#ffc107', '#28a745', '#155724'],
             breaks: [0.2, 0.4, 0.6, 0.8]
         };
+        this.primaryDriverPillars = [
+            { id: 'education', keys: ['education', 'pillar_education'], icon: '🏫' },
+            { id: 'food', keys: ['Food_security', 'food_security', 'pillar_food_security'], icon: '🍽️' },
+            { id: 'poverty', keys: ['poverty', 'pillar_economic'], icon: '💰' },
+            { id: 'health', keys: ['health', 'pillar_health'], icon: '🏥' },
+            { id: 'climate', keys: ['climate_vulnerability', 'pillar_climate'], icon: '🌾' }
+        ];
         
         // District information lookup
         this.districtInfo = {
@@ -108,11 +117,11 @@ export class SEPIManager {
     createSEPIBreakdownChart(properties) {
         // Support both legacy and refreshed (May) Somalia keys.
         const pillars = [
-            { name: 'Education', value: this.getFirstNumericProperty(properties, ['education', 'pillar_education']), color: '#28a745' },
-            { name: 'Food Security', value: this.getFirstNumericProperty(properties, ['Food_security', 'food_security', 'pillar_food_security']), color: '#ffc107' },
-            { name: 'Poverty', value: this.getFirstNumericProperty(properties, ['poverty', 'pillar_economic']), color: '#17a2b8' },
-            { name: 'Health', value: this.getFirstNumericProperty(properties, ['health', 'pillar_health']), color: '#dc3545' },
-            { name: 'Climate', value: this.getFirstNumericProperty(properties, ['climate_vulnerability', 'pillar_climate']), color: '#6f42c1' }
+            { name: 'Education', value: this.getFirstNumericProperty(properties, ['education', 'pillar_education']) },
+            { name: 'Food Security', value: this.getFirstNumericProperty(properties, ['Food_security', 'food_security', 'pillar_food_security']) },
+            { name: 'Poverty', value: this.getFirstNumericProperty(properties, ['poverty', 'pillar_economic']) },
+            { name: 'Health', value: this.getFirstNumericProperty(properties, ['health', 'pillar_health']) },
+            { name: 'Climate', value: this.getFirstNumericProperty(properties, ['climate_vulnerability', 'pillar_climate']) }
         ];
         
         // Sort pillars by value (descending)
@@ -126,11 +135,12 @@ export class SEPIManager {
         
         pillars.forEach(pillar => {
             const percentage = Math.round(pillar.value * 100);
+            const pillarColor = this.getColor(pillar.value);
 chartHTML += `
     <div class="pillar-bar" style="display: flex; align-items: center; margin-bottom: 8px; font-size: 12px;">
         <div class="pillar-label" style="width: 90px; flex-shrink: 0; font-weight: 500; color: #495057;">${pillar.name}:</div>
         <div class="pillar-bar-container" style="flex: 1; height: 18px; background: #e9ecef; border-radius: 9px; margin: 0 8px; position: relative; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);">
-            <div class="pillar-bar-fill" style="width: ${percentage}%; height: 100%; border-radius: 9px; background: ${pillar.color}; transition: width 0.4s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></div>
+            <div class="pillar-bar-fill" style="width: ${percentage}%; height: 100%; border-radius: 9px; background: ${pillarColor}; transition: width 0.4s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></div>
         </div>
         <div class="pillar-value" style="min-width: 35px; text-align: right; font-weight: 600; color: #2c5f2d; font-size: 11px;">${pillar.value.toFixed(2)}</div>
     </div>
@@ -140,12 +150,13 @@ chartHTML += `
         // Add overall SEPI score - UPDATED: Use dynamic property
         const overallSEPI = this.getFirstNumericProperty(properties, [this.config.property, 'sepi', 'peacebuilding_index']) || 0;
         const overallPercentage = Math.round(overallSEPI * 100);
+        const overallLabel = this.getDescription(overallSEPI);
         
         chartHTML += `
             <div class="pillar-bar" style="margin-top: 12px; padding-top: 8px; border-top: 1px solid #dee2e6;">
                 <div class="pillar-label" style="font-weight: bold;">Overall SEPI:</div>
                 <div class="pillar-bar-container">
-                    <div class="pillar-bar-fill" style="width: ${overallPercentage}%; background: #2c5f2d;"></div>
+                    <div class="pillar-bar-fill" style="width: ${overallPercentage}%; background: ${this.getColor(overallSEPI)};"></div>
                 </div>
                 <div class="pillar-value" style="font-size: 14px;">${overallSEPI.toFixed(2)}</div>
             </div>
@@ -304,15 +315,9 @@ chartHTML += `
             <div style="padding: 15px;">
                 ${chartHTML}
                 
-                <div style="background: #e8f5e8; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #2c5f2d;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="color: #2c5f2d;">Overall SEPI Score:</strong>
-                        <span style="font-size: 18px; font-weight: bold; color: ${this.getColor(sepiValue)};">
-                            ${sepiValue != null ? Number(sepiValue).toFixed(2) : 'No data'}
-                        </span>
-                    </div>
-                    <div style="margin-top: 5px; font-size: 12px; color: #2c5f2d; font-weight: 500;">
-                        ${this.getDescription(sepiValue)}
+                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #6c757d;">
+                    <div style="text-align: center; font-size: 16px; font-weight: 600; color: #495057;">
+                        ${sepiValue != null ? this.getDescription(sepiValue) : 'No data'}
                     </div>
                 </div>
                 
@@ -380,7 +385,11 @@ chartHTML += `
     addToMap() {
         if (this.sepiLayer && !this.map.hasLayer(this.sepiLayer)) {
             this.sepiLayer.addTo(this.map);
-            updateSEPILegend();
+            if (this.primaryConflictDriverEnabled) {
+                this.refreshPrimaryConflictDriverLayer();
+            } else {
+                updateSEPILegend();
+            }
         }
     }
     
@@ -388,6 +397,7 @@ chartHTML += `
      * Remove layer from map
      */
     removeFromMap() {
+        this.clearPrimaryConflictDriverLayer();
         if (this.sepiLayer && this.map.hasLayer(this.sepiLayer)) {
             this.map.removeLayer(this.sepiLayer);
         }
@@ -410,6 +420,84 @@ chartHTML += `
      */
     isActive() {
         return this.sepiLayer && this.map.hasLayer(this.sepiLayer);
+    }
+
+    setPrimaryConflictDriverEnabled(enabled) {
+        this.primaryConflictDriverEnabled = Boolean(enabled);
+        if (!this.isActive()) return;
+        if (this.primaryConflictDriverEnabled) {
+            this.refreshPrimaryConflictDriverLayer();
+        } else {
+            this.clearPrimaryConflictDriverLayer();
+            updateSEPILegend();
+        }
+    }
+
+    clearPrimaryConflictDriverLayer() {
+        if (this.primaryConflictDriverLayer && this.map.hasLayer(this.primaryConflictDriverLayer)) {
+            this.map.removeLayer(this.primaryConflictDriverLayer);
+        }
+        this.primaryConflictDriverLayer?.clearLayers?.();
+    }
+
+    refreshPrimaryConflictDriverLayer() {
+        if (!this.sepiLayer || !this.isActive()) return;
+        this.clearPrimaryConflictDriverLayer();
+
+        this.sepiLayer.eachLayer((layer) => {
+            const props = layer?.feature?.properties || {};
+            const center = layer?.getBounds?.()?.getCenter?.();
+            if (!center) return;
+            const icons = this.getPrimaryConflictDriverIcons(props);
+            if (!icons.length) return;
+
+            const iconHtml = `<div class="primary-driver-icon-stack">${icons
+                .map((icon) => `<span class="primary-driver-icon-item">${icon}</span>`)
+                .join('')}</div>`;
+            const marker = L.marker(center, {
+                icon: L.divIcon({
+                    className: 'primary-driver-div-icon',
+                    html: iconHtml,
+                    iconSize: [Math.max(22, 18 * icons.length), 22],
+                    iconAnchor: [Math.max(11, 9 * icons.length), 11]
+                }),
+                interactive: false,
+                keyboard: false
+            });
+            this.primaryConflictDriverLayer.addLayer(marker);
+        });
+
+        this.primaryConflictDriverLayer.addTo(this.map);
+        updatePrimaryConflictDriverLegend();
+    }
+
+    getPrimaryConflictDriverIcons(properties) {
+        const sepiRaw = Number(properties?.[this.config.property]);
+        if (!Number.isFinite(sepiRaw)) return [];
+
+        const scored = this.primaryDriverPillars.map((pillar) => ({
+            icon: pillar.icon,
+            value: this.getFirstFiniteNumericProperty(properties, pillar.keys)
+        }));
+        const allPillarsHaveData = scored.every(
+            (entry) => Number.isFinite(entry.value) && entry.value >= 0 && entry.value <= 1
+        );
+        if (!allPillarsHaveData) return [];
+
+        const maxValue = Math.max(...scored.map((entry) => entry.value));
+        const epsilon = 1e-9;
+        return scored
+            .filter((entry) => Math.abs(entry.value - maxValue) <= epsilon)
+            .map((entry) => entry.icon);
+    }
+
+    getFirstFiniteNumericProperty(properties, keys) {
+        for (const key of keys) {
+            if (!Object.prototype.hasOwnProperty.call(properties, key)) continue;
+            const numeric = Number(properties[key]);
+            if (Number.isFinite(numeric)) return numeric;
+        }
+        return null;
     }
 }
 

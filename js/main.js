@@ -649,6 +649,10 @@ function setupInfoPanel() {
         // Set global reference for PDF download functionality
         window.infoPanelManager = { getInfoPanel: () => infoPanel };
         window.infoPanelInstance = infoPanel;
+
+        document.addEventListener('conflictTimelineUpdated', (e) => {
+            infoPanel?.setConflictTimelineData?.(e.detail || null);
+        });
         
         infoPanel.show();
         
@@ -789,10 +793,20 @@ function updateInfoPanelWithSEPI() {
                 featureCount: layerManager.pillarManager.getCurrentLayer()?.getLayers?.()?.length || 0,
                 description: pillarDescription
             });
+
+            if (isConflictData) {
+                const timelinePayload = layerManager.pillarManager.getConflictTimelinePayload?.(
+                    layerManager.pillarManager.selectedConflictDistrict || null
+                );
+                infoPanel.setConflictTimelineData?.(timelinePayload || null);
+            } else {
+                infoPanel.clearConflictTimelineData?.();
+            }
         }
     } else {
         infoPanel.removeLayer('pillar');
         infoPanel.removeLayer('conflict');
+        infoPanel.clearConflictTimelineData?.();
     }
 }
 

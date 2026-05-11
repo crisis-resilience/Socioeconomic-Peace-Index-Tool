@@ -57,6 +57,41 @@ export function updateSEPILegend() {
     legend.style.display = 'block';
 }
 
+export function updatePrimaryConflictDriverLegend() {
+    const legend = document.getElementById('legend');
+    if (!legend) return;
+
+    const iconItems = [
+        { icon: '🏫', label: 'Education strongest' },
+        { icon: '🍽️', label: 'Food Security strongest' },
+        { icon: '💰', label: 'Poverty Reduction strongest' },
+        { icon: '🏥', label: 'Health Access strongest' },
+        { icon: '🌾', label: 'Climate Resilience strongest' }
+    ];
+
+    legend.innerHTML = `
+        <h4>Primary Conflict Driver (Strongest Pillar)</h4>
+        <div class="color-scheme">
+            <p>Icons shown at district centers:</p>
+            <div class="color-boxes">
+                ${iconItems
+                    .map(
+                        (item) =>
+                            `<div style="display:flex; align-items:center; margin-bottom:6px;">
+                                <div style="width:24px; text-align:center; margin-right:6px; font-size:16px;">${item.icon}</div>
+                                <span style="font-size:12px;">${item.label}</span>
+                            </div>`
+                    )
+                    .join('')}
+            </div>
+            <div style="margin-top: 8px; font-size: 11px; color: #666;">
+                Ties are shown side by side.
+            </div>
+        </div>
+    `;
+    legend.style.display = 'block';
+}
+
 /**
  * Update the legend content dynamically for active layers
  * @param {string} layerName - Name of the active layer

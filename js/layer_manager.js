@@ -93,6 +93,11 @@ export class LayerManager {
             const opacity = e.detail.opacity;
             this.updateSEPIOpacity(opacity);
         });
+
+        document.addEventListener('primaryConflictDriverToggled', (e) => {
+            const enabled = Boolean(e.detail?.enabled);
+            this.sepiManager?.setPrimaryConflictDriverEnabled?.(enabled);
+        });
     }
 
     /**
@@ -511,6 +516,7 @@ export class SimplifiedPillarManager {
         this._conflictPooledCatalogPromise = null;
         this.conflictYear = null;
         this.availableConflictYears = [];
+        this.selectedConflictDistrict = null;
         
         // District information lookup (same as SEPI)
         this.districtInfo = {
@@ -615,17 +621,22 @@ export class SimplifiedPillarManager {
                     : this.computeConflictBreaks(this.currentPropertyName);
                 this.dispatchConflictYearsAvailable(true);
             } else {
+                this.selectedConflictDistrict = null;
                 this.conflictPooledScale = null;
                 const desiredProperty = this.pickAvailableProperty(config.property, config.fallbackProperty);
                 this.currentPropertyName = this.resolvePropertyName(desiredProperty);
                 this.conflictBreaks = null;
                 this.dispatchConflictYearsAvailable(false);
+                this.dispatchConflictTimelineUpdated(null);
             }
             this.currentLayer = await this.createIndicatorLayer(pillarId, config);
             this.currentPillarId = pillarId;
             this.currentLayer.addTo(this.map);
             
             this.updateIndicatorLegend(config);
+            if (isConflictData) {
+                this.dispatchConflictTimelineUpdated(this.getConflictTimelinePayload(this.selectedConflictDistrict));
+            }
             console.log(`✓ Indicator ${pillarId} loaded and displayed`);
             
         } catch (error) {
@@ -746,6 +757,11 @@ export class SimplifiedPillarManager {
                                 err
                             );
                         }
+                    },
+                    click: () => {
+                        if (!isConflictData) return;
+                        this.selectedConflictDistrict = feature.properties || null;
+                        this.dispatchConflictTimelineUpdated(this.getConflictTimelinePayload(feature.properties));
                     }
                 });
             }
@@ -988,6 +1004,61 @@ export class SimplifiedPillarManager {
                 selectedYear: this.conflictYear
             }
         }));
+    }
+
+    dispatchConflictTimelineUpdated(payload) {
+        document.dispatchEvent(
+            new CustomEvent('conflictTimelineUpdated', {
+                detail: payload
+            })
+        );
+    }
+
+    getConflictTimelinePayload(selectedDistrictProperties = null) {
+        if (!this.currentPillarId?.startsWith('conflict_')) return null;
+        const config = PILLAR_CONFIG[this.currentPillarId];
+        if (!config || !this.pillarsData?.features?.length) return null;
+
+        const years = this.getAvailableConflictYears(config.property);
+        if (!years.length) return null;
+
+        const features = this.pillarsData.features;
+        const perCapitaMetric = this.currentPillarId.includes('_per_1k');
+        const aggregationLabel = perCapitaMetric ? 'Average across districts' : 'Total across districts';
+
+        const overallSeries = years.map((year) => {
+            const key = this.resolvePropertyName(`${config.property}_${year}`);
+            const values = features
+                .map((feature) => this.getFeatureValue(feature, key))
+                .filter((value) => Number.isFinite(Number(value)))
+                .map((value) => Number(value));
+            if (!values.length) return 0;
+            if (perCapitaMetric) {
+                return values.reduce((sum, value) => sum + value, 0) / values.length;
+            }
+            return values.reduce((sum, value) => sum + value, 0);
+        });
+
+        let districtSeries = null;
+        let districtName = null;
+        if (selectedDistrictProperties) {
+            districtName = this.getDistrictDisplayName(selectedDistrictProperties);
+            districtSeries = years.map((year) => {
+                const key = this.resolvePropertyName(`${config.property}_${year}`);
+                const raw = this.getFeatureValue({ properties: selectedDistrictProperties }, key);
+                return Number.isFinite(Number(raw)) ? Number(raw) : 0;
+            });
+        }
+
+        return {
+            metricId: this.currentPillarId,
+            metricName: config.name || this.currentPillarId,
+            years,
+            overallSeries,
+            aggregationLabel,
+            districtName,
+            districtSeries
+        };
     }
 
     getFeatureValue(feature, desiredProperty) {

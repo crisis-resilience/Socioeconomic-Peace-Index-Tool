@@ -119,32 +119,81 @@ export class InfoPanel {
                 <section class="info-panel-tab-panel active" data-panel="welcome" role="tabpanel">
                     <div class="info-panel-section">
                         <div class="welcome-content">
-                            <h5>🎯 Welcome to the SEPI Analysis Tool</h5>
-                            
-                            <h6>📊 Getting Started</h6>
-                            <p>This tool helps you analyze relationships between the <strong>Socioeconomic Peace Index (SEPI)</strong> and various subnational indicators across Somalia.</p>
-                            
-                            <h6>🔍 How to Use</h6>
-                            <p>To generate correlation reports:</p>
-                            <ul>
-                                <li>Activate the <strong>SEPI layer</strong> from the main menu</li>
-                                <li>Select a <strong>Subnational Statistics</strong> layer</li>
-                                <li>Choose an <strong>attribute</strong> to analyze</li>
-                                <li>Click <strong>"Generate Report"</strong> in the Analysis tab</li>
-                            </ul>
-                            
-                            <div class="sepi-intro">
-                                <h6>💡 About SEPI</h6>
-                                <p>The Socioeconomic Peace Index (SEPI) measures regional peace and stability by combining multiple socioeconomic indicators. Higher values indicate better peace conditions.</p>
+                            <div style="background:#f0f0ec; border:1px solid #d2d2ce; border-radius:8px; padding:10px 12px; margin-bottom:14px;">
+                                <div style="font-size:18px; font-weight:700; color:#2f2f2f;">SEPI Analysis Tool — User Guide</div>
+                                <div style="font-size:12px; color:#666; margin-top:3px;">Socioeconomic Peace Index · Somalia · South Sudan · Kenya · Admin-1 level</div>
                             </div>
-                            
-                            <h6>📈 Analysis Features</h6>
-                            <ul>
-                                <li><strong>Correlation Analysis:</strong> Statistical relationships between SEPI and other indicators</li>
-                                <li><strong>Visual Charts:</strong> Scatter plots and bar charts for data exploration</li>
-                                <li><strong>Regional Comparisons:</strong> District-level breakdowns and rankings</li>
-                                <li><strong>Policy Insights:</strong> Interpretation and recommendations</li>
-                            </ul>
+
+                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">WHAT THE TOOL SHOWS</div>
+                            <p style="margin:0 0 8px; font-size:12px; line-height:1.5; color:#3e3e3e;">
+                                The SEPI Analysis Tool maps the Socioeconomic Peace Index and its component pillars at the sub-national (Admin-1) level across three countries. SEPI measures structural socioeconomic conditions associated with conflict vulnerability, covering education, health, food security, poverty, and climate resilience.
+                            </p>
+                            <p style="margin:0 0 10px; font-size:12px; line-height:1.5; color:#3e3e3e;">
+                                Scores run from 0 to 1, where higher values reflect stronger conditions and lower vulnerability. Scores are relative within each country and are not comparable across countries.
+                            </p>
+                            <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-bottom:14px;">
+                                Scores are relative within each country and are not comparable across countries.
+                            </div>
+
+                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">HOW TO USE</div>
+                            <div style="position:relative; margin-bottom:14px;">
+                                <div style="position:absolute; left:16px; top:10px; bottom:10px; width:2px; background:#5f9be6;"></div>
+                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">1</span>
+                                    <div style="font-size:14px; font-weight:700; color:#343434;">Select a country</div>
+                                    <div style="font-size:12px; color:#555; margin-top:4px;">Use the country buttons in the left panel to choose Somalia, South Sudan, or Kenya.</div>
+                                </div>
+                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">2</span>
+                                    <div style="font-size:14px; font-weight:700; color:#343434;">Choose a layer</div>
+                                    <div style="font-size:12px; color:#555; margin-top:4px;">Select Overall Peace Index for the composite score, or one of the five pillar indices.</div>
+                                </div>
+                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">3</span>
+                                    <div style="font-size:14px; font-weight:700; color:#343434;">Read the map</div>
+                                    <div style="font-size:12px; color:#555; margin-top:4px;">Use the legend to interpret region colours by score range. <span style="display:inline-block; margin-left:6px; padding:1px 6px; border-radius:10px; background:#f7d9d9; color:#9a2f2f; font-size:11px;">Red = deprivation</span> <span style="display:inline-block; margin-left:4px; padding:1px 6px; border-radius:10px; background:#d9efdc; color:#2f7b38; font-size:11px;">Green = resilience</span></div>
+                                </div>
+                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">4</span>
+                                    <div style="font-size:14px; font-weight:700; color:#343434;">Click a region</div>
+                                    <div style="font-size:12px; color:#555; margin-top:4px;">Open district details with the SEPI score, pillar scores, and district overview.</div>
+                                </div>
+                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">5</span>
+                                    <div style="font-size:14px; font-weight:700; color:#343434;">Drill into sub-indicators</div>
+                                    <div style="font-size:12px; color:#555; margin-top:4px;">Select any indicator listed under a pillar to map it directly and inspect district values.</div>
+                                </div>
+                            </div>
+
+                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">THE FIVE PILLARS</div>
+                            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+                                <div style="width:160px; height:160px; border-radius:50%; background: conic-gradient(#1f9d75 0% 20%, #7b72d8 20% 40%, #de6130 40% 60%, #bd7a10 60% 80%, #3a8ad8 80% 100%); position:relative; flex-shrink:0;">
+                                    <div style="position:absolute; inset:42px; border-radius:50%; background:#f7f7f7; display:flex; align-items:center; justify-content:center; text-align:center; font-size:12px; font-weight:700; color:#666; line-height:1.2;">Overall<br>SEPI</div>
+                                </div>
+                                <div style="font-size:12px; color:#444; line-height:1.5;">
+                                    <div><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#1f9d75; margin-right:8px;"></span><strong>Education</strong><br><span style="padding-left:18px; color:#666;">Attendance, literacy, school access</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#7b72d8; margin-right:8px;"></span><strong>Food security</strong><br><span style="padding-left:18px; color:#666;">IPC Phase 3+ population fraction</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#de6130; margin-right:8px;"></span><strong>Poverty reduction</strong><br><span style="padding-left:18px; color:#666;">Headcount, expenditure, income</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#bd7a10; margin-right:8px;"></span><strong>Health access</strong><br><span style="padding-left:18px; color:#666;">Facilities per population, access share</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#3a8ad8; margin-right:8px;"></span><strong>Climate resilience</strong><br><span style="padding-left:18px; color:#666;">NDVI, PDSI, FAPAR, soil moisture</span></div>
+                                </div>
+                            </div>
+                            <div style="background:#efefeb; border-left:4px solid #a5a394; color:#555; font-size:12px; line-height:1.45; padding:8px 10px; border-radius:4px; margin-bottom:12px;">
+                                The overall score is a geometric mean of all five pillars. A very low score on any one pillar significantly depresses the overall score.
+                            </div>
+
+                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">SCORE RANGES</div>
+                            <div style="font-size:12px; color:#444; line-height:1.55;">
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong>0.0 - 0.2</strong> &nbsp; Very low — severe deprivation</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong>0.2 - 0.4</strong> &nbsp; Low — significant gaps</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong>0.4 - 0.6</strong> &nbsp; Moderate — mixed performance</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong>0.6 - 0.8</strong> &nbsp; High — relatively strong conditions</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong>0.8 - 1.0</strong> &nbsp; Very high — best-performing within country</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong>No data</strong></div>
+                            </div>
+                            <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-top:10px;">
+                                Scores are within-country only and not comparable across countries.
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -157,6 +206,16 @@ export class InfoPanel {
                         </div>
                         <div class="layers-list" id="layers-list">
                             <p class="no-layers-message">No layers currently active</p>
+                        </div>
+                        <div id="sepi-ranking-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #dee2e6; border-radius: 8px; background: #f8f9fa;">
+                            <h5 style="margin: 0 0 8px 0;">SEPI District Ranking</h5>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #555;">Ranked from highest to lowest Overall Peace Index score.</p>
+                            <div id="sepi-ranking-chart"></div>
+                        </div>
+                        <div id="conflict-timeline-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #dee2e6; border-radius: 8px; background: #f8f9fa;">
+                            <h5 style="margin: 0 0 8px 0;">Conflict Temporal Evolution</h5>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #555;">Year-by-year trend for the active conflict metric.</p>
+                            <canvas id="conflict-timeline-chart" width="520" height="240" style="width: 100%; max-width: 100%; height: auto; border: 1px solid #e5e5e5; background: #fff; border-radius: 6px;"></canvas>
                         </div>
                     </div>
                 </section>
@@ -634,6 +693,7 @@ export class InfoPanel {
         
         if (this.activeLayers.size === 0) {
             layersList.innerHTML = '<p class="no-layers-message">No layers currently active</p>';
+            this.updateSepiRankingChart();
             return;
         }
         
@@ -659,6 +719,194 @@ export class InfoPanel {
             .join('');
         
         layersList.innerHTML = layersHTML;
+        this.updateSepiRankingChart();
+    }
+
+    updateSepiRankingChart() {
+        const panel = this.container?.querySelector('#sepi-ranking-panel');
+        const chart = this.container?.querySelector('#sepi-ranking-chart');
+        if (!panel || !chart) return;
+
+        const sepiLayerInfo = this.activeLayers.get('sepi');
+        const geojsonLayer = sepiLayerInfo?.layer;
+        const valueKey = sepiLayerInfo?.selectedAttribute || 'peacebuilding_index';
+        if (!geojsonLayer?.eachLayer) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        const rows = [];
+        geojsonLayer.eachLayer((layer) => {
+            const props = layer?.feature?.properties || {};
+            const raw = props[valueKey];
+            const value = Number(raw);
+            if (!Number.isFinite(value)) return;
+            rows.push({
+                name: this.getDistrictNameForRanking(props),
+                value
+            });
+        });
+
+        const filtered = rows.filter((row) => {
+            const n = String(row.name || '').trim().toLowerCase();
+            return n !== 'unknown district';
+        });
+
+        if (!filtered.length) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        filtered.sort((a, b) => b.value - a.value);
+        const maxValue = Math.max(...filtered.map((r) => r.value), 1);
+        const html = filtered.map((row, idx) => {
+            const pct = Math.max(2, (row.value / maxValue) * 100);
+            return `
+                <div style="display:flex; align-items:center; gap:8px; margin: 0 0 6px 0; font-size: 11px;">
+                    <div style="width:22px; color:#6c757d; text-align:right; flex-shrink:0;">${idx + 1}.</div>
+                    <div style="width:120px; color:#343a40; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
+                    <div style="flex:1; height:14px; background:#e9ecef; border-radius:7px; overflow:hidden;">
+                        <div style="width:${pct}%; height:100%; background:#2c5f2d;"></div>
+                    </div>
+                    <div style="width:40px; text-align:right; color:#2c5f2d; font-weight:600; flex-shrink:0;">${row.value.toFixed(2)}</div>
+                </div>
+            `;
+        }).join('');
+
+        chart.innerHTML = `<div style="max-height: 280px; overflow-y: auto; padding-right: 2px;">${html}</div>`;
+        panel.style.display = 'block';
+    }
+
+    getDistrictNameForRanking(properties) {
+        const p = properties || {};
+        return (
+            p.ADM1_EN ||
+            p.adm1_name ||
+            p.NAME_1 ||
+            p.admin1_name ||
+            p.region ||
+            p.district ||
+            'Unknown District'
+        );
+    }
+
+    setConflictTimelineData(timelineData) {
+        const panel = this.container?.querySelector('#conflict-timeline-panel');
+        if (!panel) return;
+
+        if (!timelineData || !Array.isArray(timelineData.years) || !timelineData.years.length) {
+            panel.style.display = 'none';
+            return;
+        }
+
+        panel.style.display = 'block';
+        this.renderConflictTimelineChart(timelineData);
+    }
+
+    clearConflictTimelineData() {
+        const panel = this.container?.querySelector('#conflict-timeline-panel');
+        if (!panel) return;
+        panel.style.display = 'none';
+    }
+
+    renderConflictTimelineChart(timelineData) {
+        const canvas = this.container?.querySelector('#conflict-timeline-chart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const years = timelineData.years || [];
+        const overall = timelineData.overallSeries || [];
+        const district = timelineData.districtSeries || null;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+
+        const leftPad = 44;
+        const rightPad = 16;
+        const topPad = 26;
+        const bottomPad = 46;
+        const chartW = width - leftPad - rightPad;
+        const chartH = height - topPad - bottomPad;
+
+        const combined = district ? overall.concat(district) : overall;
+        const safeValues = combined.filter((v) => Number.isFinite(v));
+        const maxValue = safeValues.length ? Math.max(...safeValues) : 1;
+        const yMax = maxValue > 0 ? maxValue * 1.1 : 1;
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = '#2f3b47';
+        ctx.font = 'bold 12px Calibri, sans-serif';
+        const titleSuffix = timelineData.districtName ? ` • ${timelineData.districtName}` : ` • ${timelineData.aggregationLabel}`;
+        ctx.fillText(`${timelineData.metricName}${titleSuffix}`, leftPad, 16);
+
+        ctx.strokeStyle = '#e6e9ec';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+            const y = topPad + (i / 4) * chartH;
+            ctx.beginPath();
+            ctx.moveTo(leftPad, y);
+            ctx.lineTo(leftPad + chartW, y);
+            ctx.stroke();
+        }
+
+        const groupWidth = chartW / Math.max(years.length, 1);
+        const hasDistrict = Array.isArray(district);
+        const barWidth = hasDistrict ? Math.max(6, groupWidth * 0.32) : Math.max(10, groupWidth * 0.55);
+
+        years.forEach((year, i) => {
+            const gx = leftPad + i * groupWidth + groupWidth / 2;
+            const overallValue = Number(overall[i] || 0);
+            const overallHeight = (overallValue / yMax) * chartH;
+            const overallX = hasDistrict ? gx - barWidth - 2 : gx - barWidth / 2;
+            const overallY = topPad + chartH - overallHeight;
+
+            ctx.fillStyle = '#dc3545';
+            ctx.fillRect(overallX, overallY, barWidth, overallHeight);
+
+            if (hasDistrict) {
+                const districtValue = Number(district[i] || 0);
+                const districtHeight = (districtValue / yMax) * chartH;
+                const districtX = gx + 2;
+                const districtY = topPad + chartH - districtHeight;
+                ctx.fillStyle = '#6c757d';
+                ctx.fillRect(districtX, districtY, barWidth, districtHeight);
+            }
+
+            ctx.fillStyle = '#555';
+            ctx.font = '11px Calibri, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(String(year), gx, topPad + chartH + 16);
+        });
+
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(leftPad, topPad);
+        ctx.lineTo(leftPad, topPad + chartH);
+        ctx.lineTo(leftPad + chartW, topPad + chartH);
+        ctx.stroke();
+
+        ctx.fillStyle = '#444';
+        ctx.font = '11px Calibri, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('0', 6, topPad + chartH + 4);
+        ctx.fillText(`${yMax.toFixed(yMax >= 10 ? 0 : 2)}`, 6, topPad + 4);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#dc3545';
+        ctx.fillRect(leftPad, height - 14, 10, 10);
+        ctx.fillStyle = '#555';
+        ctx.fillText(timelineData.aggregationLabel || 'Overall', leftPad + 14, height - 5);
+        if (hasDistrict) {
+            ctx.fillStyle = '#6c757d';
+            ctx.fillRect(leftPad + 170, height - 14, 10, 10);
+            ctx.fillStyle = '#555';
+            ctx.fillText(timelineData.districtName || 'Selected district', leftPad + 184, height - 5);
+        }
     }
     
     /**

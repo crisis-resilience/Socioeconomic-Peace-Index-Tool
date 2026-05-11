@@ -207,6 +207,7 @@ function hideSEPIInfo() {
             const conflictYearControl = document.getElementById('conflictYearControl');
             const conflictYearSlider = document.getElementById('conflictYearSlider');
             const conflictYearValue = document.getElementById('conflictYearValue');
+            const primaryConflictDriverBtn = document.getElementById('primaryConflictDriverBtn');
             
             if (sepiOptions.length === 0) return;
 
@@ -226,11 +227,34 @@ function hideSEPIInfo() {
                 conflictYearControl.style.display = type === 'conflict' ? 'block' : 'none';
             };
             
+            const setPrimaryConflictDriverState = (enabled) => {
+                if (!primaryConflictDriverBtn) return;
+                primaryConflictDriverBtn.classList.toggle('active', enabled);
+                primaryConflictDriverBtn.textContent = enabled
+                    ? 'Hide Primary Conflict Driver'
+                    : 'Show Primary Conflict Driver';
+                const event = new CustomEvent('primaryConflictDriverToggled', {
+                    detail: { enabled },
+                    bubbles: true
+                });
+                primaryConflictDriverBtn.dispatchEvent(event);
+            };
+
+            const syncPrimaryConflictDriverButton = (activeType, activePillarId = null) => {
+                if (!primaryConflictDriverBtn) return;
+                const mainIsActive = activeType === 'main' && !activePillarId;
+                primaryConflictDriverBtn.disabled = !mainIsActive;
+                if (!mainIsActive && primaryConflictDriverBtn.classList.contains('active')) {
+                    setPrimaryConflictDriverState(false);
+                }
+            };
+            
             // Set initial state - Overall Peace Index active by default (layer load: sidebarInitialized → main.js)
             const defaultOption = document.querySelector('.sepi-option[data-sepi-type="main"]');
             if (defaultOption) {
                 defaultOption.classList.add('active');
             }
+            syncPrimaryConflictDriverButton('main');
             
             // Add click listeners to all SEPI options
             sepiOptions.forEach(option => {
@@ -246,6 +270,7 @@ function hideSEPIInfo() {
                         deactivateSubPillars();
                         updateSubPillarVisibility(null);
                         updateConflictYearControlVisibility(null);
+                        syncPrimaryConflictDriverButton(null);
                         
                         // Add visual feedback that no layers are active
                         if (sepiSection) {
@@ -274,6 +299,7 @@ function hideSEPIInfo() {
                         this.classList.add('active');
                         updateSubPillarVisibility(type === 'pillar' ? pillarId : null);
                         updateConflictYearControlVisibility(type);
+                        syncPrimaryConflictDriverButton(type, pillarId);
                         
                         // Remove the no-active-layers visual state
                         if (sepiSection) {
@@ -307,6 +333,7 @@ function hideSEPIInfo() {
                     sepiOptions.forEach(opt => opt.classList.remove('active'));
                     subPillarOptions.forEach(opt => opt.classList.remove('active'));
                     this.classList.add('active');
+                    syncPrimaryConflictDriverButton(type, pillarId);
 
                     if (sepiSection) {
                         sepiSection.classList.remove('no-active-layers');
@@ -329,6 +356,14 @@ function hideSEPIInfo() {
                         bubbles: true
                     });
                     this.dispatchEvent(event);
+                });
+            }
+
+            if (primaryConflictDriverBtn) {
+                primaryConflictDriverBtn.addEventListener('click', function() {
+                    if (this.disabled) return;
+                    const nextEnabled = !this.classList.contains('active');
+                    setPrimaryConflictDriverState(nextEnabled);
                 });
             }
 
