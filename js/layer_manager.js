@@ -893,7 +893,7 @@ export class SimplifiedPillarManager {
         
         return `
             <div class="sepi-popup-header">
-                <h3 class="sepi-popup-title">${isConflictData ? '⚠️' : '📊'} ${district}</h3>
+                <h3 class="sepi-popup-title">${isConflictData ? district : `📊 ${district}`}</h3>
             </div>
             <div style="padding: 15px;">
                 <div style="background: ${isConflictData ? '#fff5f5' : '#e8f5e8'}; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid ${headerColor};">

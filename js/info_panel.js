@@ -9,6 +9,13 @@ function escapeHtml(text) {
         .replace(/"/g, '&quot;');
 }
 
+/** Match layer_manager.parseNumericIfPossible — null/empty must not become 0 in rankings. */
+function parseRankingValue(raw) {
+    if (raw == null || raw === '') return null;
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) ? numeric : null;
+}
+
 /**
  * InfoPanel class - Creates and manages a floating info/analysis panel
  */
@@ -250,6 +257,81 @@ export class InfoPanel {
                             </div>
                             <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-top:10px;">
                                 Scores are within-country only and not comparable across countries.
+                            </div>
+
+                            <div class="welcome-conflict-section">
+                                <div class="welcome-conflict-heading">CONFLICT DATA</div>
+                                <p class="welcome-conflict-source">Source: ACLED · Annual data 2016–2025 · Display only, not part of SEPI computation</p>
+
+                                <div class="welcome-conflict-grid">
+                                    <div class="welcome-conflict-card">
+                                        <div class="card-label">Conflict Fatalities</div>
+                                        <p class="card-title">Total fatalities per year</p>
+                                        <p class="card-meta">Count, Admin-1 level</p>
+                                    </div>
+                                    <div class="welcome-conflict-card">
+                                        <div class="card-label">Conflict Events</div>
+                                        <p class="card-title">Total incidents per year</p>
+                                        <p class="card-meta">Count, Admin-1 level</p>
+                                    </div>
+                                    <div class="welcome-conflict-card">
+                                        <div class="card-label">Conflict Fatalities per 100k</div>
+                                        <p class="card-title">Fatalities relative to population</p>
+                                        <p class="card-meta">Rate, Admin-1 level</p>
+                                    </div>
+                                    <div class="welcome-conflict-card">
+                                        <div class="card-label">Conflict Events per 100k</div>
+                                        <p class="card-title">Incidents relative to population</p>
+                                        <p class="card-meta">Rate, Admin-1 level</p>
+                                    </div>
+                                </div>
+
+                                <div class="welcome-conflict-block">
+                                    <div class="block-label">Year Selector</div>
+                                    <div class="welcome-conflict-slider-track" aria-hidden="true"></div>
+                                    <div class="welcome-conflict-years">
+                                        <span>2016</span><span>2017</span><span>2018</span><span>2019</span><span>2020</span>
+                                        <span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span>
+                                    </div>
+                                    <p style="margin-top:8px;">Use the slider in the left panel to select a single year. The map updates to show data for that year only.</p>
+                                </div>
+
+                                <div class="welcome-conflict-block">
+                                    <div class="block-label">Map Legend</div>
+                                    <div class="welcome-conflict-legend-bar" aria-hidden="true"></div>
+                                    <div class="welcome-conflict-legend-labels">
+                                        <span>Higher severity</span>
+                                        <span>Lower severity</span>
+                                    </div>
+                                    <p>Each indicator uses its own scale. Red indicates higher conflict severity; yellow indicates lower. Scales are not shared across indicators.</p>
+                                </div>
+
+                                <div class="welcome-conflict-opens">
+                                    <div class="welcome-conflict-opens-header">Clicking a conflict indicator opens</div>
+                                    <div class="welcome-conflict-opens-item">
+                                        <span class="item-icon" aria-hidden="true">📋</span>
+                                        <div>
+                                            <strong>Indicator overview</strong>
+                                            <p>A description of what the indicator measures and how to interpret its values.</p>
+                                        </div>
+                                    </div>
+                                    <div class="welcome-conflict-opens-item">
+                                        <span class="item-icon" aria-hidden="true">📈</span>
+                                        <div>
+                                            <strong>Time series (2016–2025)</strong>
+                                            <p>Annual trend chart showing how the indicator has changed over the full data period for the selected country.</p>
+                                        </div>
+                                    </div>
+                                    <div class="welcome-conflict-opens-item">
+                                        <span class="item-icon" aria-hidden="true">💡</span>
+                                        <div>
+                                            <strong>Country analysis</strong>
+                                            <p>A brief contextual summary highlighting key patterns and notable regions for the selected country.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="welcome-conflict-disclaimer">SEPI is a structural baseline, not a real-time early warning tool. Results should be read alongside contextual knowledge and other data sources.</p>
                             </div>
                         </div>
                     </div>
@@ -795,15 +877,19 @@ export class InfoPanel {
 
         if (!geojsonLayer?.eachLayer || this.activeLayers.has('conflict')) {
             panel.style.display = 'none';
+            this._lastRankingHtml = null;
             return;
         }
+
+        const scrollEl = chart.querySelector('.sepi-ranking-scroll');
+        const prevScrollTop = scrollEl?.scrollTop ?? 0;
 
         const rows = [];
         geojsonLayer.eachLayer((layer) => {
             const props = layer?.feature?.properties || {};
             const raw = props[valueKey];
-            const value = Number(raw);
-            if (!Number.isFinite(value)) return;
+            const value = parseRankingValue(raw);
+            if (value == null) return;
             rows.push({
                 name: this.getDistrictNameForRanking(props),
                 value
@@ -817,6 +903,7 @@ export class InfoPanel {
 
         if (!filtered.length) {
             panel.style.display = 'none';
+            this._lastRankingHtml = null;
             return;
         }
 
@@ -842,7 +929,15 @@ export class InfoPanel {
         if (subtitleEl) {
             subtitleEl.textContent = 'Ranked from highest to lowest score.';
         }
-        chart.innerHTML = `<div style="max-height: 280px; overflow-y: auto; padding-right: 2px;">${html}</div>`;
+        const rankingHtml = `<div class="sepi-ranking-scroll" style="max-height: 280px; overflow-y: auto; padding-right: 2px;">${html}</div>`;
+        if (this._lastRankingHtml === rankingHtml) {
+            panel.style.display = 'block';
+            return;
+        }
+        this._lastRankingHtml = rankingHtml;
+        chart.innerHTML = rankingHtml;
+        const newScrollEl = chart.querySelector('.sepi-ranking-scroll');
+        if (newScrollEl) newScrollEl.scrollTop = prevScrollTop;
         panel.style.display = 'block';
     }
 

@@ -1,0 +1,304 @@
+/* About SEPI (more.html) content styles */
+
+.more-page h1 {
+    color: #343a40;
+    margin-bottom: 1rem;
+}
+
+.more-page .lead {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    color: #495057;
+}
+
+.more-page .content-section {
+    margin-bottom: 48px;
+}
+
+.more-page .content-section > h2 {
+    color: #2b6cb0;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #5b9bd5;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Methodology flowchart */
+.sepi-method-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 28px 0 24px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.sepi-method-step {
+    flex: 1 1 0;
+    min-width: 180px;
+    border: 2px solid #5b9bd5;
+    border-radius: 12px;
+    padding: 16px 14px;
+    background: #fff;
+    position: relative;
+}
+
+.sepi-method-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 12px solid #5b9bd5;
+    z-index: 2;
+}
+
+.sepi-method-step h3 {
+    margin: 0 0 12px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #2b6cb0;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.3;
+}
+
+.sepi-method-step ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    color: #343a40;
+}
+
+.sepi-method-pillars {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.sepi-method-pillars li {
+    background: #e8f4fc;
+    border: 1px solid #5b9bd5;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #2b6cb0;
+    text-align: center;
+}
+
+.sepi-method-score {
+    text-align: center;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #343a40;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.sepi-method-extra {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.sepi-method-extra .extra-step {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 14px 16px;
+    background: #f8f9fa;
+}
+
+.sepi-method-extra .extra-step strong {
+    color: #2b6cb0;
+}
+
+/* Data table */
+.more-page table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.more-page th,
+.more-page td {
+    padding: 12px 15px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+    vertical-align: top;
+}
+
+.more-page thead {
+    background-color: #2b6cb0;
+    color: #fff;
+}
+
+.more-page tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.more-page .indicators-table {
+    font-size: 0.9rem;
+}
+
+.more-page .indicators-table th {
+    font-size: 0.85rem;
+}
+
+.more-page .polarity-note {
+    background: #fff8e6;
+    border-left: 4px solid #f0ad4e;
+    padding: 14px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 16px;
+    font-size: 0.95rem;
+    line-height: 1.55;
+}
+
+/* Conflict / ACLED section */
+.conflict-data-section {
+    background: #fff;
+    color: #212529;
+    border-radius: 12px;
+    padding: 28px 24px 32px;
+    margin-top: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.conflict-data-section > h2 {
+    color: #212529 !important;
+    border-bottom-color: #dee2e6 !important;
+    margin-top: 0;
+}
+
+.conflict-intro {
+    color: #495057;
+    font-size: 0.98rem;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    max-width: 900px;
+}
+
+.conflict-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.conflict-card {
+    background: #f0f2f5;
+    color: #212529;
+    border-radius: 10px;
+    padding: 20px 18px;
+    line-height: 1.55;
+    border: 1px solid #e2e6ea;
+}
+
+.conflict-card h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #000;
+}
+
+.conflict-card p {
+    margin: 0;
+    font-size: 0.92rem;
+}
+
+.conflict-card-wide {
+    background: #f0f2f5;
+    color: #212529;
+    border-radius: 10px;
+    padding: 22px 20px;
+    margin-bottom: 20px;
+    line-height: 1.55;
+    border: 1px solid #e2e6ea;
+}
+
+.conflict-card-wide h3 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #000;
+}
+
+.conflict-card-wide p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.conflict-note {
+    background: #f5e8c8;
+    border: 2px solid #c4a574;
+    border-radius: 10px;
+    padding: 18px 20px;
+    color: #3d3428;
+    font-size: 0.95rem;
+    line-height: 1.55;
+}
+
+.conflict-note strong {
+    color: #2c2416;
+}
+
+/* FAQ */
+.more-page .faq-item {
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.more-page .faq-item:last-child {
+    border-bottom: none;
+}
+
+.more-page .faq-item h3 {
+    color: #2b6cb0;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.more-page .faq-item p {
+    margin: 0;
+    line-height: 1.65;
+    color: #495057;
+}
+
+.more-page a {
+    color: #2b6cb0;
+}
+
+.more-page .cite-block {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px 20px;
+    border-left: 4px solid #5b9bd5;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .conflict-cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sepi-method-step:not(:last-child)::after {
+        display: none;
+    }
+
+    .sepi-method-flow {
+        flex-direction: column;
+        gap: 16px;
+    }
+}

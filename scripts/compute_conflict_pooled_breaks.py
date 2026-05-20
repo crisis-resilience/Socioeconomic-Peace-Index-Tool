@@ -19,9 +19,9 @@ OUT = ROOT / "data" / "conflict_pooled_breaks.json"
 
 # Same files as js getCountryPath() when loading sepi_with_pillars_9_2.geojson.
 GEOJSONS = [
-    ROOT / "data" / "Kenya" / "sepi_with_pillars_Apr_28_Kenya.geojson",
-    ROOT / "data" / "Somalia" / "sepi_with_pillars_Apr_28_Somalia.geojson",
-    ROOT / "data" / "South_Sudan" / "sepi_with_pillars_Apr_28_South_Sudan.geojson",
+    ROOT / "data" / "Kenya" / "sepi_with_pillars_May_04_Kenya.geojson",
+    ROOT / "data" / "Somalia" / "sepi_with_pillars_May_04_Somalia.geojson",
+    ROOT / "data" / "South_Sudan" / "sepi_with_pillars_May_04_South_Sudan.geojson",
 ]
 
 Q_LOW = 0.02

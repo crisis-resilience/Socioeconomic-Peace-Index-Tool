@@ -3,27 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>More Information - DSVI Data Visualization</title>
-    
-    <!-- CSS styles -->
+    <title>About SEPI - Socioeconomic Peace Index Tool</title>
     <link rel="stylesheet" href="../css/styles.css">
-    
-    <meta name="description" content="More information about the DSVI Data Visualization tool and methodology">
-    
-    <!-- Additional styles for content pages -->
+    <link rel="stylesheet" href="../css/more-page.css">
+    <meta name="description" content="About the Socio-Economic Peacebuilding Index (SEPI): methodology, data sources, and indicators for Kenya, Somalia, and South Sudan.">
     <style>
         html, body {
             height: auto !important;
             overflow: auto !important;
             overflow-x: hidden !important;
         }
-
         #navbar {
             height: auto !important;
             flex-shrink: 0;
         }
-
-        /* Ensure the content container allows scrolling */
         .content-container {
             min-height: 100vh;
             overflow: visible;
@@ -31,119 +24,9 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
-        /* Make sure the footer stays at the bottom */
         footer {
             margin-top: 40px;
             position: relative;
-        }
-        .content-container {
-            padding: 30px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .content-section {
-            margin-bottom: 40px;
-        }
-        
-        .content-section h2 {
-            color: #343a40;
-            border-bottom: 2px solid #6c757d;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .data-source {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .data-source h3 {
-            color: #343a40;
-            margin-top: 0;
-        }
-        
-        .methodology-diagram {
-            display: flex;
-            justify-content: center;
-            margin: 30px 0;
-        }
-        
-        .methodology-diagram img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        .faq-item {
-            margin-bottom: 25px;
-        }
-        
-        .faq-item h3 {
-            color: #343a40;
-            margin-bottom: 10px;
-        }
-        
-        .two-column {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .column {
-            flex: 1;
-        }
-        
-        @media (max-width: 768px) {
-            .two-column {
-                flex-direction: column;
-            }
-        }
-        
-        /* Table styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        
-        th, td {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-        }
-        
-        thead {
-            background-color: #343a40;
-            color: white;
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        /* Figure styles */
-        .figure-container {
-            margin: 30px 0;
-            text-align: center;
-        }
-        
-        .figure-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            margin-bottom: 10px;
-        }
-        
-        .figure-caption {
-            font-style: italic;
-            color: #6c757d;
-            margin-top: 10px;
-            font-size: 0.9em;
         }
     </style>
 </head>
@@ -162,7 +45,7 @@
                 <h2 class="tool-title">Socioeconomic Peace Index Tool</h2>
                 <ul class="navbar-menu">
                     <li><a href="../index.html" class="larger-nav-link">Map</a></li>
-                    <li><a href="more.html" class="larger-nav-link nav-link-current" aria-current="page">More</a></li>
+                    <li><a href="more.html" class="larger-nav-link nav-link-current" aria-current="page">About SEPI</a></li>
                     <li><a href="about.html" class="larger-nav-link">About Us</a></li>
                 </ul>
             </div>
@@ -174,33 +57,35 @@
         </div>
     </nav>
 
-    <!-- Main content container -->
-    <div class="content-container">
+    <div class="content-container more-page">
         <div class="content-section">
             <h1>More Information About the Socioeconomic Peace Index Tool</h1>
-            <p>
-                The <strong>Socio-Economic Peacebuilding Index (SEPI)</strong> is a composite indicator developed by
-                the United Nations Development Programme (UNDP) Istanbul International Centre for Private Sector in
-                Development (ICPSD). It measures structural socio-economic conditions associated with conflict
-                vulnerability in the Horn of Africa, with a focus on Somalia, South Sudan, and Kenya.
+            <p class="lead">
+                The <strong>Socio-Economic Peacebuilding Index (SEPI)</strong> is a composite indicator developed by the
+                United Nations Development Programme (UNDP) Istanbul International Centre for Private Sector in Development
+                (ICPSD) to measure the structural socio-economic conditions associated with conflict vulnerability in the
+                Horn of Africa, with a focus on Somalia, South Sudan, and Kenya. SEPI is grounded in relative deprivation
+                theory, which states that the gap between perceived entitlements and actual conditions creates grievances
+                that can escalate into collective violence under certain socioeconomic conditions.
             </p>
-            <p>
-                SEPI is grounded in relative deprivation theory, which states that the gap between perceived
-                entitlements and actual conditions can create grievances that escalate into collective violence under
-                certain socioeconomic contexts.
+            <p class="lead">
+                SEPI is designed to support development actors, government partners, and donors in identifying where
+                integrated peacebuilding and development investments are most urgently needed in order to develop the
+                conditions for sustained peace.
             </p>
-            <p>
-                SEPI is calculated at the Admin-1 level. A high SEPI score reflects better structural conditions
-                relative to other regions in the same country. Scores are relative within country and are not a
-                universal standard.
+            <p class="lead">
+                SEPI is calculated at the Admin-1 (provincial/state) level across Kenya, Somalia, and South Sudan. A high
+                SEPI score reflects how a region has better structural conditions relative to other regions in the same
+                country.
             </p>
         </div>
 
         <div class="content-section">
             <h2>What Does the Map Show?</h2>
             <p>
-                Each Admin-1 region is shaded from lower capacity to higher capacity relative to peer regions in the
-                same country. Five pillars drive the composite score:
+                Each Admin-1 region is shaded on a spectrum from lower capacity (regions with the most deprived
+                socio-economic conditions relative to their country peers) to higher capacity (regions with the strongest
+                relative structural conditions). Five underlying pillars drive the composite score:
             </p>
             <table>
                 <thead>
@@ -216,7 +101,7 @@
                     </tr>
                     <tr>
                         <td>Food Security Index</td>
-                        <td>Share of population in IPC Crisis or worse (Phase 3+)</td>
+                        <td>Share of population in IPC Crisis or Worse (Phase 3+)</td>
                     </tr>
                     <tr>
                         <td>Poverty Reduction Index</td>
@@ -233,25 +118,66 @@
                 </tbody>
             </table>
             <p>
-                Hovering over or clicking a region reveals its SEPI score, within-country rank, and pillar scores.
+                Hovering over or clicking a region on the map reveals its composite SEPI score, its within-country rank,
+                and its five pillar scores.
             </p>
         </div>
 
         <div class="content-section">
             <h2>Methodology</h2>
             <p>
-                SEPI integrates multiple indicators of structural socio-economic capacity to create a comparative
-                assessment tool for peacebuilding programming.
+                The Socio-Economic Peacebuilding Index (SEPI) integrates multiple indicators of structural socio-economic
+                capacity to create a comparative assessment tool for peacebuilding programming.
             </p>
-            <ol>
-                <li><strong>Data Collection:</strong> Household surveys, remote sensing, and international databases.</li>
-                <li><strong>Indicator Screening:</strong> Candidate indicators are reviewed for domain coverage, quality, and independence.</li>
-                <li><strong>Normalization and Polarity Alignment:</strong> Indicators are rescaled to a common [0,1] range.</li>
-                <li><strong>Pillar Score Calculation:</strong> Indicators are grouped into five pillars with equal within-pillar weights.</li>
-                <li><strong>SEPI Composite Score:</strong> Pillars are combined with a geometric mean and equal pillar weights.</li>
-                <li><strong>Validation:</strong> Tested against ACLED conflict intensity and IOM displacement tracking data.</li>
-                <li><strong>Visualization:</strong> Results are published via interactive Admin-1 maps and dashboards.</li>
-            </ol>
+
+            <div class="sepi-method-flow" role="img" aria-label="SEPI methodology: four-step process from data collection to final score">
+                <div class="sepi-method-step">
+                    <h3>1. Data Collection &amp; Cleaning</h3>
+                    <ul>
+                        <li>Household Surveys</li>
+                        <li>Satellite Data (NDVI)</li>
+                        <li>Conflict Events (ACLED)</li>
+                        <li>Health/IPC Data</li>
+                    </ul>
+                </div>
+                <div class="sepi-method-step">
+                    <h3>2. Normalization &amp; Calibration</h3>
+                    <ul>
+                        <li>Min-Max Scaling (0–1)</li>
+                        <li>Directionality Inversion</li>
+                        <li>Weighted geometric mean with equal pillar weights</li>
+                    </ul>
+                </div>
+                <div class="sepi-method-step">
+                    <h3>3. Aggregation</h3>
+                    <ul class="sepi-method-pillars">
+                        <li>Pillar 1: Education</li>
+                        <li>Pillar 2: Food Security</li>
+                        <li>Pillar 3: Poverty Reduction</li>
+                        <li>Pillar 4: Health Access</li>
+                        <li>Pillar 5: Climate Resilience</li>
+                    </ul>
+                </div>
+                <div class="sepi-method-step">
+                    <h3>4. SEPI Score</h3>
+                    <p class="sepi-method-score">Final Composite Index<br>(0 – 1 Scale)</p>
+                </div>
+            </div>
+
+            <div class="sepi-method-extra">
+                <div class="extra-step">
+                    <p><strong>Indicator screening:</strong> Candidate indicators are reviewed for domain coverage, data quality, and statistical independence before inclusion.</p>
+                </div>
+                <div class="extra-step">
+                    <p><strong>Within-pillar weighting:</strong> Each pillar score is the arithmetic mean of its indicators, with equal weight assigned to each sub-indicator.</p>
+                </div>
+                <div class="extra-step">
+                    <p><strong>Validation:</strong> SEPI scores are validated against ACLED conflict intensity data and IOM displacement tracking data. Robustness is assessed by re-running the index with alternative normalization methods and weighting schemes.</p>
+                </div>
+                <div class="extra-step">
+                    <p><strong>Visualization:</strong> Results are displayed through interactive maps and dashboards enabling users to explore composite scores, pillar breakdowns, and raw indicator values at the Admin-1 level.</p>
+                </div>
+            </div>
         </div>
 
         <div class="content-section">
@@ -259,7 +185,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Pillar / Category</th>
+                        <th>Pillar / Categories</th>
                         <th>Source</th>
                         <th>Coverage years</th>
                     </tr>
@@ -268,32 +194,32 @@
                     <tr>
                         <td>Food Security</td>
                         <td>IPC / HDX HAPI</td>
-                        <td>2024-2025</td>
+                        <td>2024–2025</td>
                     </tr>
                     <tr>
                         <td>Education</td>
                         <td>Kenya Population and Housing Census; Somalia SIHBS; South Sudan National Education Census</td>
-                        <td>2019-2022</td>
+                        <td>2019–2022</td>
                     </tr>
                     <tr>
                         <td>Health Access</td>
                         <td>Government of Kenya; WHO health facility database</td>
-                        <td>2024-2025</td>
+                        <td>2024–2025</td>
                     </tr>
                     <tr>
                         <td>Poverty Reduction</td>
                         <td>OPHI; Kenya National Bureau of Statistics; Somalia NBS; South Sudan Poverty and Equity Assessment; CLiMIS South Sudan</td>
-                        <td>2022-2024</td>
+                        <td>2022–2024</td>
                     </tr>
                     <tr>
                         <td>Education and Healthcare Accessibility</td>
                         <td>Heidelberg Institute for Geoinformation Technology</td>
-                        <td>2025-2026</td>
+                        <td>2025–2026</td>
                     </tr>
                     <tr>
                         <td>Climate Resilience / Environment</td>
                         <td>Google Earth Engine Data Catalog</td>
-                        <td>2023-2024</td>
+                        <td>2023–2024</td>
                     </tr>
                     <tr>
                         <td>Administrative boundaries</td>
@@ -301,74 +227,178 @@
                         <td>Current official releases</td>
                     </tr>
                     <tr>
-                        <td>Conflict (validation only)</td>
+                        <td>Conflict</td>
                         <td>ACLED API</td>
-                        <td>2016-2025</td>
+                        <td>2016–2025</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
+        <div class="content-section conflict-data-section">
+            <h2>Conflict Data</h2>
+            <p class="conflict-intro">
+                Event counts and fatalities were derived from ACLED data spanning January 2016 to December 2025,
+                incorporating three event types: Battles, Explosions/Remote Violence, and Violence against Civilians.
+            </p>
+
+            <div class="conflict-cards-grid">
+                <div class="conflict-card">
+                    <h3>Battles</h3>
+                    <p>A violent interaction between two organized armed groups at a particular time and location. Battles can occur between armed and organized state, non-state, and external groups, and in any combination thereof.</p>
+                </div>
+                <div class="conflict-card">
+                    <h3>Explosions / remote violence</h3>
+                    <p>Incidents in which one side uses weapon types that, by their nature, are at range and widely destructive.</p>
+                </div>
+                <div class="conflict-card">
+                    <h3>Violence against civilians</h3>
+                    <p>Violent events where an organized armed group inflicts violence upon unarmed non-combatants.</p>
+                </div>
+            </div>
+
+            <div class="conflict-card-wide">
+                <h3>What is ACLED?</h3>
+                <p>ACLED (Armed Conflict Location &amp; Event Data) is an independent global monitor that collects, analyses, and maps data on conflict and protest. ACLED provides detailed information to help identify, understand, and track patterns and trends in conflict and crisis situations around the world.</p>
+            </div>
+
+            <div class="conflict-note">
+                <strong>Fatality note:</strong> ACLED only records estimated fatalities when reported by the source material. Where possible, researchers triangulate fatality figures, but ACLED does not independently verify them.
+            </div>
+        </div>
+
         <div class="content-section">
-            <h2>Frequently Asked Questions</h2>
+            <h2>Key Indicators</h2>
+            <p><strong>Which indicators did we choose to build SEPI?</strong></p>
+            <table class="indicators-table">
+                <thead>
+                    <tr>
+                        <th>Pillar</th>
+                        <th>Kenya</th>
+                        <th>Somalia</th>
+                        <th>South Sudan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Education</td>
+                        <td>Primary school net attendance (%) + Secondary school net attendance (%) + Population with school access (%)</td>
+                        <td>Literacy rate (%) + Primary net attendance (%) + Secondary education attainment (%) + Population with school access (%)</td>
+                        <td>Population with school access (%) + Teachers on payroll (%) + Student dropout rate (%)</td>
+                    </tr>
+                    <tr>
+                        <td>Health</td>
+                        <td>Population with healthcare access (%) + Health facilities per 10k pop + Hospitals per 100k pop</td>
+                        <td>Population with healthcare access (%) + Health facilities per 10k pop + Hospitals per 100k pop</td>
+                        <td>Population with healthcare access (%) + Health facilities per 10k pop + Hospitals per 100k pop</td>
+                    </tr>
+                    <tr>
+                        <td>Food Security</td>
+                        <td>Population in IPC Phase 3+</td>
+                        <td>Population in IPC Phase 3+</td>
+                        <td>Population in IPC Phase 3+</td>
+                    </tr>
+                    <tr>
+                        <td>Economic</td>
+                        <td>Poverty headcount (%) + Gross county product per capita (KSh)</td>
+                        <td>Poverty headcount (%) + Household expenditure (USD)</td>
+                        <td>Poverty headcount (%) + Avg. minimum consumption basket cost (USD)</td>
+                    </tr>
+                    <tr>
+                        <td>Environment</td>
+                        <td>NDVI + Soil moisture anomaly + FAPAR anomaly + Palmer Drought Severity Index</td>
+                        <td>NDVI + Soil moisture anomaly + FAPAR anomaly + Palmer Drought Severity Index</td>
+                        <td>NDVI + Soil moisture anomaly + FAPAR anomaly + Palmer Drought Severity Index</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="polarity-note">
+                All indicators contribute positively to the SEPI score, except for the following, which have a negative
+                polarity (higher values reduce the score): Population in IPC Phase 3+, Poverty headcount (%), Student
+                dropout rate, and Average minimum consumption basket cost (USD).
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>FAQ</h2>
 
             <div class="faq-item">
                 <h3>Why use a geometric mean across pillars instead of a simple average?</h3>
                 <p>
-                    The geometric mean ensures all five dimensions matter and prevents strong performance in one pillar
-                    from fully masking very low performance in another.
+                    The geometric mean ensures that all five dimensions matter and that a high score in one pillar cannot
+                    compensate for a low score in another. With a simple arithmetic average, a region that completely fails
+                    on food security can still receive a mid-range score if it scores well on health and education. The
+                    geometric mean prevents this masking effect — a near-zero score on any single pillar substantially
+                    depresses the final score. This reflects the design premise that peacebuilding capacity requires a
+                    baseline across all structural dimensions.
                 </p>
             </div>
 
             <div class="faq-item">
                 <h3>How are the sub-indicators weighted?</h3>
                 <p>
-                    Each pillar contributes equally to the composite score. Within each pillar, indicators are averaged
-                    with equal weights for transparency and reproducibility.
+                    Each pillar contributes equally to the composite score. Within each pillar, the score is the arithmetic
+                    mean of its indicators, meaning each sub-pillar indicator contributes the same fraction (1 / number of
+                    indicators) to the pillar score. This is a deliberate transparency choice: equal weighting is
+                    reproducible, auditable, and prevents subjective judgments regarding ranking criteria such as “primary
+                    school enrollment rate is more important than school accessibility.”
                 </p>
             </div>
 
             <div class="faq-item">
                 <h3>Are scores comparable across Kenya, Somalia, and South Sudan?</h3>
                 <p>
-                    No. Scores are min-max normalized within each country, so a value from one country is not directly
-                    comparable to the same value in another country.
+                    No. SEPI scores are min-max normalized within each country, so the reference distribution differs between
+                    countries. A score of 0.65 in Kenya and 0.65 in South Sudan reflect different raw underlying conditions.
                 </p>
             </div>
 
             <div class="faq-item">
                 <h3>What years does the data cover?</h3>
-                <p>
-                    Data sources span approximately 2019-2026, depending on indicator type and country source systems.
-                </p>
+                <p>Data sources span 2019–2026.</p>
+                <ul style="line-height: 1.65; color: #495057;">
+                    <li>Food security data (IPC): 2024–2025</li>
+                    <li>Health facility data: 2024–2026</li>
+                    <li>Education data: 2019–2026</li>
+                    <li>Economic indicators: 2022–2024</li>
+                    <li>Climate indicators: 2023–2024</li>
+                </ul>
+                <p>See the full sources by clicking each sub-pillar on the map.</p>
             </div>
 
             <div class="faq-item">
                 <h3>Is conflict data included in the SEPI score?</h3>
                 <p>
-                    No. Conflict data is used for validation after index construction, not as an input to the composite SEPI score.
+                    No. Conflict data (ACLED) is used only to validate the index after construction — to test whether lower
+                    SEPI scores predict higher conflict intensity and displacement.
                 </p>
             </div>
         </div>
 
         <div class="content-section">
             <h2>How to Cite This Index</h2>
-            <p>
-                UNDP ICPSD Crisis Resilience Team. (2025). <em>Socio-Economic Peacebuilding Index (SEPI)</em>. Admin-1
-                level composite indicator for Kenya, Somalia, and South Sudan. United Nations Development Programme.
-            </p>
-            <p>
-                Primary repository:
-                <a href="https://github.com/m-szigeti/Socioeconomic-Peace-Index-Tool" target="_blank" rel="noopener noreferrer">
-                    https://github.com/m-szigeti/Socioeconomic-Peace-Index-Tool
-                </a>
-            </p>
-            <p>
-                Additional resources:
-                <a href="https://github.com/crisis-resilience/sepi" target="_blank" rel="noopener noreferrer">
-                    https://github.com/crisis-resilience/sepi
-                </a>
-            </p>
+            <div class="cite-block">
+                <p style="margin: 0;">
+                    UNDP ICPSD Crisis Resilience Team. (2025). <em>Socio-Economic Peacebuilding Index (SEPI)</em>. Admin-1
+                    level composite indicator for Kenya, Somalia, and South Sudan. United Nations Development Programme.
+                    Available at:
+                    <a href="https://github.com/m-szigeti/Socioeconomic-Peace-Index-Tool" target="_blank" rel="noopener noreferrer">https://github.com/m-szigeti/Socioeconomic-Peace-Index-Tool</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h2>Access the Data and Code</h2>
+            <p>All scores, pillar breakdowns, raw sub-indicator values, and methodology documentation are openly available:</p>
+            <ul>
+                <li>
+                    <strong>GitHub repository:</strong>
+                    <a href="https://github.com/m-szigeti/Socioeconomic-Peace-Index-Tool" target="_blank" rel="noopener noreferrer">https://github.com/m-szigeti/Socioeconomic-Peace-Index-Tool</a>
+                </li>
+                <li>
+                    <a href="https://github.com/crisis-resilience/sepi" target="_blank" rel="noopener noreferrer">https://github.com/crisis-resilience/sepi</a>
+                </li>
+            </ul>
         </div>
 
         <div class="content-section">
@@ -379,8 +409,7 @@
             </p>
         </div>
     </div>
-    
-    <!-- Simple footer -->
+
     <footer style="background-color: #343a40; color: white; text-align: center; padding: 20px; margin-top: 40px;">
         <p>© 2025 DSVI Data Visualization Tool | All Rights Reserved</p>
     </footer>

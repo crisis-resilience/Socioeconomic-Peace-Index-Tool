@@ -26,7 +26,23 @@
     line-height: 1.4;
     font-family: 'Calibri', 'Segoe UI', sans-serif;
     max-height: 600px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scroll only the body; keep the draggable header fixed at the top */
+.sepi-popup .sepi-popup-header,
+.pillar-popup .sepi-popup-header {
+    flex-shrink: 0;
+}
+
+.sepi-popup .sepi-popup-header + div,
+.pillar-popup .sepi-popup-header + div {
+    flex: 1 1 auto;
+    min-height: 0;
     overflow-y: auto;
+    overflow-x: hidden;
 }
 
 /* Make the Leaflet close button clearly visible on all popups */
@@ -96,6 +112,7 @@
     justify-content: space-between;
     align-items: center;
     border-radius: 8px 8px 0 0;
+    flex-shrink: 0;
 }
 
 .sepi-popup-header h3,
