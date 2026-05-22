@@ -6,6 +6,7 @@ import { LayerManager } from './layer_manager.js';
 import { createAdminLabelLayers, loadCountryOutline } from './admin_labels.js';
 import { InfoPanel } from './info_panel.js';
 import { populateColorRampSelector, setConfigCountry, COUNTRY_VIEWS, getCountryOutlineCandidates, getCountryPath, getCurrentCountry, SUPPORTED_COUNTRIES, LAYER_CONFIG, PILLAR_CONFIG } from './layer_config.js';
+import { getSepiDashboardContent } from './sepi_dashboard_content.js';
 // We only import loadTiff. We handle removal manually to ensure compatibility.
 import { loadTiff } from './zoom-adaptive-tiff-loader.js'; 
 import { WelcomePopup } from './welcome_popup.js';
@@ -790,13 +791,18 @@ function updateInfoPanelWithSEPI() {
     
     // Update SEPI layer specifically
     if (layerManager.sepiManager?.isActive()) {
+        const country = getCurrentCountry();
+        const dashboardContent = getSepiDashboardContent(country);
         infoPanel.addLayer('sepi', {
-            name: 'Socioeconomic Peace Index (SEPI)',
+            name: dashboardContent
+                ? `Overall Peace Index — ${dashboardContent.countryLabel}`
+                : 'Socioeconomic Peace Index (SEPI)',
             type: 'sepi',
             layer: layerManager.sepiManager.sepiLayer,
             selectedAttribute: layerManager.sepiManager?.config?.property || 'peacebuilding_index',
             featureCount: layerManager.sepiManager.sepiLayer?.getLayers?.()?.length || 0,
-            description: getConfigSidebarDescription('sepiLayer'),
+            description: dashboardContent ? '' : getConfigSidebarDescription('sepiLayer'),
+            dashboardContent,
             source: 'SEPI composite dataset',
             year: 'Latest available'
         });

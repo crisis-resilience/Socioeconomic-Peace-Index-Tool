@@ -1,5 +1,14 @@
 // info_panel.js - Updated with SEPI integration and correlation analysis
 
+import { renderSepiDashboardHtml } from './sepi_dashboard_content.js';
+import { getCurrentCountry } from './layer_config.js';
+import {
+    buildCountryReport,
+    renderCountryReportHTML,
+    drawCountryReportCharts
+} from './country_report.js';
+import { getCountryDisplayLabel } from './conflict_context_content.js';
+
 function escapeHtml(text) {
     if (text == null) return '';
     return String(text)
@@ -128,7 +137,6 @@ export class InfoPanel {
                         <div class="welcome-content">
                             <div style="background:#f0f0ec; border:1px solid #d2d2ce; border-radius:8px; padding:10px 12px; margin-bottom:14px;">
                                 <div style="font-size:18px; font-weight:700; color:#2f2f2f;">SEPI Analysis Tool — User Guide</div>
-                                <div style="font-size:12px; color:#666; margin-top:3px;">Socioeconomic Peace Index · Somalia · South Sudan · Kenya · Admin-1 level</div>
                             </div>
 
                             <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">WHAT THE TOOL SHOWS</div>
@@ -189,70 +197,13 @@ export class InfoPanel {
                                 The overall score is a geometric mean of all five pillars. A very low score on any one pillar significantly depresses the overall score.
                             </div>
 
-                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">ABOUT SEPI — WORKED EXAMPLE</div>
-                            <div style="background:#f2f3f1; border:1px solid #d8d9d6; border-radius:8px; padding:10px; margin-bottom:12px;">
-                                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px;">
-                                    <div style="background:#f4f1e9; border:1px solid #cbc8bf; border-radius:8px; padding:8px; text-align:center;">
-                                        <div style="font-weight:700; color:#4a4a4a; font-size:11px;">Primary attendance</div>
-                                        <div style="font-size:11px; color:#6a6a6a;">84% (range 42–96%)</div>
-                                    </div>
-                                    <div style="background:#f4f1e9; border:1px solid #cbc8bf; border-radius:8px; padding:8px; text-align:center;">
-                                        <div style="font-weight:700; color:#4a4a4a; font-size:11px;">Secondary attendance</div>
-                                        <div style="font-size:11px; color:#6a6a6a;">68% (range 28–88%)</div>
-                                    </div>
-                                    <div style="background:#f4f1e9; border:1px solid #cbc8bf; border-radius:8px; padding:8px; text-align:center;">
-                                        <div style="font-weight:700; color:#4a4a4a; font-size:11px;">School access</div>
-                                        <div style="font-size:11px; color:#6a6a6a;">91% (range 55–98%)</div>
-                                    </div>
-                                </div>
-
-                                <div style="text-align:center; font-size:11px; color:#777; margin:4px 0;">↓ min-max normalize to [0,1]</div>
-
-                                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px;">
-                                    <div style="background:#d9ece6; border:1px solid #7cb9aa; border-radius:8px; padding:8px; text-align:center;">
-                                        <div style="font-weight:700; color:#1b6e5d; font-size:20px; line-height:1;">0.78</div>
-                                        <div style="font-size:11px; color:#1b6e5d;">normalized</div>
-                                    </div>
-                                    <div style="background:#d9ece6; border:1px solid #7cb9aa; border-radius:8px; padding:8px; text-align:center;">
-                                        <div style="font-weight:700; color:#1b6e5d; font-size:20px; line-height:1;">0.67</div>
-                                        <div style="font-size:11px; color:#1b6e5d;">normalized</div>
-                                    </div>
-                                    <div style="background:#d9ece6; border:1px solid #7cb9aa; border-radius:8px; padding:8px; text-align:center;">
-                                        <div style="font-weight:700; color:#1b6e5d; font-size:20px; line-height:1;">0.84</div>
-                                        <div style="font-size:11px; color:#1b6e5d;">normalized</div>
-                                    </div>
-                                </div>
-
-                                <div style="text-align:center; font-size:11px; color:#777; margin:4px 0;">(0.78 + 0.67 + 0.84) / 3</div>
-
-                                <div style="background:#d9e7f5; border:1px solid #8db0d9; border-radius:8px; padding:10px; text-align:center; margin:6px auto 8px; max-width:320px;">
-                                    <div style="font-weight:700; color:#245a93;">Education pillar score: 0.76</div>
-                                    <div style="font-size:11px; color:#2f6ea8;">arithmetic mean of normalized indicators</div>
-                                </div>
-
-                                <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:8px;">
-                                    <div style="background:#e2edf8; border:1px solid #95b3d6; border-radius:8px; padding:6px; text-align:center; font-size:11px;"><strong>Food</strong><br>0.68</div>
-                                    <div style="background:#e2edf8; border:1px solid #6e9ccf; border-radius:8px; padding:6px; text-align:center; font-size:11px;"><strong>Education</strong><br>0.76</div>
-                                    <div style="background:#e2edf8; border:1px solid #95b3d6; border-radius:8px; padding:6px; text-align:center; font-size:11px;"><strong>Health</strong><br>0.71</div>
-                                    <div style="background:#e2edf8; border:1px solid #95b3d6; border-radius:8px; padding:6px; text-align:center; font-size:11px;"><strong>Economic</strong><br>0.55</div>
-                                    <div style="background:#e2edf8; border:1px solid #95b3d6; border-radius:8px; padding:6px; text-align:center; font-size:11px;"><strong>Climate</strong><br>0.63</div>
-                                </div>
-
-                                <div style="text-align:center; font-size:11px; color:#777; margin:4px 0;">geometric mean of all five pillars</div>
-
-                                <div style="background:#dfead2; border:1px solid #90b274; border-radius:10px; padding:10px; text-align:center; margin:6px auto 0; max-width:280px;">
-                                    <div style="font-weight:700; color:#355a1f;">Overall SEPI: 0.67</div>
-                                    <div style="font-size:11px; color:#426d28;">County X, Kenya · High performance range</div>
-                                </div>
-                            </div>
-
                             <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">SCORE RANGES</div>
                             <div style="font-size:12px; color:#444; line-height:1.55;">
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong>0.0 - 0.2</strong> &nbsp; Very low — severe deprivation</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong>0.2 - 0.4</strong> &nbsp; Low — significant gaps</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong>0.4 - 0.6</strong> &nbsp; Moderate — mixed performance</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong>0.6 - 0.8</strong> &nbsp; High — relatively strong conditions</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong>0.8 - 1.0</strong> &nbsp; Very high — best-performing within country</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong>0.0 - 0.2</strong></div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong>0.2 - 0.4</strong></div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong>0.4 - 0.6</strong></div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong>0.6 - 0.8</strong></div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong>0.8 - 1.0</strong></div>
                                 <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong>No data</strong></div>
                             </div>
                             <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-top:10px;">
@@ -366,8 +317,8 @@ export class InfoPanel {
                         </div>
                         <div class="analysis-content">
                             <div class="analysis-tool">
-                                <h5>Create Summary Report</h5>
-                                <p>Generate correlation analysis between SEPI index and subnational statistics with visualizations</p>
+                                <h5>Country SEPI Report</h5>
+                                <p>Build a report for the selected country using Active Layers context, district rankings, conflict narrative, and charts.</p>
                                 <button class="run-analysis-btn" data-analysis="summary">Generate Report</button>
                             </div>
                         </div>
@@ -842,6 +793,10 @@ export class InfoPanel {
                     layer.description && String(layer.description).trim()
                         ? `<div class="layer-description">${escapeHtml(layer.description)}</div>`
                         : '';
+                const dashboardHtml = layer.dashboardContent
+                    ? renderSepiDashboardHtml(layer.dashboardContent)
+                    : '';
+                const detailsHtml = dashboardHtml || this.generateLayerDetails(layer);
                 return `
             <div class="layer-item" data-layer-id="${escapeHtml(layer.id)}">
                 <div class="layer-header">
@@ -850,7 +805,7 @@ export class InfoPanel {
                 </div>
                 ${desc}
                 <div class="layer-details">
-                    ${this.generateLayerDetails(layer)}
+                    ${detailsHtml}
                 </div>
             </div>
         `;
@@ -1078,6 +1033,10 @@ export class InfoPanel {
      * @param {Object} layer - Layer information
      */
     generateLayerDetails(layer) {
+        if (layer.dashboardContent) {
+            return '';
+        }
+
         const details = [];
         
         if (layer.opacity !== undefined) {
@@ -1109,65 +1068,40 @@ export class InfoPanel {
     }
     
     /**
-     * Generate summary report with correlations and visualizations
+     * Generate country SEPI report for the selected country (Analysis → Report Results).
      */
     async generateSummaryReport() {
         const button = this.container.querySelector('.run-analysis-btn');
         const resultsContent = this.container.querySelector('.results-content');
-        
-        // Show loading state
+        const country = getCurrentCountry();
+        const countryLabel = getCountryDisplayLabel(country);
+
         button.disabled = true;
         button.textContent = 'Generating...';
         resultsContent.innerHTML = `
             <div class="analysis-loading">
                 <div class="loading-spinner"></div>
-                <p>Analyzing layer correlations...</p>
+                <p>Building report for ${escapeHtml(countryLabel)}…</p>
             </div>
         `;
-        
-        try {
-            // Simulate analysis processing
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // UPDATED: Look for SEPI layers AND Pillar layers
-            const sepiLayers = Array.from(this.activeLayers.values()).filter(l => 
-                l.type === 'sepi' || l.type === 'pillar' || 
-                l.name.toLowerCase().includes('sepi') || 
-                l.name.toLowerCase().includes('peace') ||
-                l.name.toLowerCase().includes('pillar')
-            );
-            const statLayers = Array.from(this.activeLayers.values()).filter(l => 
-                l.type === 'vector' && 
-                !l.name.toLowerCase().includes('sepi') && 
-                !l.name.toLowerCase().includes('peace') &&
-                !l.name.toLowerCase().includes('pillar')
-            );
 
-            console.log('SEPI/Pillar Layers found:', sepiLayers);
-            console.log('Stat Layers found:', statLayers);
-            
-            if (sepiLayers.length === 0 || statLayers.length === 0) {
-                this.showNoDataMessage(resultsContent);
-                return;
-            }
-            
-            // Generate the report
-            const reportData = this.generateCorrelationData(sepiLayers, statLayers);
-            const reportHTML = this.createReportHTML(reportData);
-            
-            resultsContent.innerHTML = reportHTML;
-            
-            // Create charts after HTML is rendered
-            setTimeout(() => {
-                this.createCharts(reportData);
-            }, 100);
-            
+        try {
+            const reportData = await buildCountryReport({
+                country,
+                activeLayers: this.activeLayers
+            });
+
+            this._lastCountryReport = reportData;
+            resultsContent.innerHTML = renderCountryReportHTML(reportData);
+            this.setActiveTab('analysis');
+
+            setTimeout(() => drawCountryReportCharts(reportData), 100);
         } catch (error) {
             console.error('Error generating report:', error);
             resultsContent.innerHTML = `
                 <div class="analysis-error">
                     <h5>Report Generation Error</h5>
-                    <p>Failed to generate correlation report: ${error.message}</p>
+                    <p>Failed to generate country report: ${escapeHtml(error.message)}</p>
                 </div>
             `;
         } finally {
@@ -2067,7 +2001,10 @@ export class InfoPanel {
                     
                     // Generate filename with timestamp
                     const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                    const filename = `sepi-correlation-report-${timestamp}.pdf`;
+                    const countrySlug = (this._lastCountryReport?.country || getCurrentCountry() || 'country')
+                        .replace(/_/g, '-')
+                        .toLowerCase();
+                    const filename = `sepi-country-report-${countrySlug}-${timestamp}.pdf`;
                     
                     // Save the PDF
                     pdf.save(filename);
