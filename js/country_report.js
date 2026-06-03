@@ -1,21 +1,24 @@
 /**
- * Country SEPI report builder for Analysis → Report Results.
+ * Country SEPI / Conflict report builder for Analysis → Report Results.
+ * SEPI report: country report docx. Conflict report: conflict PDF UI + Conflict Context.docx when conflict layer active.
  */
 
-import { getSepiDistrictGeoJSONPathForAdm1Labels } from './layer_config.js';
-import { getSepiDashboardContent, renderSepiDashboardHtml } from './sepi_dashboard_content.js';
-import { getConflictContextContent, getCountryDisplayLabel } from './conflict_context_content.js';
-import { renderSepiWorkedExampleSection } from './sepi_methodology_content.js';
+import { getSepiDistrictGeoJSONPathForAdm1Labels, PILLAR_CONFIG } from './layer_config.js';
+import { getCountryDisplayLabel, getConflictContextContent } from './conflict_context_content.js';
+import { getCountryReportNarrative } from './country_report_narrative.js';
 
 const CONFLICT_YEARS = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
+const DEFAULT_CONFLICT_YEAR = 2025;
 
-const PILLAR_KEYS = [
+const TABLE_PILLARS = [
     { key: 'pillar_education', label: 'Education' },
     { key: 'pillar_health', label: 'Health Access' },
     { key: 'pillar_food_security', label: 'Food Security' },
     { key: 'pillar_economic', label: 'Poverty Reduction' },
-    { key: 'pillar_climate', label: 'Climate Resilience' }
+    { key: 'pillar_climate', label: 'Climate' }
 ];
+
+const SEPI_VALUE_KEYS = ['sepi', 'peacebuilding_index', 'index', 'peace_index'];
 
 function escapeHtml(text) {
     if (text == null) return '';
@@ -45,40 +48,108 @@ function getDistrictName(properties) {
     );
 }
 
-function collectRankingFromGeoJSON(geojson, valueKey = 'peacebuilding_index') {
+function detectSepiKey(properties) {
+    for (const key of SEPI_VALUE_KEYS) {
+        if (properties[key] != null && properties[key] !== '') return key;
+    }
+    return 'sepi';
+}
+
+function getConflictValue(properties, pillarId, year) {
+    const config = PILLAR_CONFIG[pillarId];
+    if (!config) return null;
+    const candidates = [];
+    if (year) candidates.push(`${config.property}_${year}`);
+    if (config.fallbackProperty) candidates.push(config.fallbackProperty);
+    candidates.push(config.property);
+    for (const key of candidates) {
+        if (!key) continue;
+        if (properties[key] != null && properties[key] !== '') {
+            const v = parseRankingValue(properties[key]);
+            if (v != null) return v;
+        }
+    }
+    return null;
+}
+
+function getConflictPer100k(properties, year = DEFAULT_CONFLICT_YEAR) {
+    const keys = [
+        `count_conflicts_events_per_1k_${year}`,
+        'ACLED_conflict_events_per_1k_pop',
+        'count_conflicts_events_per_1k'
+    ];
+    for (const key of keys) {
+        const v = parseRankingValue(properties[key]);
+        if (v != null) return v;
+    }
+    return null;
+}
+
+function formatScore(value) {
+    if (value == null) return 'N/A';
+    const n = Number(value);
+    if (!Number.isFinite(n)) return 'N/A';
+    return n.toFixed(3);
+}
+
+function formatConflictMetric(value, perCapita = false) {
+    if (value == null) return '—';
+    const n = Number(value);
+    if (!Number.isFinite(n)) return '—';
+    if (perCapita) return n.toFixed(3);
+    return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+function collectAllRegionRows(geojson) {
+    const sepiKey = geojson.features?.[0]?.properties
+        ? detectSepiKey(geojson.features[0].properties)
+        : 'sepi';
+
     const rows = [];
     for (const feature of geojson.features || []) {
         const props = feature.properties || {};
-        const value = parseRankingValue(props[valueKey]);
-        if (value == null) continue;
+        const sepi = parseRankingValue(props[sepiKey]);
+        if (sepi == null) continue;
         const name = getDistrictName(props);
         if (String(name).trim().toLowerCase() === 'unknown district') continue;
-        rows.push({ name, value });
+
+        const pillars = {};
+        TABLE_PILLARS.forEach(({ key }) => {
+            pillars[key] = parseRankingValue(props[key]);
+        });
+
+        rows.push({
+            name,
+            sepi,
+            pillars,
+            conflictPer100k: getConflictPer100k(props),
+            properties: props
+        });
     }
-    rows.sort((a, b) => b.value - a.value);
+
+    rows.sort((a, b) => b.sepi - a.sepi);
+    rows.forEach((row, idx) => {
+        row.rank = idx + 1;
+    });
     return rows;
 }
 
-function collectRankingFromLayer(layerInfo) {
-    const geojsonLayer = layerInfo?.layer;
-    const valueKey = layerInfo?.rankingAttribute || layerInfo?.selectedAttribute || 'peacebuilding_index';
-    if (!geojsonLayer?.eachLayer) return { rows: [], valueKey, layerName: layerInfo?.name || 'SEPI' };
-
+function collectConflictRanking(geojson, pillarId, year) {
     const rows = [];
-    geojsonLayer.eachLayer((layer) => {
-        const props = layer?.feature?.properties || {};
-        const value = parseRankingValue(props[valueKey]);
-        if (value == null) return;
-        const name = getDistrictName(props);
-        if (String(name).trim().toLowerCase() === 'unknown district') return;
-        rows.push({ name, value });
-    });
+    const perCapita = pillarId?.includes('_per_1k');
+    for (const feature of geojson.features || []) {
+        const props = feature.properties || {};
+        const value = getConflictValue(props, pillarId, year);
+        if (value == null || value <= 0) continue;
+        const sepiKey = detectSepiKey(props);
+        rows.push({
+            name: getDistrictName(props),
+            value,
+            sepi: parseRankingValue(props[sepiKey])
+        });
+    }
     rows.sort((a, b) => b.value - a.value);
-    return {
-        rows,
-        valueKey,
-        layerName: (layerInfo?.name || 'SEPI').replace(/^Pillar:\s*/i, '')
-    };
+    return rows;
 }
 
 function aggregateConflictSeries(geojson) {
@@ -106,91 +177,307 @@ function aggregateConflictSeries(geojson) {
     };
 }
 
-function topConflictDistricts(geojson, year = 2025, limit = 10) {
-    const key = `count_conflict_events_${year}`;
-    const rows = [];
-    for (const feature of geojson.features || []) {
-        const props = feature.properties || {};
-        const events = parseRankingValue(props[key]);
-        if (events == null || events <= 0) continue;
-        const fatalities = parseRankingValue(props[`total_fatalities_${year}`]) ?? 0;
-        const sepi = parseRankingValue(props.peacebuilding_index);
-        rows.push({
-            name: getDistrictName(props),
-            events,
-            fatalities,
-            sepi
-        });
-    }
-    rows.sort((a, b) => b.events - a.events);
-    return rows.slice(0, limit);
-}
-
-function averagePillarScores(geojson) {
-    const sums = {};
-    const counts = {};
-    PILLAR_KEYS.forEach(({ key }) => {
-        sums[key] = 0;
-        counts[key] = 0;
-    });
-
-    for (const feature of geojson.features || []) {
-        const props = feature.properties || {};
-        PILLAR_KEYS.forEach(({ key }) => {
-            const v = parseRankingValue(props[key]);
-            if (v == null) return;
-            sums[key] += v;
-            counts[key] += 1;
-        });
+function renderRegionTableHtml(rows, { bottom = false } = {}) {
+    const sorted = [...rows].sort((a, b) => (bottom ? a.sepi - b.sepi : b.sepi - a.sepi));
+    const slice = sorted.slice(0, 5);
+    if (!slice.length) {
+        return '<p class="report-muted">No district scores available.</p>';
     }
 
-    return PILLAR_KEYS.map(({ key, label }) => ({
-        label,
-        value: counts[key] ? sums[key] / counts[key] : null
-    })).filter((p) => p.value != null);
-}
+    const head = `
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Region</th>
+                <th>SEPI</th>
+                ${TABLE_PILLARS.map((p) => `<th>${escapeHtml(p.label)}</th>`).join('')}
+                <th>Events /100k (${DEFAULT_CONFLICT_YEAR})</th>
+            </tr>
+        </thead>`;
 
-function summarizeActiveLayers(activeLayers) {
-    if (!activeLayers || typeof activeLayers.values !== 'function') return [];
-    return Array.from(activeLayers.values()).map((layer) => ({
-        name: layer.name || 'Layer',
-        type: layer.type || '',
-        details: [
-            layer.selectedAttribute ? `Attribute: ${layer.selectedAttribute}` : null,
-            layer.source ? `Source: ${layer.source}` : null,
-            layer.year != null ? `Year: ${layer.year}` : null,
-            layer.featureCount != null ? `Features: ${layer.featureCount}` : null
-        ].filter(Boolean)
-    }));
-}
+    const body = slice
+        .map(
+            (row) => `
+            <tr>
+                <td>${row.rank}</td>
+                <td>${escapeHtml(row.name)}</td>
+                <td>${formatScore(row.sepi)}</td>
+                ${TABLE_PILLARS.map((p) => `<td>${formatScore(row.pillars[p.key])}</td>`).join('')}
+                <td>${row.conflictPer100k != null ? formatScore(row.conflictPer100k) : '—'}</td>
+            </tr>`
+        )
+        .join('');
 
-function renderConflictSection(section) {
-    if (!section) return '';
     return `
-        <h6>${escapeHtml(section.title)}</h6>
-        ${section.paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('')}
+        <div class="data-table-container report-region-table cr-ranking-table">
+            <table class="data-table">
+                ${head}
+                <tbody>${body}</tbody>
+            </table>
+        </div>`;
+}
+
+function renderActorsHtml(actors, conflictStyle = false) {
+    if (!actors?.length) return '';
+    if (conflictStyle) {
+        return `
+            <div class="cr-actors-grid">
+                ${actors
+                    .map(
+                        (a) => `
+                    <div class="cr-actor-card">
+                        <div class="cr-actor-name">${escapeHtml(a.name)}</div>
+                        <p class="cr-actor-desc">${escapeHtml(a.description)}</p>
+                    </div>`
+                    )
+                    .join('')}
+            </div>`;
+    }
+    return `
+        <ul class="report-actors-list">
+            ${actors
+                .map(
+                    (a) => `
+                <li>
+                    <strong>${escapeHtml(a.name)}:</strong>
+                    ${escapeHtml(a.description)}
+                </li>`
+                )
+                .join('')}
+        </ul>`;
+}
+
+function renderParagraphs(paragraphs) {
+    if (!paragraphs?.length) return '';
+    return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('');
+}
+
+function renderCallouts(callouts) {
+    if (!callouts?.length) return '';
+    return `
+        <div class="cr-callout-grid">
+            ${callouts
+                .map(
+                    (c) => `
+                <div class="cr-region-callout">
+                    <div class="cr-callout-title">${escapeHtml(c.title)}</div>
+                    <p>${escapeHtml(c.body)}</p>
+                </div>`
+                )
+                .join('')}
+        </div>`;
+}
+
+function renderConflictContextSection(ctx) {
+    if (!ctx) return '';
+    const renderBlock = (section) => {
+        if (!section?.paragraphs?.length) return '';
+        return `
+            <div class="cr-context-block">
+                <h6 class="cr-context-heading">${escapeHtml(section.title)}</h6>
+                ${section.paragraphs
+                    .map(
+                        (p) => `
+                    <div class="cr-intensive-item">
+                        <p>${escapeHtml(p)}</p>
+                    </div>`
+                    )
+                    .join('')}
+            </div>`;
+    };
+
+    return `
+        <div class="cr-context-panel">
+            <div class="cr-context-panel-header">
+                <span class="cr-context-panel-label">ACLED · 2016–2025</span>
+                <span class="cr-context-panel-title">Conflict context</span>
+            </div>
+            ${renderBlock(ctx.profile)}
+            ${renderBlock(ctx.trends)}
+            ${renderBlock(ctx.intensive)}
+            <div class="cr-legend-block">
+                <div class="cr-legend-label">Map legend (conflict layers)</div>
+                <div class="welcome-conflict-legend-bar" aria-hidden="true"></div>
+                <div class="welcome-conflict-legend-labels">
+                    <span>Higher severity</span>
+                    <span>Lower severity</span>
+                </div>
+                <p class="report-muted">Red indicates higher conflict severity; yellow indicates lower. Each indicator uses its own pooled scale.</p>
+            </div>
+        </div>`;
+}
+
+function renderPeacebuildingSections(narrative, regionRows, conflictStyle = false) {
+    if (!narrative) return '';
+
+    const sectionLabel = (text) =>
+        conflictStyle
+            ? `<div class="cr-section-banner">${escapeHtml(text)}</div>`
+            : `<h6>${escapeHtml(text)}</h6>`;
+
+    const rankingBanner = (text) =>
+        conflictStyle ? `<div class="cr-ranking-subtitle">${escapeHtml(text)}</div>` : '';
+
+    return `
+        <div class="report-section cr-peacebuilding-block">
+            ${sectionLabel('MAIN ACTORS')}
+            ${renderActorsHtml(narrative.mainActors, conflictStyle)}
+        </div>
+
+        <div class="report-section cr-peacebuilding-block">
+            ${sectionLabel('REGIONS WITH STRONG PEACEBUILDING CAPACITY')}
+            ${renderCallouts(narrative.strongRegions?.callouts)}
+            ${narrative.strongRegions?.intro ? `<p>${escapeHtml(narrative.strongRegions.intro)}</p>` : ''}
+            ${rankingBanner('SEPI RANKINGS — STRONG PEACEBUILDING CAPACITY')}
+            ${renderRegionTableHtml(regionRows, { bottom: false })}
+            ${renderParagraphs(narrative.strongRegions?.paragraphs)}
+        </div>
+
+        <div class="report-section cr-peacebuilding-block">
+            ${sectionLabel('REGIONS WITH WEAK PEACEBUILDING CAPACITY')}
+            ${
+                narrative.weakRegions?.tableFirst !== false
+                    ? `${rankingBanner('SEPI RANKINGS — WEAK PEACEBUILDING CAPACITY')}${renderRegionTableHtml(regionRows, { bottom: true })}${renderCallouts(narrative.weakRegions?.callouts)}${renderParagraphs(narrative.weakRegions?.paragraphs)}`
+                    : `${renderCallouts(narrative.weakRegions?.callouts)}${rankingBanner('SEPI RANKINGS — WEAK PEACEBUILDING CAPACITY')}${renderRegionTableHtml(regionRows, { bottom: true })}${renderParagraphs(narrative.weakRegions?.paragraphs)}`
+            }
+        </div>
+
+        <div class="report-section cr-peacebuilding-block">
+            ${sectionLabel(narrative.resilience?.title || 'SOURCES OF RESILIENCE')}
+            <div class="cr-resilience-panel">
+                ${renderParagraphs(narrative.resilience?.paragraphs)}
+            </div>
+        </div>`;
+}
+
+function renderNarrativeHtml(narrative, regionRows) {
+    if (!narrative) {
+        return '<p class="report-muted">Country narrative is not available for this selection.</p>';
+    }
+    const conflictTitle = narrative.conflictAnalysisTitle
+        ? `<div class="report-section"><h6>${escapeHtml(narrative.conflictAnalysisTitle)}</h6></div>`
+        : '';
+    return `${conflictTitle}${renderPeacebuildingSections(narrative, regionRows, false)}`;
+}
+
+function renderConflictMetricTable(rows, metricLabel, year, perCapita) {
+    if (!rows.length) {
+        return '<p class="report-muted">No districts with values for this metric and year.</p>';
+    }
+    const slice = rows.slice(0, 12);
+    return `
+        <div class="data-table-container report-region-table cr-conflict-rank-table">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Region</th>
+                        <th>${escapeHtml(metricLabel)} (${year})</th>
+                        <th>SEPI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${slice
+                        .map(
+                            (row, idx) => `
+                        <tr>
+                            <td>${idx + 1}</td>
+                            <td>${escapeHtml(row.name)}</td>
+                            <td>${formatConflictMetric(row.value, perCapita)}</td>
+                            <td>${row.sepi != null ? formatScore(row.sepi) : '—'}</td>
+                        </tr>`
+                        )
+                        .join('')}
+                </tbody>
+            </table>
+        </div>`;
+}
+
+function renderConflictReportHTML(report) {
+    const {
+        countryLabel,
+        timestamp,
+        narrative,
+        regionRows,
+        conflictContext,
+        conflictSeries,
+        conflictLayer,
+        conflictRanking,
+        districtCount
+    } = report;
+
+    const pillarId = conflictLayer?.selectedAttribute || 'conflict_events';
+    const year = conflictLayer?.year || DEFAULT_CONFLICT_YEAR;
+    const metricName = conflictLayer?.name?.replace(/^Conflict:\s*/i, '') || PILLAR_CONFIG[pillarId]?.name || 'Conflict metric';
+    const perCapita = pillarId.includes('_per_1k');
+
+    return `
+        <div class="report-container country-report conflict-report">
+            <div class="report-header conflict-report-header">
+                <h5>${escapeHtml(countryLabel)} Conflict Analysis</h5>
+                <button type="button" class="download-btn" onclick="window.infoPanelInstance.downloadReport()">
+                    Download PDF
+                </button>
+            </div>
+
+            <div class="report-body">
+                <div class="cr-metric-strip">
+                    <span class="cr-metric-pill">${escapeHtml(metricName)}</span>
+                    <span class="cr-metric-pill cr-metric-pill-year">Year ${escapeHtml(String(year))}</span>
+                    <span class="cr-metric-pill cr-metric-pill-source">ACLED · Display only</span>
+                </div>
+
+                <p class="report-intro report-muted">
+                    Generated ${escapeHtml(timestamp)} · ${districtCount} regions · Active conflict layer on map
+                </p>
+
+                ${renderConflictContextSection(conflictContext)}
+
+                <div class="report-section cr-charts-section">
+                    <div class="cr-section-banner">CONFLICT DATA · NATIONAL TRENDS</div>
+                    <p class="report-muted">Totals aggregated from district-level ACLED fields (2016–2025).</p>
+                    <div class="report-chart-grid cr-chart-grid">
+                        <div class="report-chart-cell">
+                            <label>Conflict events by year (national sum)</label>
+                            <canvas id="report-conflict-events-chart" width="480" height="220"></canvas>
+                        </div>
+                        <div class="report-chart-cell">
+                            <label>Fatalities by year (national sum)</label>
+                            <canvas id="report-conflict-fatalities-chart" width="480" height="220"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="report-section">
+                    <div class="cr-section-banner">HIGHEST-CONFLICT REGIONS · ${escapeHtml(metricName.toUpperCase())} (${year})</div>
+                    ${renderConflictMetricTable(conflictRanking, metricName, year, perCapita)}
+                </div>
+
+                ${renderPeacebuildingSections(narrative, regionRows, true)}
+            </div>
+        </div>
     `;
 }
 
-function renderRankingBarsHtml(rows, maxRows = 20) {
-    const slice = rows.slice(0, maxRows);
-    if (!slice.length) {
-        return '<p class="report-muted">No district scores available for the current layer.</p>';
-    }
-    const maxValue = Math.max(...slice.map((r) => r.value), 1);
-    return slice
-        .map((row, idx) => {
-            const pct = Math.max(2, (row.value / maxValue) * 100);
-            return `
-                <div class="report-ranking-row">
-                    <span class="report-ranking-rank">${idx + 1}.</span>
-                    <span class="report-ranking-name" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</span>
-                    <span class="report-ranking-bar-wrap"><span class="report-ranking-bar" style="width:${pct}%"></span></span>
-                    <span class="report-ranking-value">${row.value.toFixed(2)}</span>
-                </div>
-            `;
-        })
-        .join('');
+function renderSepiReportHTML(report) {
+    const { countryLabel, timestamp, narrative, districtCount } = report;
+    return `
+        <div class="report-container country-report">
+            <div class="report-header">
+                <h5>${escapeHtml(countryLabel)} Report</h5>
+                <button type="button" class="download-btn" onclick="window.infoPanelInstance.downloadReport()">
+                    Download PDF
+                </button>
+            </div>
+            <div class="report-body">
+                <p class="report-intro report-muted">
+                    Generated ${escapeHtml(timestamp)} · ${districtCount} regions with SEPI scores ·
+                    Data source: country district GeoJSON bundle
+                </p>
+                ${renderNarrativeHtml(narrative, report.regionRows)}
+            </div>
+        </div>
+    `;
 }
 
 /**
@@ -203,185 +490,47 @@ export async function buildCountryReport({ country, activeLayers }) {
         throw new Error(`Could not load district data for ${getCountryDisplayLabel(country)}`);
     }
     const geojson = await response.json();
+    const regionRows = collectAllRegionRows(geojson);
+    const narrative = getCountryReportNarrative(country);
+    const conflictLayer = activeLayers?.get?.('conflict') || null;
+    const isConflictReport = Boolean(conflictLayer);
 
-    const sepiLayerInfo = activeLayers?.get?.('sepi');
-    const pillarLayerInfo = activeLayers?.get?.('pillar');
-    const layerInfo = sepiLayerInfo || pillarLayerInfo;
-
-    let ranking;
-    if (layerInfo?.layer && !activeLayers?.has?.('conflict')) {
-        ranking = collectRankingFromLayer(layerInfo);
-    } else {
-        const valueKey = layerInfo?.rankingAttribute || layerInfo?.selectedAttribute || 'peacebuilding_index';
-        ranking = {
-            rows: collectRankingFromGeoJSON(geojson, valueKey),
-            valueKey,
-            layerName: layerInfo?.name?.replace(/^Pillar:\s*/i, '') || 'Overall Peace Index'
-        };
-    }
-
-    const dashboard = getSepiDashboardContent(country);
-    const conflictContext = getConflictContextContent(country);
-    const conflictSeries = aggregateConflictSeries(geojson);
-    const topConflict = topConflictDistricts(geojson, 2025, 12);
-    const pillarMeans = averagePillarScores(geojson);
-    const activeLayerItems = summarizeActiveLayers(activeLayers);
-    const showDashboard = Boolean(dashboard) && (sepiLayerInfo || !pillarLayerInfo);
-
-    return {
+    const base = {
         country,
         countryLabel: getCountryDisplayLabel(country),
         timestamp: new Date().toLocaleString(),
         geojsonPath,
-        ranking,
-        dashboard: showDashboard ? dashboard : null,
-        dashboardHtml: showDashboard && dashboard ? renderSepiDashboardHtml(dashboard) : '',
-        conflictContext,
-        conflictSeries,
-        topConflict,
-        pillarMeans,
-        activeLayerItems,
-        methodologyHtml: renderSepiWorkedExampleSection()
+        regionRows,
+        narrative,
+        districtCount: regionRows.length,
+        mode: isConflictReport ? 'conflict' : 'sepi'
+    };
+
+    if (!isConflictReport) {
+        return base;
+    }
+
+    const pillarId = conflictLayer.selectedAttribute || 'conflict_events';
+    const year = Number(conflictLayer.year) || DEFAULT_CONFLICT_YEAR;
+
+    return {
+        ...base,
+        conflictContext: getConflictContextContent(country),
+        conflictSeries: aggregateConflictSeries(geojson),
+        conflictLayer: {
+            ...conflictLayer,
+            pillarId,
+            year
+        },
+        conflictRanking: collectConflictRanking(geojson, pillarId, year)
     };
 }
 
 export function renderCountryReportHTML(report) {
-    const { countryLabel, timestamp, ranking, activeLayerItems } = report;
-
-    const activeLayersBlock =
-        activeLayerItems.length > 0
-            ? `<ul class="report-active-layers-list">
-                ${activeLayerItems
-                    .map(
-                        (l) => `
-                    <li><strong>${escapeHtml(l.name)}</strong>${l.type ? ` <span class="report-muted">(${escapeHtml(l.type)})</span>` : ''}
-                        ${l.details.length ? `<br><span class="report-muted">${escapeHtml(l.details.join(' • '))}</span>` : ''}
-                    </li>`
-                    )
-                    .join('')}
-               </ul>`
-            : '<p class="report-muted">No layers were active when this report was generated. Map data below uses the country district file.</p>';
-
-    const dashboardBlock = report.dashboardHtml
-        ? `<div class="report-dashboard-narrative">${report.dashboardHtml}</div>`
-        : '';
-
-    const conflictBlock = report.conflictContext
-        ? `
-            <div class="report-section">
-                <h6>Conflict Context — ${escapeHtml(report.conflictContext.countryLabel)}</h6>
-                ${renderConflictSection(report.conflictContext.profile)}
-                ${renderConflictSection(report.conflictContext.trends)}
-                ${renderConflictSection(report.conflictContext.intensive)}
-            </div>
-            <div class="report-section">
-                <h6>Conflict Data Visualizations</h6>
-                <p class="report-muted">National totals aggregated from district-level ACLED fields in the active country dataset (events and fatalities per 100k where applicable on the map).</p>
-                <div class="report-chart-grid">
-                    <div class="report-chart-cell">
-                        <label>Conflict events by year (national sum)</label>
-                        <canvas id="report-conflict-events-chart" width="480" height="220"></canvas>
-                    </div>
-                    <div class="report-chart-cell">
-                        <label>Fatalities by year (national sum)</label>
-                        <canvas id="report-conflict-fatalities-chart" width="480" height="220"></canvas>
-                    </div>
-                </div>
-                <h6 style="margin-top:14px;">Highest-conflict districts (${report.conflictSeries.years[report.conflictSeries.years.length - 1]})</h6>
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>District / Region</th>
-                                <th>Events</th>
-                                <th>Fatalities</th>
-                                <th>SEPI</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${report.topConflict
-                                .map(
-                                    (row) => `
-                                <tr>
-                                    <td>${escapeHtml(row.name)}</td>
-                                    <td>${row.events.toLocaleString()}</td>
-                                    <td>${row.fatalities.toLocaleString()}</td>
-                                    <td>${row.sepi != null ? row.sepi.toFixed(2) : '—'}</td>
-                                </tr>`
-                                )
-                                .join('')}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="report-mockup-ideas">
-                    <h6>Visualization mockup ideas</h6>
-                    <ul>
-                        ${report.conflictContext.mockupIdeas.map((idea) => `<li>${escapeHtml(idea)}</li>`).join('')}
-                    </ul>
-                </div>
-            </div>`
-        : '<p class="report-muted">Conflict context is not available for this country.</p>';
-
-    return `
-        <div class="report-container country-report">
-            <div class="report-header">
-                <h5>SEPI Country Report — ${escapeHtml(countryLabel)}</h5>
-                <button type="button" class="download-btn" onclick="window.infoPanelInstance.downloadReport()">
-                    Download PDF
-                </button>
-            </div>
-
-            <div class="report-summary">
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <label>Country</label>
-                        <span>${escapeHtml(countryLabel)}</span>
-                    </div>
-                    <div class="summary-item">
-                        <label>Generated</label>
-                        <span>${escapeHtml(timestamp)}</span>
-                    </div>
-                    <div class="summary-item">
-                        <label>Ranking metric</label>
-                        <span>${escapeHtml(ranking.layerName)}</span>
-                    </div>
-                    <div class="summary-item">
-                        <label>Districts ranked</label>
-                        <span>${ranking.rows.length}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="report-section">
-                <h6>Active Layers</h6>
-                ${activeLayersBlock}
-                ${dashboardBlock}
-            </div>
-
-            <div class="report-section">
-                <h6>${escapeHtml(ranking.layerName)} — District Ranking</h6>
-                <p class="report-muted">Same ranking as the Active Layers pillar chart (highest to lowest). Top ${Math.min(20, ranking.rows.length)} districts shown.</p>
-                <div class="report-ranking-bars">${renderRankingBarsHtml(ranking.rows)}</div>
-                <div class="report-chart-cell" style="margin-top:12px;">
-                    <label>Top 15 districts (chart)</label>
-                    <canvas id="report-ranking-chart" width="480" height="280"></canvas>
-                </div>
-            </div>
-
-            ${report.pillarMeans.length ? `
-            <div class="report-section">
-                <h6>Pillar scores (country average)</h6>
-                <canvas id="report-pillar-chart" width="480" height="240"></canvas>
-            </div>` : ''}
-
-            ${conflictBlock}
-
-            <div class="report-section report-methodology">
-                <h6>SEPI methodology</h6>
-                ${report.methodologyHtml}
-            </div>
-        </div>
-    `;
+    if (report.mode === 'conflict') {
+        return renderConflictReportHTML(report);
+    }
+    return renderSepiReportHTML(report);
 }
 
 function drawLineChart(canvasId, labels, values, options = {}) {
@@ -393,20 +542,18 @@ function drawLineChart(canvasId, labels, values, options = {}) {
     const padding = 44;
     const chartWidth = width - padding * 2;
     const chartHeight = height - padding * 2;
+    const maxVal = Math.max(...values, 1);
 
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, width, height);
-
-    const maxVal = Math.max(...values, 1);
-    const minVal = 0;
 
     ctx.strokeStyle = '#e9ecef';
     ctx.fillStyle = '#666';
     ctx.font = '11px Calibri';
     for (let i = 0; i <= 4; i++) {
         const y = padding + chartHeight - (i / 4) * chartHeight;
-        const val = minVal + (i / 4) * (maxVal - minVal);
+        const val = (i / 4) * maxVal;
         ctx.beginPath();
         ctx.moveTo(padding, y);
         ctx.lineTo(padding + chartWidth, y);
@@ -415,12 +562,12 @@ function drawLineChart(canvasId, labels, values, options = {}) {
         ctx.fillText(Math.round(val).toLocaleString(), padding - 6, y + 4);
     }
 
-    ctx.strokeStyle = options.color || '#dc3545';
+    ctx.strokeStyle = options.color || '#b71c1c';
     ctx.lineWidth = 2;
     ctx.beginPath();
     values.forEach((v, i) => {
         const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
-        const y = padding + chartHeight - ((v - minVal) / (maxVal - minVal)) * chartHeight;
+        const y = padding + chartHeight - (v / maxVal) * chartHeight;
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
     });
@@ -428,8 +575,8 @@ function drawLineChart(canvasId, labels, values, options = {}) {
 
     values.forEach((v, i) => {
         const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
-        const y = padding + chartHeight - ((v - minVal) / (maxVal - minVal)) * chartHeight;
-        ctx.fillStyle = options.color || '#dc3545';
+        const y = padding + chartHeight - (v / maxVal) * chartHeight;
+        ctx.fillStyle = options.color || '#b71c1c';
         ctx.beginPath();
         ctx.arc(x, y, 4, 0, Math.PI * 2);
         ctx.fill();
@@ -444,73 +591,16 @@ function drawLineChart(canvasId, labels, values, options = {}) {
     ctx.fillText(options.title || '', width / 2, 18);
 }
 
-function drawHorizontalBarChart(canvasId, labels, values, color = '#60a5fa') {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
-    const leftPad = 120;
-    const rightPad = 48;
-    const topPad = 28;
-    const bottomPad = 16;
-    const barGap = 4;
-    const n = labels.length;
-    if (!n) return;
-
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, width, height);
-
-    const chartH = height - topPad - bottomPad;
-    const barH = Math.min(18, (chartH - barGap * (n - 1)) / n);
-    const maxVal = Math.max(...values, 0.01);
-
-    ctx.font = '10px Calibri';
-    values.forEach((v, i) => {
-        const y = topPad + i * (barH + barGap);
-        const label = String(labels[i]).slice(0, 16);
-        ctx.fillStyle = '#333';
-        ctx.textAlign = 'right';
-        ctx.fillText(label, leftPad - 8, y + barH * 0.72);
-        const barW = ((width - leftPad - rightPad) * v) / maxVal;
-        ctx.fillStyle = '#e9ecef';
-        ctx.fillRect(leftPad, y, width - leftPad - rightPad, barH);
-        ctx.fillStyle = color;
-        ctx.fillRect(leftPad, y, barW, barH);
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#2563eb';
-        ctx.fillText(v.toFixed(2), leftPad + barW + 6, y + barH * 0.72);
-    });
-}
-
-function drawPillarBarChart(canvasId, pillars) {
-    const labels = pillars.map((p) => p.label);
-    const values = pillars.map((p) => p.value);
-    drawHorizontalBarChart(canvasId, labels.reverse(), values.reverse(), '#28a745');
-}
-
 export function drawCountryReportCharts(report) {
-    const { conflictSeries, ranking, pillarMeans } = report;
-    const yearLabels = conflictSeries.years.map(String);
+    if (report.mode !== 'conflict' || !report.conflictSeries) return;
 
-    drawLineChart('report-conflict-events-chart', yearLabels, conflictSeries.events, {
-        title: 'Conflict events (sum)',
-        color: '#c0392b'
+    const yearLabels = report.conflictSeries.years.map(String);
+    drawLineChart('report-conflict-events-chart', yearLabels, report.conflictSeries.events, {
+        title: 'Conflict events (national sum)',
+        color: '#b71c1c'
     });
-    drawLineChart('report-conflict-fatalities-chart', yearLabels, conflictSeries.fatalities, {
-        title: 'Fatalities (sum)',
-        color: '#8e44ad'
+    drawLineChart('report-conflict-fatalities-chart', yearLabels, report.conflictSeries.fatalities, {
+        title: 'Fatalities (national sum)',
+        color: '#6a1b9a'
     });
-
-    const top = ranking.rows.slice(0, 15).reverse();
-    drawHorizontalBarChart(
-        'report-ranking-chart',
-        top.map((r) => r.name),
-        top.map((r) => r.value)
-    );
-
-    if (pillarMeans.length) {
-        drawPillarBarChart('report-pillar-chart', pillarMeans);
-    }
 }

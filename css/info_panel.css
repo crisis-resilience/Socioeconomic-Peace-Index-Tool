@@ -629,6 +629,309 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.country-report .report-body {
+    padding: 16px 20px 20px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.country-report .report-intro {
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.country-report .report-section {
+    padding: 14px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.country-report .report-section:last-child {
+    border-bottom: none;
+}
+
+.country-report .report-section h6 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #2c5f2d;
+}
+
+.country-report .report-actors-list {
+    margin: 0 0 12px;
+    padding-left: 18px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #343a40;
+}
+
+.country-report .report-actors-list li {
+    margin-bottom: 8px;
+}
+
+.country-report .report-region-table {
+    margin: 10px 0 14px;
+    overflow-x: auto;
+}
+
+.country-report .report-region-table .data-table {
+    width: 100%;
+    font-size: 11px;
+    border-collapse: collapse;
+}
+
+.country-report .report-region-table .data-table th,
+.country-report .report-region-table .data-table td {
+    padding: 6px 8px;
+    border: 1px solid #dee2e6;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.country-report .report-region-table .data-table th {
+    background: #f1f3f5;
+    font-weight: 600;
+    color: #495057;
+}
+
+.country-report .report-region-table .data-table tbody tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+/* Conflict Analysis report (PDF UI mockup styling) */
+.conflict-report .conflict-report-header {
+    background: linear-gradient(135deg, #5c1a1a 0%, #8b2525 55%, #a83232 100%);
+}
+
+.conflict-report .cr-metric-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.conflict-report .cr-metric-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #f0f2f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.conflict-report .cr-metric-pill-year {
+    background: #dce9fa;
+    color: #1a4d8c;
+    border-color: #b8d4f0;
+}
+
+.conflict-report .cr-metric-pill-source {
+    background: #faf6ef;
+    color: #5b4f36;
+    border-color: #e8dcc4;
+}
+
+.conflict-report .cr-context-panel {
+    background: #fff;
+    border: 1px solid #e2e6ea;
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    margin-bottom: 16px;
+    border-left: 4px solid #b71c1c;
+}
+
+.conflict-report .cr-context-panel-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 12px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.conflict-report .cr-context-panel-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.conflict-report .cr-context-panel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #212529;
+}
+
+.conflict-report .cr-context-block {
+    margin-bottom: 14px;
+}
+
+.conflict-report .cr-context-heading {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #8b2525;
+}
+
+.conflict-report .cr-intensive-item {
+    background: #f8f9fa;
+    border-left: 3px solid #e65100;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    border-radius: 0 6px 6px 0;
+}
+
+.conflict-report .cr-intensive-item p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #343a40;
+}
+
+.conflict-report .cr-legend-block {
+    background: #f0f2f5;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-top: 8px;
+}
+
+.conflict-report .cr-legend-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin-bottom: 6px;
+}
+
+.conflict-report .cr-section-banner {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: #495057;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 0 0 12px;
+}
+
+.conflict-report .cr-ranking-subtitle {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin: 10px 0 8px;
+}
+
+.conflict-report .cr-actors-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.conflict-report .cr-actor-card {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.conflict-report .cr-actor-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.conflict-report .cr-actor-desc {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #495057;
+}
+
+.conflict-report .cr-callout-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.conflict-report .cr-region-callout {
+    background: #faf6ef;
+    border: 1px solid #e8dcc4;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+.conflict-report .cr-callout-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #5b4f36;
+    margin-bottom: 6px;
+}
+
+.conflict-report .cr-region-callout p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.45;
+    color: #343a40;
+}
+
+.conflict-report .cr-resilience-panel {
+    background: #e8f5e8;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.conflict-report .cr-resilience-panel p {
+    margin: 0 0 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #155724;
+}
+
+.conflict-report .cr-resilience-panel p:last-child {
+    margin-bottom: 0;
+}
+
+.conflict-report .cr-ranking-table .data-table thead th {
+    background: #495057;
+    color: #fff;
+}
+
+.conflict-report .cr-conflict-rank-table .data-table thead th {
+    background: #8b2525;
+    color: #fff;
+}
+
+.conflict-report .cr-charts-section {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 4px;
+}
+
+.conflict-report .cr-chart-grid {
+    margin-top: 8px;
+}
+
+.conflict-report .cr-peacebuilding-block {
+    margin-top: 4px;
+}
+
 .report-header {
     background: #28a745;
     color: white;

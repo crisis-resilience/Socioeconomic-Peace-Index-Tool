@@ -318,7 +318,7 @@ export class InfoPanel {
                         <div class="analysis-content">
                             <div class="analysis-tool">
                                 <h5>Country SEPI Report</h5>
-                                <p>Build a report for the selected country using Active Layers context, district rankings, conflict narrative, and charts.</p>
+                                <p>Build a country report from the analysis documents. With a conflict layer active, the report follows the Conflict Analysis layout (context narrative, trends, SEPI peacebuilding tables).</p>
                                 <button class="run-analysis-btn" data-analysis="summary">Generate Report</button>
                             </div>
                         </div>
@@ -1969,7 +1969,8 @@ export class InfoPanel {
                     allowTaint: false,
                     backgroundColor: '#ffffff',
                     width: reportElement.scrollWidth,
-                    height: reportElement.scrollHeight
+                    height: reportElement.scrollHeight,
+                    windowWidth: reportElement.scrollWidth
                 });
                 
                 // Initialize jsPDF (requires jspdf library)
@@ -1977,26 +1978,26 @@ export class InfoPanel {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF('p', 'mm', 'a4');
                     
-                    // Calculate dimensions
-                    const imgWidth = 210; // A4 width in mm
-                    const pageHeight = 295; // A4 height in mm
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    const pageWidth = 210;
+                    const pageHeight = 297;
+                    const marginX = 14;
+                    const marginY = 14;
+                    const contentWidth = pageWidth - marginX * 2;
+                    const contentHeight = pageHeight - marginY * 2;
+                    const imgHeight = (canvas.height * contentWidth) / canvas.width;
                     let heightLeft = imgHeight;
-                    let position = 0;
+                    let position = marginY;
                     
-                    // Convert canvas to image
                     const imgData = canvas.toDataURL('image/png');
                     
-                    // Add first page
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+                    pdf.addImage(imgData, 'PNG', marginX, position, contentWidth, imgHeight);
+                    heightLeft -= contentHeight;
                     
-                    // Add additional pages if needed
-                    while (heightLeft >= 0) {
-                        position = heightLeft - imgHeight;
+                    while (heightLeft > 0) {
+                        position = marginY - (imgHeight - heightLeft);
                         pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+                        pdf.addImage(imgData, 'PNG', marginX, position, contentWidth, imgHeight);
+                        heightLeft -= contentHeight;
                     }
                     
                     // Generate filename with timestamp
