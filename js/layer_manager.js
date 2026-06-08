@@ -1,6 +1,6 @@
 // layer_manager.js - Updated with aligned popup styling
 
-import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription, conflictRawToNormalized, getConflictColorFromNormalized, conflictLegendRawEdges, getCurrentCountry } from './layer_config.js';
+import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription, conflictRawToNormalized, getConflictColorFromNormalized, conflictLegendRawEdges, getCurrentCountry, isSubIndicatorPillar } from './layer_config.js';
 import { loadTiff } from './zoom-adaptive-tiff-loader.js';
 import { SEPIManager } from './sepi_manager.js';
 import { loadVectorLayer, loadPointLayer, updateVectorLayerStyle, updatePointLayerStyle, populateAttributeSelector } from './vector_layers.js';
@@ -510,6 +510,8 @@ export class SimplifiedPillarManager {
         this.currentPropertyName = null;
         this.pillarsData = null;
         this.conflictBreaks = null;
+        /** Quantile breaks for sub-pillar raw values (percentages, counts, etc.) */
+        this.subIndicatorBreaks = null;
         /** Loaded from data/conflict_pooled_breaks.json; null = use legacy per-map quantiles */
         this.conflictPooledScale = null;
         this._conflictPooledCatalog = undefined;
@@ -695,6 +697,7 @@ export class SimplifiedPillarManager {
             this.currentPillarId = null;
             this.currentPropertyName = null;
             this.conflictBreaks = null;
+            this.subIndicatorBreaks = null;
             this.conflictPooledScale = null;
             this.dispatchConflictYearsAvailable(false);
             return;
@@ -726,14 +729,20 @@ export class SimplifiedPillarManager {
             } else {
                 this.selectedConflictDistrict = null;
                 this.conflictPooledScale = null;
-                const desiredProperty = this.pickAvailableProperty(config.property, config.fallbackProperty);
-                this.currentPropertyName = this.resolvePropertyName(desiredProperty);
                 this.conflictBreaks = null;
+                const isSubIndicator = isSubIndicatorPillar(pillarId);
+                const desiredProperty = isSubIndicator
+                    ? this.pickSubIndicatorProperty(config.property, config.fallbackProperty)
+                    : this.pickAvailableProperty(config.property, config.fallbackProperty);
+                this.currentPropertyName = this.resolvePropertyName(desiredProperty);
+                this.subIndicatorBreaks = isSubIndicator
+                    ? this.computeQuantileBreaks(this.currentPropertyName)
+                    : null;
                 this.dispatchConflictYearsAvailable(false);
                 this.dispatchConflictTimelineUpdated(null);
             }
-            this.currentLayer = await this.createIndicatorLayer(pillarId, config);
             this.currentPillarId = pillarId;
+            this.currentLayer = await this.createIndicatorLayer(pillarId, config);
             this.currentLayer.addTo(this.map);
             
             this.updateIndicatorLegend(config);
@@ -772,11 +781,16 @@ export class SimplifiedPillarManager {
         return typeof name === 'string' && name.trim() ? name.trim() : 'Unknown District';
     }
 
-    buildIndicatorTooltipHtml(config, districtName, value, isConflictData) {
-        const decimals =
-            isConflictData ? (this.currentPillarId?.includes('_per_1k') ? 3 : 0) : 2;
+    buildIndicatorTooltipHtml(config, districtName, value, pillarId) {
+        const isConflictData = pillarId?.startsWith('conflict_');
+        const isSubIndicator = isSubIndicatorPillar(pillarId);
+        const decimals = isConflictData
+            ? (pillarId?.includes('_per_1k') ? 3 : 0)
+            : 2;
         const num = value !== undefined ? Number(value) : NaN;
-        const scoreText = Number.isFinite(num) ? num.toFixed(decimals) : 'No data';
+        const scoreText = Number.isFinite(num)
+            ? (isSubIndicator ? num.toLocaleString(undefined, { maximumFractionDigits: decimals }) : num.toFixed(decimals))
+            : 'No data';
         const metric = typeof config?.name === 'string' ? config.name : 'Indicator';
         return `
             <div style="text-align: center; font-family: Calibri, sans-serif;">
@@ -784,6 +798,33 @@ export class SimplifiedPillarManager {
                 <span style="font-weight: bold;">${metric}: ${scoreText}</span>
             </div>
         `;
+    }
+
+    getIndicatorFillColor(value, config, pillarId) {
+        if (!pillarId) {
+            return getPillarColorForPolarity(value, config?.polarity ?? 1);
+        }
+        if (pillarId.startsWith('conflict_')) {
+            return this.getConflictColorDynamic(value);
+        }
+        if (isSubIndicatorPillar(pillarId)) {
+            return this.getSubIndicatorColorDynamic(value, config.polarity ?? 1);
+        }
+        return getPillarColorForPolarity(value, config.polarity ?? 1);
+    }
+
+    getIndicatorDescription(value, config, pillarId) {
+        if (!pillarId) {
+            return getPillarDescriptionForPolarity(value, config?.polarity ?? 1);
+        }
+        if (pillarId.startsWith('conflict_')) {
+            const conflictMetricType = pillarId.includes('events') ? 'events' : 'fatalities';
+            return getConflictDescription(value, conflictMetricType);
+        }
+        if (isSubIndicatorPillar(pillarId)) {
+            return this.getSubIndicatorDescription(value, config.polarity ?? 1);
+        }
+        return getPillarDescriptionForPolarity(value, config.polarity ?? 1);
     }
 
     async createIndicatorLayer(pillarId, config) {
@@ -796,9 +837,7 @@ export class SimplifiedPillarManager {
             style: (feature) => {
                 const value = this.getFeatureValue(feature, this.currentPropertyName);
                 return {
-                    fillColor: isConflictData
-                        ? this.getConflictColorDynamic(value)
-                        : getPillarColorForPolarity(value, config.polarity ?? 1),
+                    fillColor: this.getIndicatorFillColor(value, config, pillarId),
                     weight: 2,
                     opacity: 1,
                     color: '#ffffff',
@@ -812,7 +851,7 @@ export class SimplifiedPillarManager {
                 const district = this.getDistrictDisplayName(feature.properties);
 
                 layer.bindPopup(
-                    this.createIndicatorPopup(config, feature.properties, district, value, isConflictData),
+                    this.createIndicatorPopup(config, feature.properties, district, value, pillarId),
                     {
                         minWidth: 360,
                         maxWidth: 450,
@@ -824,7 +863,7 @@ export class SimplifiedPillarManager {
                 );
 
                 layer.bindTooltip(
-                    this.buildIndicatorTooltipHtml(config, district, value, isConflictData),
+                    this.buildIndicatorTooltipHtml(config, district, value, pillarId),
                     {
                         permanent: false,
                         direction: 'auto',
@@ -875,9 +914,15 @@ export class SimplifiedPillarManager {
     /**
      * Create SEPI-style popup for indicators - Updated to match SEPI popup structure
      */
-    createIndicatorPopup(config, properties, district, value, isConflictData = false) {
-        const conflictDecimals = this.currentPillarId?.includes('_per_1k') ? 3 : 0;
-        const formattedValue = value !== undefined ? Number(value).toFixed(isConflictData ? conflictDecimals : 3) : 'No data';
+    createIndicatorPopup(config, properties, district, value, pillarId) {
+        const isConflictData = pillarId?.startsWith('conflict_');
+        const isSubIndicator = isSubIndicatorPillar(pillarId);
+        const conflictDecimals = pillarId?.includes('_per_1k') ? 3 : 0;
+        const formattedValue = value !== undefined
+            ? (isSubIndicator
+                ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })
+                : Number(value).toFixed(isConflictData ? conflictDecimals : 3))
+            : 'No data';
         const csvOverview = this.getAdm1OverviewEntry(properties, district);
         const districtDetails = csvOverview?.overview || this.districtInfo[district];
         const sourceUrl = csvOverview?.sourceUrl || '';
@@ -885,8 +930,7 @@ export class SimplifiedPillarManager {
         
         // Use consistent color scheme
         const headerColor = isConflictData ? '#dc3545' : '#2c5f2d';
-        const valueColor = isConflictData ? this.getConflictColorDynamic(value) : getPillarColorForPolarity(value, config.polarity ?? 1);
-        const conflictMetricType = this.currentPillarId?.includes('events') ? 'events' : 'fatalities';
+        const valueColor = this.getIndicatorFillColor(value, config, pillarId);
         
         // Get additional properties (similar to SEPI)
         const additionalInfo = this.getAdditionalProperties(properties, this.currentPropertyName);
@@ -904,7 +948,7 @@ export class SimplifiedPillarManager {
                         </span>
                     </div>
                     <div style="margin-top: 5px; font-size: 12px; color: ${headerColor}; font-weight: 500;">
-                        ${isConflictData ? getConflictDescription(value, conflictMetricType) : getPillarDescriptionForPolarity(value, config.polarity ?? 1)}
+                        ${this.getIndicatorDescription(value, config, pillarId)}
                     </div>
                 </div>
                 
@@ -985,6 +1029,7 @@ export class SimplifiedPillarManager {
     
     updateIndicatorLegend(config) {
         const isConflictData = this.currentPillarId?.startsWith('conflict_');
+        const isSubIndicator = isSubIndicatorPillar(this.currentPillarId);
         
         if (isConflictData) {
             // Conflict data legend (Yellow to Red)
@@ -993,6 +1038,19 @@ export class SimplifiedPillarManager {
             const desc = this.conflictPooledScale
                 ? `${config.description}<br><span style="font-size:11px;color:#555">Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).</span>`
                 : config.description;
+
+            this.updateLegend(
+                config.name,
+                colors,
+                desc,
+                labels
+            );
+        } else if (isSubIndicator) {
+            const forwardColors = ['#d73027', '#fc8d59', '#ffffbf', '#91cf60', '#1a9850'];
+            const pol = Number(config.polarity) === -1 ? -1 : 1;
+            const colors = pol === -1 ? [...forwardColors].reverse() : forwardColors;
+            const labels = this.getSubIndicatorLegendLabels();
+            const desc = `${config.description}<br><span style="font-size:11px;color:#555">Scale: quintiles within the current country (raw indicator values).</span>`;
 
             this.updateLegend(
                 config.name,
@@ -1024,15 +1082,12 @@ export class SimplifiedPillarManager {
     updateOpacity(opacity) {
         if (this.currentLayer && this.currentPillarId) {
             const config = PILLAR_CONFIG[this.currentPillarId];
-            const isConflictData = this.currentPillarId.startsWith('conflict_');
             
             this.currentLayer.setStyle((feature) => ({
                 ...(() => {
                     const value = this.getFeatureValue(feature, this.currentPropertyName);
                     return {
-                fillColor: isConflictData 
-                    ? this.getConflictColorDynamic(value)
-                    : getPillarColorForPolarity(value, config.polarity ?? 1)
+                fillColor: this.getIndicatorFillColor(value, config, this.currentPillarId)
                     };
                 })(),
                 weight: 2,
@@ -1057,23 +1112,50 @@ export class SimplifiedPillarManager {
         return matchedKey || desiredProperty;
     }
 
-    pickAvailableProperty(primaryProperty, fallbackProperty) {
-        const sampleFeature = this.pillarsData?.features?.find(feature => feature?.properties);
-        const props = sampleFeature?.properties || {};
-        if (Object.prototype.hasOwnProperty.call(props, primaryProperty)) {
+    propertyHasNumericData(propertyName) {
+        if (!propertyName) return false;
+        return (this.pillarsData?.features || []).some((feature) => {
+            const value = feature?.properties?.[propertyName];
+            if (value == null || value === '') return false;
+            return Number.isFinite(Number(value));
+        });
+    }
+
+    pickSubIndicatorProperty(primaryProperty, fallbackProperty) {
+        if (this.propertyHasNumericData(primaryProperty)) {
             return primaryProperty;
         }
         const normalizedPrimary = `${primaryProperty}_norm`;
-        if (Object.prototype.hasOwnProperty.call(props, normalizedPrimary)) {
+        if (this.propertyHasNumericData(normalizedPrimary)) {
             return normalizedPrimary;
         }
-        if (fallbackProperty && Object.prototype.hasOwnProperty.call(props, fallbackProperty)) {
-            return fallbackProperty;
+        if (fallbackProperty) {
+            if (this.propertyHasNumericData(fallbackProperty)) {
+                return fallbackProperty;
+            }
+            const normalizedFallback = `${fallbackProperty}_norm`;
+            if (this.propertyHasNumericData(normalizedFallback)) {
+                return normalizedFallback;
+            }
+        }
+        return primaryProperty;
+    }
+
+    pickAvailableProperty(primaryProperty, fallbackProperty) {
+        const normalizedPrimary = `${primaryProperty}_norm`;
+        if (this.propertyHasNumericData(normalizedPrimary)) {
+            return normalizedPrimary;
+        }
+        if (this.propertyHasNumericData(primaryProperty)) {
+            return primaryProperty;
         }
         if (fallbackProperty) {
             const normalizedFallback = `${fallbackProperty}_norm`;
-            if (Object.prototype.hasOwnProperty.call(props, normalizedFallback)) {
+            if (this.propertyHasNumericData(normalizedFallback)) {
                 return normalizedFallback;
+            }
+            if (this.propertyHasNumericData(fallbackProperty)) {
+                return fallbackProperty;
             }
         }
         return primaryProperty;
@@ -1195,10 +1277,11 @@ export class SimplifiedPillarManager {
         return Number.isFinite(numeric) ? numeric : value;
     }
 
-    computeConflictBreaks(propertyName) {
+    computeQuantileBreaks(propertyName) {
         const values = (this.pillarsData?.features || [])
-            .map(feature => Number(feature?.properties?.[propertyName]))
-            .filter(value => Number.isFinite(value))
+            .map((feature) => this.getFeatureValue(feature, propertyName))
+            .filter((value) => Number.isFinite(Number(value)))
+            .map(Number)
             .sort((a, b) => a - b);
 
         if (!values.length) {
@@ -1216,6 +1299,63 @@ export class SimplifiedPillarManager {
         };
 
         return [quantile(0.2), quantile(0.4), quantile(0.6), quantile(0.8)];
+    }
+
+    computeConflictBreaks(propertyName) {
+        return this.computeQuantileBreaks(propertyName);
+    }
+
+    getSubIndicatorColorDynamic(value, polarity = 1) {
+        if (value == null || isNaN(value)) return '#cccccc';
+
+        const numericValue = Number(value);
+        const forwardColors = ['#d73027', '#fc8d59', '#ffffbf', '#91cf60', '#1a9850'];
+        const breaks = this.subIndicatorBreaks || [0, 0, 0, 0];
+
+        let idx = 0;
+        if (numericValue >= breaks[3]) idx = 4;
+        else if (numericValue >= breaks[2]) idx = 3;
+        else if (numericValue >= breaks[1]) idx = 2;
+        else if (numericValue >= breaks[0]) idx = 1;
+
+        if (Number(polarity) === -1) {
+            idx = 4 - idx;
+        }
+
+        return forwardColors[idx];
+    }
+
+    getSubIndicatorDescription(value, polarity = 1) {
+        if (value == null || isNaN(value)) return 'No data available';
+
+        const numericValue = Number(value);
+        const breaks = this.subIndicatorBreaks || [0, 0, 0, 0];
+        const tierNames = ['Very Low', 'Low', 'Moderate', 'High', 'Very High'];
+
+        let idx = 0;
+        if (numericValue >= breaks[3]) idx = 4;
+        else if (numericValue >= breaks[2]) idx = 3;
+        else if (numericValue >= breaks[1]) idx = 2;
+        else if (numericValue >= breaks[0]) idx = 1;
+
+        if (Number(polarity) === -1) {
+            idx = 4 - idx;
+        }
+
+        return `${tierNames[idx]} relative to other regions in this country`;
+    }
+
+    getSubIndicatorLegendLabels() {
+        const breaks = this.subIndicatorBreaks || [0, 0, 0, 0];
+        const format = (v) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 });
+
+        return [
+            `Very Low (${format(0)} - ${format(breaks[0])})`,
+            `Low (${format(breaks[0])} - ${format(breaks[1])})`,
+            `Moderate (${format(breaks[1])} - ${format(breaks[2])})`,
+            `High (${format(breaks[2])} - ${format(breaks[3])})`,
+            `Very High (${format(breaks[3])}+)`
+        ];
     }
 
     getConflictColorDynamic(value) {

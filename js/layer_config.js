@@ -29,11 +29,11 @@ export function getCurrentCountry() {
 export function getSepiDistrictGeoJSONPathForAdm1Labels(country = currentCountry) {
     switch (country) {
         case 'Kenya':
-            return `data/Kenya/sepi_with_pillars_May_04_Kenya.geojson`;
+            return `data/Kenya/sepi_with_pillars_June_09_Kenya.geojson`;
         case 'Somalia':
-            return `data/Somalia/sepi_with_pillars_May_04_Somalia.geojson`;
+            return `data/Somalia/sepi_with_pillars_June_09_Somalia.geojson`;
         case 'South_Sudan':
-            return `data/South_Sudan/sepi_with_pillars_May_04_South_Sudan.geojson`;
+            return `data/South_Sudan/sepi_with_pillars_June_09_South_Sudan.geojson`;
         default:
             return getCountryPath('sepi_with_pillars_9_2.geojson', country);
     }
@@ -43,9 +43,9 @@ export function getCountryPath(filename, country = currentCountry) {
     // Route all pillar/SEPI layer bindings to refreshed country bundles.
     if (filename === 'sepi_with_pillars_9_2.geojson') {
         const refreshedPillarFiles = {
-            Somalia: 'sepi_with_pillars_May_04_Somalia.geojson',
-            Kenya: 'sepi_with_pillars_May_04_Kenya.geojson',
-            South_Sudan: 'sepi_with_pillars_May_04_South_Sudan.geojson'
+            Somalia: 'sepi_with_pillars_June_09_Somalia.geojson',
+            Kenya: 'sepi_with_pillars_June_09_Kenya.geojson',
+            South_Sudan: 'sepi_with_pillars_June_09_South_Sudan.geojson'
         };
         if (refreshedPillarFiles[country]) {
             return `data/${country}/${refreshedPillarFiles[country]}`;
@@ -227,6 +227,19 @@ export const LAYER_CONFIG = {
     ...generateInfrastructureLayers()
 };
 
+
+/** Composite index pillars scored on a fixed 0–1 scale. Sub-indicators use dynamic country quantiles. */
+export const MAIN_PILLAR_IDS = new Set([
+    'education',
+    'food_security',
+    'poverty',
+    'health',
+    'climate_vulnerability'
+]);
+
+export function isSubIndicatorPillar(pillarId) {
+    return Boolean(pillarId) && !pillarId.startsWith('conflict_') && !MAIN_PILLAR_IDS.has(pillarId);
+}
 
 /**
  * Updated Pillar configuration using single pillars.geojson file
