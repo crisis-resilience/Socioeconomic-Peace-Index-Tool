@@ -462,15 +462,7 @@ function setupCountrySelector() {
     setTimeout(syncCountrySelectorUi, 0);
 
     sidebar.addEventListener('click', async (event) => {
-        const infoTrigger = event.target.closest('.country-info-trigger');
-        if (infoTrigger && sidebar.contains(infoTrigger)) {
-            if (typeof window.showSEPIInfo === 'function') {
-                window.showSEPIInfo();
-            }
-            return;
-        }
-
-        const clickedOption = event.target.closest('.country-dot-option');
+const clickedOption = event.target.closest('.country-dot-option');
         if (!clickedOption || !sidebar.contains(clickedOption)) return;
 
         const selectedCountry = clickedOption.dataset.country;

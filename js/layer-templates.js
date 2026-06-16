@@ -6,8 +6,7 @@ export class LayerTemplates {
     return `
         <div class="country-selector-container">
             <div class="country-selection-toolbar">
-            <button type="button" class="country-sepi-learn-btn" onclick="showSEPIInfo()" title="Learn about SEPI" aria-label="Learn about SEPI">ℹ</button>
-            <div id="countryDotsSelector" class="country-dots-selector" role="tablist" aria-label="Country selector">
+<div id="countryDotsSelector" class="country-dots-selector" role="tablist" aria-label="Country selector">
                 <button type="button" class="country-dot-option active" data-country="Somalia" title="Somalia" aria-label="Somalia">
                     <span class="country-dot-indicator"></span>
                     <span class="country-dot-label">Somalia</span>
