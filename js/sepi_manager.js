@@ -2,7 +2,7 @@
 // Replaces: sepi_integration.js + sepi_popups.js
 
 import { updateSEPILegend, updatePrimaryConflictDriverLegend } from './legend.js';
-import { getCountryPath } from './layer_config.js';
+import { getCountryPath, AGGREGATE_GEOJSON_PATH, getCurrentCountry } from './layer_config.js';
 
 /**
  * SEPI Manager - Handles all SEPI layer functionality
@@ -177,9 +177,14 @@ export class SEPIManager {
      */
     async loadLayer() {
         try {
-            this.config.dataUrl = getCountryPath('sepi_with_pillars_9_2.geojson');
+            this.config.dataUrl = AGGREGATE_GEOJSON_PATH;
             console.log('Loading SEPI data from:', this.config.dataUrl);
-            const geojsonData = await fetchJsonWithRetry(this.config.dataUrl);
+            const allData = await fetchJsonWithRetry(this.config.dataUrl);
+            const countryName = getCurrentCountry().replace('_', ' ');
+            const geojsonData = {
+                ...allData,
+                features: allData.features.filter(f => f.properties?.country === countryName)
+            };
             if (geojsonData.features && geojsonData.features.length > 0) {
                 const firstFeature = geojsonData.features[0];
                 

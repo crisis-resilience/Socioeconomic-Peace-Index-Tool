@@ -665,19 +665,28 @@ export class SimplifiedPillarManager {
 
     async loadPillarsData() {
         if (this.pillarsData) return this.pillarsData;
-    
+
         try {
-            const firstPillar = PILLAR_CONFIG.education || Object.values(PILLAR_CONFIG)[0];
-            const pillarsFile = resolvePath(firstPillar?.file);
-            const response = await fetch(pillarsFile);
-            if (!response.ok) {
-                throw new Error(`Failed to load pillars data: ${response.status}`);
+            if (!this._allPillarsData) {
+                const firstPillar = PILLAR_CONFIG.education || Object.values(PILLAR_CONFIG)[0];
+                const pillarsFile = resolvePath(firstPillar?.file);
+                const response = await fetch(pillarsFile);
+                if (!response.ok) {
+                    throw new Error(`Failed to load pillars data: ${response.status}`);
+                }
+                this._allPillarsData = await response.json();
             }
-            
-            this.pillarsData = await response.json();
+
+            const countryName = getCurrentCountry().replace('_', ' ');
+            this.pillarsData = {
+                ...this._allPillarsData,
+                features: this._allPillarsData.features.filter(
+                    f => f.properties?.country === countryName
+                )
+            };
             console.log('Pillars data loaded successfully');
             return this.pillarsData;
-            
+
         } catch (error) {
             console.error('Error loading pillars data:', error);
             throw error;
@@ -956,6 +965,7 @@ export class SimplifiedPillarManager {
                     <h4 style="margin: 0 0 8px 0; color: ${headerColor}; font-size: 14px;">About This Indicator</h4>
                     <div style="font-size: 13px; color: ${headerColor}; line-height: 1.4;">
                         ${config.description}
+                        ${config.unit ? `<div style="margin-top: 8px; font-size: 12px; color: ${headerColor}; font-weight: 600;">Unit: ${config.unit}</div>` : ''}
                     </div>
                 </div>
                 
@@ -1035,9 +1045,7 @@ export class SimplifiedPillarManager {
             // Conflict data legend (Yellow to Red)
             const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
             const labels = this.getConflictLegendLabels();
-            const desc = this.conflictPooledScale
-                ? `${config.description}<br><span style="font-size:11px;color:#555">Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).</span>`
-                : config.description;
+            const desc = config.description;
 
             this.updateLegend(
                 config.name,
@@ -1050,7 +1058,7 @@ export class SimplifiedPillarManager {
             const pol = Number(config.polarity) === -1 ? -1 : 1;
             const colors = pol === -1 ? [...forwardColors].reverse() : forwardColors;
             const labels = this.getSubIndicatorLegendLabels();
-            const desc = `${config.description}<br><span style="font-size:11px;color:#555">Scale: quintiles within the current country (raw indicator values).</span>`;
+            const desc = config.unit ? `Unit: ${config.unit}` : '';
 
             this.updateLegend(
                 config.name,

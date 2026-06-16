@@ -139,9 +139,10 @@ export function updateLegend(layerName, colorScheme, description, labels) {
         }
     }
 
-    // Descriptions live in the Active Layers sidebar (config still passes description for future use).
+    // Descriptions live in the Active Layers sidebar, but the legend box also shows a short description.
     legend.innerHTML = `
         <h4>${layerName}</h4>
+        ${description ? `<div class="legend-description" style="font-size:12px; color:#444; margin-bottom:10px; line-height:1.4;">${description}</div>` : ''}
         <div class="color-scheme">
             <p>Color Scheme:</p>
             <div class="color-boxes">

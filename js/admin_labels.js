@@ -457,7 +457,12 @@ function loadAdm1LabelsForCurrentCountry(labelLayer) {
     return fetchGeoJSON(sepiUrl)
         .then((data) => {
             if (!stillValid()) return;
-            addAdm1MarkersGroupedFromDistrictGeoJSON(data, labelLayer);
+            const countryName = getCurrentCountry().replace('_', ' ');
+            const filtered = {
+                ...data,
+                features: data.features.filter(f => f.properties?.country === countryName)
+            };
+            addAdm1MarkersGroupedFromDistrictGeoJSON(filtered, labelLayer);
             if (labelLayer.getLayers().length === 0) {
                 return runFallback();
             }
