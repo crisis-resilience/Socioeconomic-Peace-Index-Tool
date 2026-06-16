@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/info_panel.css">
     <link rel="stylesheet" href="css/pop_styles.css">
-    <link rel="stylesheet" href="css/sepi_info_popup.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
   crossorigin=""/>
@@ -96,18 +95,6 @@
     <script type="module" src="js/main.js"></script>
     
 
-<!-- ADD: Simple JavaScript functions -->
-<script>
-function showSEPIInfo() {
-    document.getElementById('sepiInfoOverlay').style.display = 'block';
-    document.getElementById('sepiInfoPopup').style.display = 'block';
-}
-
-function hideSEPIInfo() {
-    document.getElementById('sepiInfoOverlay').style.display = 'none';
-    document.getElementById('sepiInfoPopup').style.display = 'none';
-}
-</script>
 
     <!-- Layer templates initialization -->
     <script type="module">
@@ -485,61 +472,6 @@ function hideSEPIInfo() {
             }
         }
     </script>
-                        <!-- ADD: Info popup HTML (add anywhere in body) -->
-<!-- ADD: Info popup HTML (add anywhere in body) -->
-<div class="sepi-info-overlay" id="sepiInfoOverlay" onclick="hideSEPIInfo()"></div>
-<div class="sepi-info-popup" id="sepiInfoPopup">
-    <div class="sepi-info-header">
-        <h3>🕊️ Socioeconomic Peace Index</h3>
-        <button class="sepi-info-close" onclick="hideSEPIInfo()">&times;</button>
-    </div>
-    <div class="sepi-info-content">
-        <h4>What is SEPI?</h4>
-        <p>The Socioeconomic Peace Index measures regional peace by combining five key development factors derived from 14 socioeconomic indicators.</p>
-        
-        <h4>The Five Pillars & Their Indicators:</h4>
-        
-        <p><strong>📚 Education Index:</strong></p>
-        <ul style="margin: 5px 0 10px 20px; font-size: 13px;">
-            <li>Percent with no formal education</li>
-            <li>Primary school gross attendance rates</li>
-            <li>Secondary school gross attendance rates</li>
-            <li>Percent with primary education as highest level</li>
-            <li>Percent with secondary education as highest level</li>
-            <li>Percent with university education as highest level</li>
-        </ul>
-        
-        <p><strong>🌾 Food Security Index:</strong></p>
-        <ul style="margin: 5px 0 10px 20px; font-size: 13px;">
-            <li>Population fraction in IPC Phase 3+ (crisis or worse food insecurity)</li>
-            <li>Food expenditure as percentage share of total household spending</li>
-        </ul>
-        
-        <p><strong>💰 Poverty Reduction Index:</strong></p>
-        <ul style="margin: 5px 0 10px 20px; font-size: 13px;">
-            <li>Poverty headcount percentage</li>
-            <li>Extreme poverty headcount percentage</li>
-            <li>Total household expenditure (USD)</li>
-        </ul>
-        
-        <p><strong>🏥 Health Access Index:</strong></p>
-        <ul style="margin: 5px 0 10px 20px; font-size: 13px;">
-            <li>Health facilities per 10,000 population</li>
-        </ul>
-        
-        <p><strong>🌍 Climate Resilience Index:</strong></p>
-        <ul style="margin: 5px 0 10px 20px; font-size: 13px;">
-            <li>Precipitation anomaly for 2023</li>
-            <li>Mean NDVI change from 2015 to 2023 (vegetation health)</li>
-        </ul>
-        
-        <h4>Score Ranges:</h4>
-        <p style="font-size: 13px; line-height: 1.4;">
-            <strong>0.8-1.0:</strong> Very High Peace | <strong>0.6-0.8:</strong> High Peace | 
-            <strong>0.4-0.6:</strong> Moderate | <strong>0.2-0.4:</strong> Low | 
-            <strong>0.0-0.2:</strong> Very Low
-        </p>
-    </div>
-</div>
+
 </body>
 </html>

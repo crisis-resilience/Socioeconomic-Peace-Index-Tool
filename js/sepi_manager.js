@@ -120,7 +120,7 @@ export class SEPIManager {
 
     async loadAdm1OverviewCsv() {
         if (this.adm1OverviewLoadPromise) return this.adm1OverviewLoadPromise;
-        this.adm1OverviewLoadPromise = fetch('all_adm1_overview.csv')
+        this.adm1OverviewLoadPromise = fetch('data/all_adm1_overview.csv')
             .then((response) => (response.ok ? response.text() : ''))
             .then((csvText) => {
                 if (!csvText) return;
@@ -233,7 +233,7 @@ export class SEPIManager {
         // Create chart HTML
         let chartHTML = `
     <div class="sepi-breakdown-chart" style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #2c5f2d; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <h4 style="margin: 0 0 12px 0; color: #2c5f2d; font-size: 14px; font-weight: 600;">📊 SEPI Pillar Breakdown</h4>
+        <h4 style="margin: 0 0 12px 0; color: #2c5f2d; font-size: 14px; font-weight: 600;"> SEPI Pillar Breakdown</h4>
 `;
         
         pillars.forEach(pillar => {

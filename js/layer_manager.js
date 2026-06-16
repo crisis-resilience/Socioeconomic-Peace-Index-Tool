@@ -594,7 +594,7 @@ export class SimplifiedPillarManager {
 
     async loadAdm1OverviewCsv() {
         if (this.adm1OverviewLoadPromise) return this.adm1OverviewLoadPromise;
-        this.adm1OverviewLoadPromise = fetch('all_adm1_overview.csv')
+        this.adm1OverviewLoadPromise = fetch('data/all_adm1_overview.csv')
             .then((response) => (response.ok ? response.text() : ''))
             .then((csvText) => {
                 if (!csvText) return;
