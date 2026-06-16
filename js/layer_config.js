@@ -273,27 +273,31 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'literacy_percent_total',
         description: 'Literacy percent total',
+        unit: 'Percent of population',
         polarity: 1
     },
     primary_school_net_attendance_total: {
-        name: 'Primary school net attendance rate (total)',
+        name: 'Primary school net attendance rate',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'primary_school_net_attendance_total',
-        description: 'Primary school net attendance rate (total)',
+        description: 'Primary school net attendance rate',
+        unit: 'Percent of population',
         polarity: 1
     },
     percent_highest_level_secondary_education: {
-        name: 'Percent highest level secondary education',
+        name: 'Secondary school completion rate (as highest level of education)',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'percent_highest_level_secondary_education',
-        description: 'Percent highest level secondary education',
+        description: 'Secondary school completion rate (as highest level of education)',
+        unit: 'Percent of population',
         polarity: 1
     },
     net_attendance_total: {
-        name: 'Secondary Attendance (Total)',
+        name: 'Secondary school net attendance rate',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'net_attendance_total',
-        description: 'Secondary Attendance (Total)',
+        description: 'Secondary school net attendance rate',
+        unit: 'Percent of population',
         polarity: 1
     },
     school_access_pop: {
@@ -301,6 +305,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'school_access_pop',
         description: 'Population with school access',
+        unit: 'Percent of population',
         polarity: 1
     },
     on_payroll_pct: {
@@ -308,6 +313,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'on_payroll_pct',
         description: 'Share of teachers on payroll',
+        unit: 'Percent of teachers',
         polarity: 1
     },
     dropout_pct: {
@@ -315,6 +321,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'dropout_pct',
         description: 'Student dropout rate',
+        unit: 'Percent of students',
         polarity: -1
     },
 
@@ -323,6 +330,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'healthcare_access_pop',
         description: 'Population with healthcare access',
+        unit: 'Percent of population',
         polarity: 1
     },
     health_fac_per_10k_pop: {
@@ -330,6 +338,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'health_fac_per_10k_pop',
         description: 'Health facilities per 10,000 population',
+        unit: 'Per 10,000 people',
         polarity: 1
     },
     hospitals_per_100k_pop: {
@@ -337,6 +346,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'hospitals_per_100k_pop',
         description: 'Hospitals per 100,000 population',
+        unit: 'Per 100,000 people',
         polarity: 1
     },
 
@@ -345,6 +355,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'pop_frac_3plus',
         description: 'Fraction of population in IPC (Integrated Food Security Phase Classification) Phase 3 or higher',
+        unit: 'proportion (0-1) in population',
         polarity: -1
     },
 
@@ -353,6 +364,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'poverty_headcount_pct',
         description: 'Poverty headcount (population below poverty line)',
+        unit: 'Percent of population',
         polarity: -1
     },
     gcp_pc: {
@@ -360,13 +372,15 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'gcp_pc',
         description: 'Gross County Product Per Capita',
+        unit: 'KSh per person',
         polarity: 1
     },
     total_expenditure_usd: {
-        name: 'Total expenditure usd',
+        name: 'Mean total household expenditure',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'total_expenditure_usd',
-        description: 'Total expenditure usd',
+        description: 'Mean total household expenditure',
+        unit: 'USD',
         polarity: 1
     },
     annual_cmb_mean: {
@@ -374,6 +388,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'annual_cmb_mean',
         description: 'Average annual CMB (Cost of Minimum Expenditure Basket) cost',
+        unit: 'USD',
         polarity: -1
     },
 
@@ -382,6 +397,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'rs_ndvi',
         description: 'Normalized Difference Vegetation Index',
+        unit: 'index',
         polarity: 1
     },
     rs_soil_moist: {
@@ -389,6 +405,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'rs_soil_moist',
         description: 'Soil Moisture Anomaly',
+        unit: 'index',
         polarity: 1
     },
     rs_fapar: {
@@ -396,6 +413,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'rs_fapar',
         description: 'Fraction of Absorbed Photosynthetically Active Radiation',
+        unit: 'index',
         polarity: 1
     },
     rs_pdsi: {
@@ -403,6 +421,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'rs_pdsi',
         description: 'Palmer Drought Severity Index',
+        unit: 'index',
         polarity: 1
     },
 

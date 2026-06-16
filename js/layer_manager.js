@@ -965,6 +965,7 @@ export class SimplifiedPillarManager {
                     <h4 style="margin: 0 0 8px 0; color: ${headerColor}; font-size: 14px;">About This Indicator</h4>
                     <div style="font-size: 13px; color: ${headerColor}; line-height: 1.4;">
                         ${config.description}
+                        ${config.unit ? `<div style="margin-top: 8px; font-size: 12px; color: ${headerColor}; font-weight: 600;">Unit: ${config.unit}</div>` : ''}
                     </div>
                 </div>
                 
@@ -1044,9 +1045,7 @@ export class SimplifiedPillarManager {
             // Conflict data legend (Yellow to Red)
             const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
             const labels = this.getConflictLegendLabels();
-            const desc = this.conflictPooledScale
-                ? `${config.description}<br><span style="font-size:11px;color:#555">Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).</span>`
-                : config.description;
+            const desc = config.description;
 
             this.updateLegend(
                 config.name,
@@ -1059,7 +1058,7 @@ export class SimplifiedPillarManager {
             const pol = Number(config.polarity) === -1 ? -1 : 1;
             const colors = pol === -1 ? [...forwardColors].reverse() : forwardColors;
             const labels = this.getSubIndicatorLegendLabels();
-            const desc = `${config.description}<br><span style="font-size:11px;color:#555">Scale: quintiles within the current country (raw indicator values).</span>`;
+            const desc = config.unit ? `Unit: ${config.unit}` : '';
 
             this.updateLegend(
                 config.name,

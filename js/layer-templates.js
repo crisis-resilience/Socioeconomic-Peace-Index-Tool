@@ -60,19 +60,19 @@ export class LayerTemplates {
                     <div class="sepi-subpillars" data-parent-pillar="education">
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="primary_school_net_attendance_total" data-countries="Kenya,Somalia">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Primary school net attendance rate (total)</span>
+                            <span class="sepi-subpillar-text">Primary school net attendance rate</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="literacy_percent_total" data-countries="Somalia">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Literacy percent total</span>
+                            <span class="sepi-subpillar-text">Literacy rate</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="percent_highest_level_secondary_education" data-countries="Somalia">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Percent highest level secondary education</span>
+                            <span class="sepi-subpillar-text">Secondary education completion rate</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="net_attendance_total" data-countries="Kenya">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Secondary Attendance (Total)</span>
+                            <span class="sepi-subpillar-text">Secondary school net attendance rate</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="school_access_pop" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
@@ -106,19 +106,19 @@ export class LayerTemplates {
                     <div class="sepi-subpillars" data-parent-pillar="poverty">
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="poverty_headcount_pct" data-countries="Kenya,Somalia,Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Poverty headcount (below poverty line)</span>
+                            <span class="sepi-subpillar-text">Poverty headcount ratio</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="gcp_pc" data-countries="Kenya">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Gross County Product Per Capita</span>
+                            <span class="sepi-subpillar-text">GCP (Gross County Product) per capita</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="total_expenditure_usd" data-countries="Somalia">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Total expenditure (USD)</span>
+                            <span class="sepi-subpillar-text">Mean total household expenditure</span>
                         </button>
                         <button type="button" class="sepi-subpillar-option" data-sepi-type="pillar" data-pillar-id="annual_cmb_mean" data-countries="Ssd">
                             <span class="sepi-subpillar-dot"></span>
-                            <span class="sepi-subpillar-text">Average annual CMB cost</span>
+                            <span class="sepi-subpillar-text">Average annual CMB</span>
                         </button>
                     </div>
                     
