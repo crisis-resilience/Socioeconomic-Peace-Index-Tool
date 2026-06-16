@@ -665,19 +665,28 @@ export class SimplifiedPillarManager {
 
     async loadPillarsData() {
         if (this.pillarsData) return this.pillarsData;
-    
+
         try {
-            const firstPillar = PILLAR_CONFIG.education || Object.values(PILLAR_CONFIG)[0];
-            const pillarsFile = resolvePath(firstPillar?.file);
-            const response = await fetch(pillarsFile);
-            if (!response.ok) {
-                throw new Error(`Failed to load pillars data: ${response.status}`);
+            if (!this._allPillarsData) {
+                const firstPillar = PILLAR_CONFIG.education || Object.values(PILLAR_CONFIG)[0];
+                const pillarsFile = resolvePath(firstPillar?.file);
+                const response = await fetch(pillarsFile);
+                if (!response.ok) {
+                    throw new Error(`Failed to load pillars data: ${response.status}`);
+                }
+                this._allPillarsData = await response.json();
             }
-            
-            this.pillarsData = await response.json();
+
+            const countryName = getCurrentCountry().replace('_', ' ');
+            this.pillarsData = {
+                ...this._allPillarsData,
+                features: this._allPillarsData.features.filter(
+                    f => f.properties?.country === countryName
+                )
+            };
             console.log('Pillars data loaded successfully');
             return this.pillarsData;
-            
+
         } catch (error) {
             console.error('Error loading pillars data:', error);
             throw error;

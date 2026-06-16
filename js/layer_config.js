@@ -26,30 +26,15 @@ export function getCurrentCountry() {
  * District SEPI bundles used by Map Controls "Show labels" (group districts → ADM1).
  * Country district SEPI bundles used by map controls "Show labels" (group districts → ADM1).
  */
-export function getSepiDistrictGeoJSONPathForAdm1Labels(country = currentCountry) {
-    switch (country) {
-        case 'Kenya':
-            return `data/Kenya/sepi_with_pillars_June_09_Kenya.geojson`;
-        case 'Somalia':
-            return `data/Somalia/sepi_with_pillars_June_09_Somalia.geojson`;
-        case 'South_Sudan':
-            return `data/South_Sudan/sepi_with_pillars_June_09_South_Sudan.geojson`;
-        default:
-            return getCountryPath('sepi_with_pillars_9_2.geojson', country);
-    }
+export const AGGREGATE_GEOJSON_PATH = 'data/all_countries_v1_equal_geometric.geojson';
+
+export function getSepiDistrictGeoJSONPathForAdm1Labels() {
+    return AGGREGATE_GEOJSON_PATH;
 }
 
 export function getCountryPath(filename, country = currentCountry) {
-    // Route all pillar/SEPI layer bindings to refreshed country bundles.
     if (filename === 'sepi_with_pillars_9_2.geojson') {
-        const refreshedPillarFiles = {
-            Somalia: 'sepi_with_pillars_June_09_Somalia.geojson',
-            Kenya: 'sepi_with_pillars_June_09_Kenya.geojson',
-            South_Sudan: 'sepi_with_pillars_June_09_South_Sudan.geojson'
-        };
-        if (refreshedPillarFiles[country]) {
-            return `data/${country}/${refreshedPillarFiles[country]}`;
-        }
+        return AGGREGATE_GEOJSON_PATH;
     }
     return `data/${country}/${filename}`;
 }
