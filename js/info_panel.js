@@ -296,7 +296,6 @@ export class InfoPanel {
                     <div class="info-panel-section">
                         <div class="section-header">
                             <h4>Active Layers</h4>
-                            <span class="layer-count">0 layers</span>
                         </div>
                         <div class="layers-list" id="layers-list">
                             <p class="no-layers-message">No layers currently active</p>
@@ -779,11 +778,8 @@ export class InfoPanel {
      */
     updateLayersList() {
         const layersList = document.getElementById('layers-list');
-        const layerCount = this.container.querySelector('.layer-count');
-        
-        if (!layersList || !layerCount) return;
-        
-        layerCount.textContent = `${this.activeLayers.size} layer${this.activeLayers.size !== 1 ? 's' : ''}`;
+
+        if (!layersList) return;
         
         if (this.activeLayers.size === 0) {
             layersList.innerHTML = '<p class="no-layers-message">No layers currently active</p>';
@@ -800,7 +796,10 @@ export class InfoPanel {
                 const dashboardHtml = layer.dashboardContent
                     ? renderSepiDashboardHtml(layer.dashboardContent)
                     : '';
-                const detailsHtml = dashboardHtml || this.generateLayerDetails(layer);
+                const overviewHtml = layer.overview && String(layer.overview).trim()
+                    ? `<div class="layer-overview">${escapeHtml(layer.overview)}</div>`
+                    : '';
+                const detailsHtml = dashboardHtml || overviewHtml || this.generateLayerDetails(layer);
                 return `
             <div class="layer-item" data-layer-id="${escapeHtml(layer.id)}">
                 <div class="layer-header">
@@ -1038,6 +1037,10 @@ export class InfoPanel {
      */
     generateLayerDetails(layer) {
         if (layer.dashboardContent) {
+            return '';
+        }
+
+        if (layer.type === 'pillar' || layer.type === 'conflict') {
             return '';
         }
 

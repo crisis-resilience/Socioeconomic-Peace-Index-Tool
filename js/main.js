@@ -27,6 +27,7 @@ const countryOutlines = {};
 /** `sidebarInitialized` can fire while this module is still awaiting outline preload — avoid double load. */
 let initialSepiActivationDone = false;
 const pillarOverviewByDashboardName = new Map();
+const pillarShortDescByDashboardName = new Map();
 let pillarOverviewLoadPromise = null;
 
 function resolveConfigUrl(pathOrResolver) {
@@ -49,14 +50,19 @@ async function loadPillarOverviewDescriptions() {
             if (rows.length < 2) return;
             const header = parseCsvLine(rows[0]);
             const dashboardCol = header.findIndex((col) => col === 'Dashboard Pillar Name');
+            const shortCol = header.findIndex((col) => col === 'short_description');
             const overviewCol = header.findIndex((col) => col === 'pillar_overview');
-            if (dashboardCol < 0 || overviewCol < 0) return;
+            if (dashboardCol < 0) return;
             for (let i = 1; i < rows.length; i += 1) {
                 const cells = parseCsvLine(rows[i]);
-                const key = cells[dashboardCol];
-                const overview = cells[overviewCol];
-                if (!key || !overview) continue;
-                pillarOverviewByDashboardName.set(key.trim(), overview.trim());
+                const key = cells[dashboardCol]?.trim();
+                if (!key) continue;
+                if (shortCol >= 0 && cells[shortCol]?.trim()) {
+                    pillarShortDescByDashboardName.set(key, cells[shortCol].trim());
+                }
+                if (overviewCol >= 0 && cells[overviewCol]?.trim()) {
+                    pillarOverviewByDashboardName.set(key, cells[overviewCol].trim());
+                }
             }
         })
         .catch((err) => {
@@ -813,18 +819,15 @@ function updateInfoPanelWithSEPI() {
                 : `Pillar: ${getPillarDisplayName(currentPillar)}`;
 
             const pillarCfg = PILLAR_CONFIG[currentPillar];
-            let pillarDescription = pillarCfg?.description || '';
+            const dashboardName = getPillarDisplayName(currentPillar);
+            const shortDescription = pillarShortDescByDashboardName.get(dashboardName) || pillarCfg?.description || '';
+            let pillarOverview = '';
             if (!isConflictData) {
-                const dashboardName = getPillarDisplayName(currentPillar);
-                const csvOverview = pillarOverviewByDashboardName.get(dashboardName);
-                if (csvOverview) {
-                    pillarDescription = csvOverview;
-                }
+                pillarOverview = pillarOverviewByDashboardName.get(dashboardName) || '';
             }
+            let conflictNote = '';
             if (isConflictData && layerManager.pillarManager?.conflictPooledScale) {
-                const note =
-                    'Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).';
-                pillarDescription = pillarDescription ? `${pillarDescription} ${note}` : note;
+                conflictNote = 'Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).';
             }
 
             infoPanel.addLayer(layerType, {
@@ -834,11 +837,8 @@ function updateInfoPanelWithSEPI() {
                 selectedAttribute: currentPillar,
                 rankingAttribute: layerManager.pillarManager?.currentPropertyName || currentPillar,
                 featureCount: layerManager.pillarManager.getCurrentLayer()?.getLayers?.()?.length || 0,
-                description: pillarDescription,
-                source: isConflictData ? 'ACLED API' : 'SEPI pillar dataset',
-                year: isConflictData
-                    ? (layerManager.pillarManager?.conflictYear || 'Selected year')
-                    : 'Latest available'
+                description: shortDescription,
+                overview: pillarOverview || conflictNote
             });
 
             // Keep only the currently relevant derived layer entry to avoid stale state in Active Layers UI.
