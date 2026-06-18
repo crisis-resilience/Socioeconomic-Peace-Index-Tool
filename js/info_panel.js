@@ -284,6 +284,10 @@ export class InfoPanel {
 
                                 <p class="welcome-conflict-disclaimer">SEPI is a structural baseline, not a real-time early warning tool. Results should be read alongside contextual knowledge and other data sources.</p>
                             </div>
+
+                            <div class="welcome-disclaimer">
+                                The final status of the following territories has not yet been agreed or determined: Abyei area, Aksai Chin, Arunachal Pradesh, Bi’r Tawil, Hala\'ib Triangle, Ilemi Triangle, Jammu and Kashmir, Kuril Islands, Paracel Islands, Scarborough Shoal, Senkaku Islands and Spratly Islands.
+                            </div>
                         </div>
                     </div>
                 </section>

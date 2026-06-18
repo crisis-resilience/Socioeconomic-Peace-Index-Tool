@@ -39,11 +39,11 @@ export class SEPIManager {
             breaks: [0.2, 0.4, 0.6, 0.8]
         };
         this.primaryDriverPillars = [
-            { id: 'education', keys: ['education', 'pillar_education'], icon: '🏫' },
-            { id: 'food', keys: ['Food_security', 'food_security', 'pillar_food_security'], icon: '🍽️' },
-            { id: 'poverty', keys: ['poverty', 'pillar_economic'], icon: '💰' },
-            { id: 'health', keys: ['health', 'pillar_health'], icon: '🏥' },
-            { id: 'climate', keys: ['climate_vulnerability', 'pillar_climate'], icon: '🌾' }
+            { id: 'education', keys: ['education', 'pillar_education'], icon: '<img src="assets/ocha-icons/education.svg" class="ocha-pillar-icon" alt="Education">' },
+            { id: 'food', keys: ['Food_security', 'food_security', 'pillar_food_security'], icon: '<img src="assets/ocha-icons/food-security.svg" class="ocha-pillar-icon" alt="Food Security">' },
+            { id: 'poverty', keys: ['poverty', 'pillar_economic'], icon: '<img src="assets/ocha-icons/livelihoods.svg" class="ocha-pillar-icon" alt="Poverty Reduction">' },
+            { id: 'health', keys: ['health', 'pillar_health'], icon: '<img src="assets/ocha-icons/health.svg" class="ocha-pillar-icon" alt="Health Access">' },
+            { id: 'climate', keys: ['climate_vulnerability', 'pillar_climate'], icon: '<img src="assets/ocha-icons/drought.svg" class="ocha-pillar-icon" alt="Climate Resilience">' }
         ];
         this.adm1OverviewByCountryAndName = new Map();
         this.adm1OverviewByName = new Map();
@@ -575,8 +575,8 @@ chartHTML += `
                 icon: L.divIcon({
                     className: 'primary-driver-div-icon',
                     html: iconHtml,
-                    iconSize: [Math.max(22, 18 * icons.length), 22],
-                    iconAnchor: [Math.max(11, 9 * icons.length), 11]
+                    iconSize: [6 + 24 * icons.length, 26],
+                    iconAnchor: [3 + 12 * icons.length, 13]
                 }),
                 interactive: false,
                 keyboard: false

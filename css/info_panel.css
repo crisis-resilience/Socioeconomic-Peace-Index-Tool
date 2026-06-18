@@ -593,6 +593,15 @@
     margin: 0;
 }
 
+/* Small disclaimer used at the bottom of the Welcome tab */
+.welcome-disclaimer {
+    font-size: 10px;
+    color: #666666;
+    text-align: left;
+    margin-top: 10px;
+    line-height: 1.25;
+}
+
 @media (max-width: 480px) {
     .welcome-conflict-grid {
         grid-template-columns: 1fr;

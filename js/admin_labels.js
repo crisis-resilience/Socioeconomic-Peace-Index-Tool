@@ -316,7 +316,8 @@ function centroidFromGeoJSONFeature(feature) {
     if (!geo) return null;
 
     if (geo.type === 'Polygon') {
-        return calculatePolygonCentroid(geo.coordinates[0]);
+        const centroid = calculatePolygonCentroid(geo.coordinates[0]);
+        return centroid ? findBestLabelPosition(geo.coordinates[0], centroid) : null;
     }
     if (geo.type === 'MultiPolygon') {
         let largestRing = geo.coordinates[0]?.[0];
@@ -329,7 +330,8 @@ function centroidFromGeoJSONFeature(feature) {
                 largestRing = ring;
             }
         }
-        return calculatePolygonCentroid(largestRing);
+        const centroid = calculatePolygonCentroid(largestRing);
+        return centroid ? findBestLabelPosition(largestRing, centroid) : null;
     }
     return null;
 }
@@ -350,11 +352,32 @@ function adm1Marker(center, htmlName) {
         icon: L.divIcon({
             className: 'admin-label-icon',
             html: `<div class="admin-label adm1-label">${htmlName}</div>`,
-            iconSize: [120, 25],
-            iconAnchor: [60, 12]
+            iconSize: null,
+            iconAnchor: [0, 0]
         }),
         interactive: false
     });
+}
+
+/**
+ * Update zoom-level classes on map container for responsive label styling
+ * @param {Object} map - Leaflet map instance
+ */
+function updateZoomLevelClasses(map) {
+    const zoom = map.getZoom();
+    const container = map.getContainer();
+    
+    // Remove all zoom classes
+    container.classList.remove('zoom-out-min', 'zoom-mid-5-7', 'zoom-in-8');
+    
+    // Add appropriate zoom class
+    if (zoom >= 8) {
+        container.classList.add('zoom-in-8');
+    } else if (zoom >= 5) {
+        container.classList.add('zoom-mid-5-7');
+    } else {
+        container.classList.add('zoom-out-min');
+    }
 }
 
 function escapeHtmlLite(s) {
@@ -481,6 +504,8 @@ function toggleAdm1Labels(button, labelLayers, map) {
         button.style.backgroundColor = '#f8f8f8';
         button.style.fontWeight = 'normal';
         map.removeLayer(labelLayers.adm1);
+        // Remove zoom event listener
+        map.off('zoom', onAdm1LabelsZoom);
         return;
     }
 
@@ -493,6 +518,9 @@ function toggleAdm1Labels(button, labelLayers, map) {
             .then(() => {
                 if (button.classList.contains('active')) {
                     labelLayers.adm1.addTo(map);
+                    // Set up zoom event listener
+                    updateZoomLevelClasses(map);
+                    map.on('zoom', onAdm1LabelsZoom);
                 }
             })
             .catch((err) => {
@@ -505,6 +533,18 @@ function toggleAdm1Labels(button, labelLayers, map) {
     }
 
     labelLayers.adm1.addTo(map);
+    // Set up zoom event listener
+    updateZoomLevelClasses(map);
+    map.on('zoom', onAdm1LabelsZoom);
+}
+
+/**
+ * Zoom event handler for ADM1 labels
+ * Updates label appearance based on zoom level
+ */
+function onAdm1LabelsZoom() {
+    // 'this' context is the map object
+    updateZoomLevelClasses(this);
 }
 
 /**
@@ -549,6 +589,90 @@ function calculatePolygonArea(coordinates) {
         area += (x1 * y2) - (x2 * y1);
     }
     return Math.abs(area) / 2;
+}
+
+/**
+ * Check if a point is inside a polygon using ray casting algorithm
+ * @param {number} lng - Longitude
+ * @param {number} lat - Latitude
+ * @param {Array} coordinates - Polygon coordinates [[lng, lat], ...]
+ * @returns {boolean} - True if point is inside polygon
+ */
+function isPointInPolygon(lng, lat, coordinates) {
+    if (!coordinates || coordinates.length < 3) return false;
+    
+    let inside = false;
+    for (let i = 0, j = coordinates.length - 1; i < coordinates.length; j = i++) {
+        const [x1, y1] = coordinates[i];
+        const [x2, y2] = coordinates[j];
+        
+        const intersect = ((y1 > lat) !== (y2 > lat)) &&
+            (lng < ((x2 - x1) * (lat - y1)) / (y2 - y1) + x1);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+/**
+ * Find the best label position inside a polygon
+ * @param {Array} coordinates - Polygon coordinates
+ * @param {Object} centroid - Initial centroid point {lng, lat}
+ * @returns {Object} - Best position {lat, lng} inside the polygon
+ */
+function findBestLabelPosition(coordinates, centroid) {
+    if (!coordinates || !centroid) return centroid;
+    
+    // Check if centroid is already inside
+    if (isPointInPolygon(centroid.lng, centroid.lat, coordinates)) {
+        return centroid;
+    }
+    
+    // If centroid is outside, find the best point inside by sampling
+    const bounds = getBoundingBox(coordinates);
+    const samples = [];
+    
+    // Sample a grid of points within the bounding box
+    const gridStep = Math.min(
+        (bounds.maxLng - bounds.minLng) / 5,
+        (bounds.maxLat - bounds.minLat) / 5
+    );
+    
+    for (let lng = bounds.minLng; lng <= bounds.maxLng; lng += gridStep) {
+        for (let lat = bounds.minLat; lat <= bounds.maxLat; lat += gridStep) {
+            if (isPointInPolygon(lng, lat, coordinates)) {
+                const distance = Math.pow(lng - centroid.lng, 2) + Math.pow(lat - centroid.lat, 2);
+                samples.push({ lng, lat, distance });
+            }
+        }
+    }
+    
+    // If we found valid points, return the closest to the original centroid
+    if (samples.length > 0) {
+        samples.sort((a, b) => a.distance - b.distance);
+        return { lng: samples[0].lng, lat: samples[0].lat };
+    }
+    
+    // Fallback: return centroid as-is
+    return centroid;
+}
+
+/**
+ * Get bounding box of polygon coordinates
+ * @param {Array} coordinates - Polygon coordinates
+ * @returns {Object} - {minLng, maxLng, minLat, maxLat}
+ */
+function getBoundingBox(coordinates) {
+    let minLng = Infinity, maxLng = -Infinity;
+    let minLat = Infinity, maxLat = -Infinity;
+    
+    coordinates.forEach(([lng, lat]) => {
+        minLng = Math.min(minLng, lng);
+        maxLng = Math.max(maxLng, lng);
+        minLat = Math.min(minLat, lat);
+        maxLat = Math.max(maxLat, lat);
+    });
+    
+    return { minLng, maxLng, minLat, maxLat };
 }
 
 /**
