@@ -41,15 +41,15 @@ export function updateSEPILegend() {
                 ${sepiColors
                     .map(
                         (color, index) =>
-                            `<div style="display:flex; align-items:center; margin-bottom:5px;">
-                                <div style="background:${color}; width:20px; height:20px; margin-right:5px; border: 1px solid #ccc;"></div>
-                                <span style="font-size: 12px;">${sepiLabels[index]}</span>
+                            `<div style="display:flex; align-items:center; margin-bottom:3px;">
+                                <div style="background:${color}; width:14px; height:14px; margin-right:5px; border: 1px solid #ccc; flex-shrink:0;"></div>
+                                <span style="font-size: 11px;">${sepiLabels[index]}</span>
                             </div>`
                     )
                     .join('')}
                 ${getNoDataLegendEntry()}
             </div>
-            <div style="margin-top: 10px; font-size: 11px; color: #666;">
+            <div style="margin-top: 6px; font-size: 10px; color: #666;">
                 Click on districts for detailed information
             </div>
         </div>
@@ -62,11 +62,11 @@ export function updatePrimaryConflictDriverLegend() {
     if (!legend) return;
 
     const iconItems = [
-        { icon: '🏫', label: 'Education strongest' },
-        { icon: '🍽️', label: 'Food Security strongest' },
-        { icon: '💰', label: 'Poverty Reduction strongest' },
-        { icon: '🏥', label: 'Health Access strongest' },
-        { icon: '🌾', label: 'Climate Resilience strongest' }
+        { icon: '<img src="assets/ocha-icons/education.svg" class="ocha-pillar-icon" alt="Education">', label: 'Education' },
+        { icon: '<img src="assets/ocha-icons/food-security.svg" class="ocha-pillar-icon" alt="Food Security">', label: 'Food Security' },
+        { icon: '<img src="assets/ocha-icons/livelihoods.svg" class="ocha-pillar-icon" alt="Poverty Reduction">', label: 'Poverty Reduction' },
+        { icon: '<img src="assets/ocha-icons/health.svg" class="ocha-pillar-icon" alt="Health Access">', label: 'Health Access' },
+        { icon: '<img src="assets/ocha-icons/drought.svg" class="ocha-pillar-icon" alt="Climate Resilience">', label: 'Climate Resilience' }
     ];
 
     legend.innerHTML = `
@@ -77,15 +77,14 @@ export function updatePrimaryConflictDriverLegend() {
                 ${iconItems
                     .map(
                         (item) =>
-                            `<div style="display:flex; align-items:center; margin-bottom:6px;">
-                                <div style="width:24px; text-align:center; margin-right:6px; font-size:16px;">${item.icon}</div>
-                                <span style="font-size:12px;">${item.label}</span>
+                            `<div style="display:flex; align-items:center; margin-bottom:4px;">
+                                <div style="width:20px; text-align:center; margin-right:5px; flex-shrink:0;">${item.icon}</div>
+                                <span style="font-size:11px;">${item.label}</span>
                             </div>`
                     )
                     .join('')}
             </div>
-            <div style="margin-top: 8px; font-size: 11px; color: #666;">
-                Ties are shown side by side.
+            <div style="margin-top: 6px; font-size: 10px; color: #666;">
             </div>
         </div>
     `;
@@ -164,9 +163,9 @@ export function updateLegend(layerName, colorScheme, description, labels) {
 
 function getNoDataLegendEntry() {
     return `
-        <div style="display:flex; align-items:center; margin-bottom:5px;">
-            <div style="background:#cccccc; width:20px; height:20px; margin-right:5px; border: 1px solid #999;"></div>
-            <span>No data</span>
+        <div style="display:flex; align-items:center; margin-bottom:3px;">
+            <div style="background:#cccccc; width:14px; height:14px; margin-right:5px; border: 1px solid #999; flex-shrink:0;"></div>
+            <span style="font-size:11px;">No data</span>
         </div>
     `;
 }
