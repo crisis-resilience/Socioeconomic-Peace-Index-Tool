@@ -554,6 +554,13 @@ export class InfoPanel {
         if (analysisBtn) {
             analysisBtn.addEventListener('click', () => this.generateSummaryReport());
         }
+
+        // Re-generate report automatically when the user switches country
+        document.addEventListener('countryChanged', () => {
+            if (this._lastCountryReport) {
+                this.generateSummaryReport();
+            }
+        });
         
         // Make panel draggable and resizable only in floating mode
         if (!this.options.docked) {

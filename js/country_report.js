@@ -490,6 +490,10 @@ export async function buildCountryReport({ country, activeLayers }) {
         throw new Error(`Could not load district data for ${getCountryDisplayLabel(country)}`);
     }
     const geojson = await response.json();
+    const countryLabel = country.replace(/_/g, ' ');
+    geojson.features = geojson.features.filter(
+        f => f.properties?.country === countryLabel
+    );
     const regionRows = collectAllRegionRows(geojson);
     const narrative = getCountryReportNarrative(country);
     const conflictLayer = activeLayers?.get?.('conflict') || null;
