@@ -317,11 +317,11 @@ chartHTML += `
         if (value == null) return 'No data available';
         
         const numValue = Number(value);
-        if (numValue >= 0.8) return 'Very High Peace Level';
-        if (numValue >= 0.6) return 'High Peace Level';
-        if (numValue >= 0.4) return 'Moderate Peace Level';
-        if (numValue >= 0.2) return 'Low Peace Level';
-        return 'Very Low Peace Level';
+        if (numValue >= 0.8) return 'Very High Socioeconomic Peace Level';
+        if (numValue >= 0.6) return 'High Socioeconomic Peace Level';
+        if (numValue >= 0.4) return 'Moderate Socioeconomic Peace Level';
+        if (numValue >= 0.2) return 'Low Socioeconomic Peace Level';
+        return 'Very Low Socioeconomic Peace Level';
     }
     
     /** Reset hover styling / tooltips for every SEPI polygon (fast moves can skip `mouseout`). */
