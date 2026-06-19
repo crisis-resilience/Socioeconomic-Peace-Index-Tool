@@ -3,7 +3,7 @@
 import { addDefaultBasemap } from './basemaps.js';
 import { initializeLegend, updateLegend, hideLegend } from './legend.js';
 import { LayerManager } from './layer_manager.js';
-import { createAdminLabelLayers, loadCountryOutline } from './admin_labels.js';
+import { createAdminLabelLayers, loadCountryOutline, createOutlineFromAggregateData } from './admin_labels.js';
 import { InfoPanel } from './info_panel.js';
 import { populateColorRampSelector, setConfigCountry, COUNTRY_VIEWS, getCountryOutlineCandidates, getCountryPath, getCurrentCountry, SUPPORTED_COUNTRIES, LAYER_CONFIG, PILLAR_CONFIG } from './layer_config.js';
 import { getSepiDashboardContent } from './sepi_dashboard_content.js';
@@ -572,8 +572,16 @@ async function loadOutlineWithFallbacks(country) {
             return;
         }
     }
-    console.warn(`No valid outline file found for ${country}`);
-    showAllCountryOutlines(countryKey);
+    console.warn(`No valid outline file found for ${country}, trying synthetic fallback`);
+    const synthetic = await createOutlineFromAggregateData(country, countryKey);
+    if (synthetic) {
+        countryOutlines[countryKey] = synthetic;
+        activeCountryOutline = synthetic;
+        showAllCountryOutlines(countryKey);
+        window.activeCountryOutline = synthetic;
+    } else {
+        showAllCountryOutlines(countryKey);
+    }
 }
 
 async function preloadCountryOutlines() {
@@ -588,6 +596,10 @@ async function preloadCountryOutlines() {
                 countryOutlines[key] = outline;
                 break;
             }
+        }
+        if (!countryOutlines[key]) {
+            const synthetic = await createOutlineFromAggregateData(country, key);
+            if (synthetic) countryOutlines[key] = synthetic;
         }
     }
 }

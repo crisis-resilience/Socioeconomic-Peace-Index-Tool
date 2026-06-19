@@ -3,6 +3,7 @@
 import { basemaps, basemapOptions } from './basemaps.js';
 import {
     LAYER_CONFIG,
+    AGGREGATE_GEOJSON_PATH,
     getCountryPath,
     getCurrentCountry,
     getSepiDistrictGeoJSONPathForAdm1Labels
@@ -718,6 +719,67 @@ function safelyBringLayerToBack(layer) {
 }
 
 /**
+ * Build a synthetic outline layer from the aggregate district GeoJSON when no
+ * dedicated outline file exists for the country.
+ * @param {string} country - App-level country name, e.g. 'Somalia'
+ * @param {string} countryId - Outline key, e.g. 'somalia'
+ * @returns {Promise<L.GeoJSON|null>}
+ */
+export async function createOutlineFromAggregateData(country, countryId) {
+    try {
+        const data = await fetchGeoJSON(AGGREGATE_GEOJSON_PATH);
+        const countryName = country.replace('_', ' ');
+        const filtered = {
+            ...data,
+            features: data.features.filter(f => f.properties?.country === countryName)
+        };
+        if (!filtered.features.length) return null;
+
+        const appCountry = OUTLINE_SELECT_VALUE_TO_APP_COUNTRY[countryId] || country;
+        const displayName = appCountry.replace('_', ' ');
+
+        const outlineLayer = L.geoJSON(filtered, {
+            style: {
+                color: "#8a8a8a",
+                weight: 1,
+                opacity: 1,
+                fillColor: "#ffffff",
+                fillOpacity: 0.18
+            },
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(displayName, {
+                    permanent: false,
+                    direction: 'center',
+                    className: 'country-outline-tooltip'
+                });
+                layer.on({
+                    mouseover: function(e) {
+                        if (getCurrentCountry() !== appCountry) {
+                            e.target.setStyle({ weight: 2, color: '#555', fillOpacity: 0.35 });
+                        }
+                    },
+                    mouseout: function(e) {
+                        outlineLayer.resetStyle(e.target);
+                    },
+                    click: function() {
+                        if (typeof window.switchApplicationCountry === 'function' &&
+                            getCurrentCountry() !== appCountry) {
+                            void window.switchApplicationCountry(appCountry);
+                        }
+                    }
+                });
+            }
+        });
+
+        console.log(`Synthetic outline created for ${countryId} from aggregate data (${filtered.features.length} districts)`);
+        return outlineLayer;
+    } catch (err) {
+        console.debug(`Synthetic outline failed for ${countryId}:`, err?.message || err);
+        return null;
+    }
+}
+
+/**
  * Load a country outline from file
  * @param {string} countryId - Country identifier
  * @param {string} filepath - Path to the GeoJSON file
@@ -731,6 +793,9 @@ export async function loadCountryOutline(countryId, filepath) {
         }
         const data = await response.json();
 
+        const appCountry = OUTLINE_SELECT_VALUE_TO_APP_COUNTRY[countryId];
+        const displayName = appCountry ? appCountry.replace('_', ' ') : null;
+
         const outlineLayer = L.geoJSON(data, {
             style: {
                 color: "#8a8a8a",
@@ -738,12 +803,32 @@ export async function loadCountryOutline(countryId, filepath) {
                 opacity: 1,
                 fillColor: "#ffffff",
                 fillOpacity: 0.18
-            }
-        });
-        
-        // Remove tooltips from outline features
-        outlineLayer.eachLayer(layer => {
-            layer.unbindTooltip();
+            },
+            onEachFeature: appCountry ? function(feature, layer) {
+                if (displayName) {
+                    layer.bindTooltip(displayName, {
+                        permanent: false,
+                        direction: 'center',
+                        className: 'country-outline-tooltip'
+                    });
+                }
+                layer.on({
+                    mouseover: function(e) {
+                        if (getCurrentCountry() !== appCountry) {
+                            e.target.setStyle({ weight: 2, color: '#555', fillOpacity: 0.35 });
+                        }
+                    },
+                    mouseout: function(e) {
+                        outlineLayer.resetStyle(e.target);
+                    },
+                    click: function() {
+                        if (typeof window.switchApplicationCountry === 'function' &&
+                            getCurrentCountry() !== appCountry) {
+                            void window.switchApplicationCountry(appCountry);
+                        }
+                    }
+                });
+            } : undefined
         });
         
         console.log(`Loaded ${countryId} outline from ${filepath}`);
