@@ -199,12 +199,12 @@ export class InfoPanel {
 
                             <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">SCORE RANGES</div>
                             <div style="font-size:12px; color:#444; line-height:1.55;">
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong>0.0 - 0.2</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong>0.2 - 0.4</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong>0.4 - 0.6</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong>0.6 - 0.8</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong>0.8 - 1.0</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong>No data</strong></div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.0 - 0.2</strong>Very Low</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.2 - 0.4</strong>Low</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.4 - 0.6</strong>Moderate</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.6 - 0.8</strong>High</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.8 - 1.0</strong>Very High</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">No data</strong></div>
                             </div>
                             <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-top:10px;">
                                 Scores are within-country only and not comparable across countries.
