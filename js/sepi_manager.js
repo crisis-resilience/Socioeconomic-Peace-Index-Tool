@@ -227,9 +227,9 @@ export class SEPIManager {
         const pillars = [
             { name: 'Education', value: this.getFirstNumericProperty(properties, ['education', 'pillar_education']) },
             { name: 'Food Security', value: this.getFirstNumericProperty(properties, ['Food_security', 'food_security', 'pillar_food_security']) },
-            { name: 'Poverty', value: this.getFirstNumericProperty(properties, ['poverty', 'pillar_economic']) },
-            { name: 'Health', value: this.getFirstNumericProperty(properties, ['health', 'pillar_health']) },
-            { name: 'Climate', value: this.getFirstNumericProperty(properties, ['climate_vulnerability', 'pillar_climate']) }
+            { name: 'Poverty Reduction', value: this.getFirstNumericProperty(properties, ['poverty', 'pillar_economic']) },
+            { name: 'Health Access', value: this.getFirstNumericProperty(properties, ['health', 'pillar_health']) },
+            { name: 'Climate Resilience', value: this.getFirstNumericProperty(properties, ['climate_vulnerability', 'pillar_climate']) }
         ];
         
         // Sort pillars by value (descending)
