@@ -199,12 +199,12 @@ export class InfoPanel {
 
                             <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">SCORE RANGES</div>
                             <div style="font-size:12px; color:#444; line-height:1.55;">
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong>0.0 - 0.2</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong>0.2 - 0.4</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong>0.4 - 0.6</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong>0.6 - 0.8</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong>0.8 - 1.0</strong></div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong>No data</strong></div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.0 - 0.2</strong>Very Low</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.2 - 0.4</strong>Low</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.4 - 0.6</strong>Moderate</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.6 - 0.8</strong>High</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.8 - 1.0</strong>Very High</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">No data</strong></div>
                             </div>
                             <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-top:10px;">
                                 Scores are within-country only and not comparable across countries.
@@ -329,7 +329,7 @@ export class InfoPanel {
                     
                     <div class="info-panel-section results-section">
                         <div class="section-header">
-                            <h4>Report Results</h4>
+                            <h4>Conflict Analysis</h4>
                         </div>
                         <div class="results-content">
                             <p class="no-results-message">No reports generated yet</p>
@@ -554,6 +554,13 @@ export class InfoPanel {
         if (analysisBtn) {
             analysisBtn.addEventListener('click', () => this.generateSummaryReport());
         }
+
+        // Re-generate report automatically when the user switches country
+        document.addEventListener('countryChanged', () => {
+            if (this._lastCountryReport) {
+                this.generateSummaryReport();
+            }
+        });
         
         // Make panel draggable and resizable only in floating mode
         if (!this.options.docked) {
@@ -793,6 +800,10 @@ export class InfoPanel {
                     layer.description && String(layer.description).trim()
                         ? `<div class="layer-description">${escapeHtml(layer.description)}</div>`
                         : '';
+                const dataSourceHtml =
+                    layer.dataSource
+                        ? `<div class="layer-data-source">Source: ${escapeHtml(layer.dataSource)}${layer.dataYear ? ` (${escapeHtml(layer.dataYear)})` : ''}</div>`
+                        : '';
                 const dashboardHtml = layer.dashboardContent
                     ? renderSepiDashboardHtml(layer.dashboardContent)
                     : '';
@@ -807,6 +818,7 @@ export class InfoPanel {
                     <span class="layer-type">${escapeHtml(layer.type)}</span>
                 </div>
                 ${desc}
+                ${dataSourceHtml}
                 <div class="layer-details">
                     ${detailsHtml}
                 </div>
@@ -882,7 +894,7 @@ export class InfoPanel {
         }).join('');
 
         if (titleEl) {
-            titleEl.textContent = `${layerName.replace(/^Pillar:\s*/i, '')} District Ranking`;
+            titleEl.textContent = `${layerName.replace(/^Pillar:\s*/i, '')} district ranking`;
         }
         if (subtitleEl) {
             subtitleEl.textContent = 'Ranked from highest to lowest score.';
@@ -1951,88 +1963,29 @@ export class InfoPanel {
     }
     
     /**
-     * Download report as PDF (placeholder - would need a PDF library)
+     * Download the static conflict report PDF for the current country.
      */
-    async downloadReport() {
-        const button = this.container.querySelector('.download-btn');
-        const originalText = button.textContent;
-        
-        try {
-            // Show loading state
-            button.disabled = true;
-            button.textContent = '📄 Generating PDF...';
-            
-            // Get the report container
-            const reportElement = this.container.querySelector('.report-container');
-            if (!reportElement) {
-                throw new Error('Report container not found');
-            }
-            
-            // Create canvas from the report element (requires html2canvas library)
-            if (typeof html2canvas !== 'undefined') {
-                const canvas = await html2canvas(reportElement, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff',
-                    width: reportElement.scrollWidth,
-                    height: reportElement.scrollHeight,
-                    windowWidth: reportElement.scrollWidth
-                });
-                
-                // Initialize jsPDF (requires jspdf library)
-                if (typeof window.jspdf !== 'undefined') {
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    
-                    const pageWidth = 210;
-                    const pageHeight = 297;
-                    const marginX = 14;
-                    const marginY = 14;
-                    const contentWidth = pageWidth - marginX * 2;
-                    const contentHeight = pageHeight - marginY * 2;
-                    const imgHeight = (canvas.height * contentWidth) / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = marginY;
-                    
-                    const imgData = canvas.toDataURL('image/png');
-                    
-                    pdf.addImage(imgData, 'PNG', marginX, position, contentWidth, imgHeight);
-                    heightLeft -= contentHeight;
-                    
-                    while (heightLeft > 0) {
-                        position = marginY - (imgHeight - heightLeft);
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', marginX, position, contentWidth, imgHeight);
-                        heightLeft -= contentHeight;
-                    }
-                    
-                    // Generate filename with timestamp
-                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                    const countrySlug = (this._lastCountryReport?.country || getCurrentCountry() || 'country')
-                        .replace(/_/g, '-')
-                        .toLowerCase();
-                    const filename = `sepi-country-report-${countrySlug}-${timestamp}.pdf`;
-                    
-                    // Save the PDF
-                    pdf.save(filename);
-                    
-                    console.log('PDF generated successfully:', filename);
-                } else {
-                    throw new Error('jsPDF library not available');
-                }
-            } else {
-                throw new Error('html2canvas library not available');
-            }
-            
-        } catch (error) {
-            console.error('Error generating PDF:', error);
-            alert('Failed to generate PDF. Please try again or ensure required libraries are loaded.');
-        } finally {
-            // Restore button state
-            button.disabled = false;
-            button.textContent = originalText;
+    downloadReport() {
+        const REPORT_PDFS = {
+            Kenya: 'assets/conflict-reports/Kenya_Conflict_Report.pdf',
+            Somalia: 'assets/conflict-reports/Somalia_Conflict_Report.pdf',
+            South_Sudan: 'assets/conflict-reports/South_Sudan_Conflict_Report.pdf'
+        };
+
+        const country = this._lastCountryReport?.country || getCurrentCountry();
+        const path = REPORT_PDFS[country];
+
+        if (!path) {
+            alert('No conflict report available for this country.');
+            return;
         }
+
+        const a = document.createElement('a');
+        a.href = path;
+        a.download = path.split('/').pop();
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 }
 

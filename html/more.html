@@ -74,7 +74,7 @@
                 conditions for sustained peace.
             </p>
             <p class="lead">
-                SEPI is calculated at the Admin-1 (provincial/state) level across Kenya, Somalia, and South Sudan. A high
+                SEPI is calculated at the <strong>Admin-1 (provincial/state) level across Kenya, Somalia, and South Sudan</strong>. A high
                 SEPI score reflects how a region has better structural conditions relative to other regions in the same
                 country.
             </p>
@@ -166,16 +166,22 @@
 
             <div class="sepi-method-extra">
                 <div class="extra-step">
-                    <p><strong>Indicator screening:</strong> Candidate indicators are reviewed for domain coverage, data quality, and statistical independence before inclusion.</p>
+                    <p><strong>Data Collection &amp; Cleaning:</strong> Data is gathered from multiple reliable sources, including household surveys, remote sensing, and international databases. Candidate indicators are reviewed for domain coverage, data quality, and statistical independence.</p>
                 </div>
                 <div class="extra-step">
-                    <p><strong>Within-pillar weighting:</strong> Each pillar score is the arithmetic mean of its indicators, with equal weight assigned to each sub-indicator.</p>
+                    <p><strong>Normalization &amp; Calibration:</strong> All indicators are rescaled to a common [0, 1] range using min-max normalization (with polarity adjustments if needed).</p>
                 </div>
                 <div class="extra-step">
-                    <p><strong>Validation:</strong> SEPI scores are validated against ACLED conflict intensity data and IOM displacement tracking data. Robustness is assessed by re-running the index with alternative normalization methods and weighting schemes.</p>
+                    <p><strong>Aggregation:</strong> Normalized indicators are grouped into five thematic pillars - Food Security, Education, Health, Poverty Reduction, and Environment. Each pillar score is the arithmetic mean of its indicators, with equal weight assigned to each.</p>
                 </div>
                 <div class="extra-step">
-                    <p><strong>Visualization:</strong> Results are displayed through interactive maps and dashboards enabling users to explore composite scores, pillar breakdowns, and raw indicator values at the Admin-1 level.</p>
+                    <p><strong>SEPI Score:</strong> The five pillar scores are combined into a single composite score using a geometric mean with equal pillar weights.</p>
+                </div>
+                <div class="extra-step">
+                    <p><strong>Validation:</strong> SEPI scores are validated against two external criteria - ACLED conflict intensity data (testing whether lower scores are associated with higher conflict levels) and IOM displacement tracking data (testing whether lower scores are correlated with higher displacement pressure). Robustness is assessed by re-running the index with alternative normalization methods and weighting schemes and measuring rank stability.</p>
+                </div>
+                <div class="extra-step">
+                    <p><strong>Visualization:</strong> Results are displayed through interactive maps and dashboards enabling users to explore composite scores, individual pillar breakdowns, and raw indicator values at the Admin-1 level.</p>
                 </div>
             </div>
         </div>
@@ -328,7 +334,7 @@
                     The geometric mean ensures that all five dimensions matter and that a high score in one pillar cannot
                     compensate for a low score in another. With a simple arithmetic average, a region that completely fails
                     on food security can still receive a mid-range score if it scores well on health and education. The
-                    geometric mean prevents this masking effect — a near-zero score on any single pillar substantially
+                    geometric mean prevents this masking effect, a near-zero score on any single pillar substantially
                     depresses the final score. This reflects the design premise that peacebuilding capacity requires a
                     baseline across all structural dimensions.
                 </p>
@@ -369,7 +375,7 @@
             <div class="faq-item">
                 <h3>Is conflict data included in the SEPI score?</h3>
                 <p>
-                    No. Conflict data (ACLED) is used only to validate the index after construction — to test whether lower
+                    No. Conflict data (ACLED) is used only to validate the index after construction, to test whether lower
                     SEPI scores predict higher conflict intensity and displacement.
                 </p>
             </div>

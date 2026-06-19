@@ -17,6 +17,12 @@ let layerManager = null;
 let infoPanel = null;
 let map = null;
 let activeLayers = new Set();
+let indicatorDetails = {};
+
+fetch('data/indicator_details.json')
+    .then((r) => r.json())
+    .then((data) => { indicatorDetails = data; })
+    .catch(() => {});
 let tiffLayers = {}; // Global TIFF layers storage for proper cleanup
 
 // Track async loading states to prevent race conditions
@@ -793,7 +799,7 @@ function updateInfoPanelWithSEPI() {
         const dashboardContent = getSepiDashboardContent(country);
         infoPanel.addLayer('sepi', {
             name: dashboardContent
-                ? `Overall Peace Index — ${dashboardContent.countryLabel}`
+                ? `Overall Peace Index - ${dashboardContent.countryLabel}`
                 : 'Socioeconomic Peace Index (SEPI)',
             type: 'sepi',
             layer: layerManager.sepiManager.sepiLayer,
@@ -830,6 +836,7 @@ function updateInfoPanelWithSEPI() {
                 conflictNote = 'Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).';
             }
 
+            const indicatorMeta = indicatorDetails[currentPillar] || {};
             infoPanel.addLayer(layerType, {
                 name: displayName,
                 type: layerType,
@@ -838,7 +845,9 @@ function updateInfoPanelWithSEPI() {
                 rankingAttribute: layerManager.pillarManager?.currentPropertyName || currentPillar,
                 featureCount: layerManager.pillarManager.getCurrentLayer()?.getLayers?.()?.length || 0,
                 description: shortDescription,
-                overview: pillarOverview || conflictNote
+                overview: pillarOverview || conflictNote,
+                dataSource: indicatorMeta.dataSource || '',
+                dataYear: indicatorMeta.dataYear || ''
             });
 
             // Keep only the currently relevant derived layer entry to avoid stale state in Active Layers UI.
@@ -872,10 +881,10 @@ function getPillarDisplayName(pillarId) {
         poverty: 'Poverty Reduction Index',
         health: 'Health Access Index',
         climate_vulnerability: 'Climate Resilience Index',
-        literacy_percent_total: 'Literacy percent total',
-        primary_school_net_attendance_total: 'Primary school net attendance rate (total)',
-        percent_highest_level_secondary_education: 'Percent highest level secondary education',
-        net_attendance_total: 'Secondary Attendance (Total)',
+        literacy_percent_total: 'Literacy rate',
+        primary_school_net_attendance_total: 'Primary school net attendance rate',
+        percent_highest_level_secondary_education: 'Secondary education completion rate',
+        net_attendance_total: 'Secondary school net attendance rate',
         school_access_pop: 'Population with school access',
         on_payroll_pct: 'Share of teachers on payroll',
         dropout_pct: 'Student dropout rate',
@@ -883,10 +892,10 @@ function getPillarDisplayName(pillarId) {
         health_fac_per_10k_pop: 'Health facilities per 10,000 population',
         hospitals_per_100k_pop: 'Hospitals per 100,000 population',
         pop_frac_3plus: 'IPC Phase 3+ population fraction',
-        poverty_headcount_pct: 'Poverty headcount (below poverty line)',
-        gcp_pc: 'Gross County Product Per Capita',
-        total_expenditure_usd: 'Total expenditure (USD)',
-        annual_cmb_mean: 'Average annual CMB cost',
+        poverty_headcount_pct: 'Poverty headcount ratio',
+        gcp_pc: 'GCP (Gross County Product) per capita',
+        total_expenditure_usd: 'Mean total household expenditure',
+        annual_cmb_mean: 'Average annual CMB',
         rs_ndvi: 'NDVI',
         rs_soil_moist: 'Soil moisture anomaly',
         rs_fapar: 'FAPAR',

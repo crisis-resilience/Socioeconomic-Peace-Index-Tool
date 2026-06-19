@@ -49,9 +49,6 @@ export function updateSEPILegend() {
                     .join('')}
                 ${getNoDataLegendEntry()}
             </div>
-            <div style="margin-top: 6px; font-size: 10px; color: #666;">
-                Click on districts for detailed information
-            </div>
         </div>
     `;
     legend.style.display = 'block';

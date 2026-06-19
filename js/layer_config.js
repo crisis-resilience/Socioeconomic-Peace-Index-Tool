@@ -274,7 +274,9 @@ export const PILLAR_CONFIG = {
         property: 'literacy_percent_total',
         description: 'Literacy percent total',
         unit: 'Percent of population',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Somalia Integrated Household Budget Survey (SIHBS)',
+        dataYear: '2022'
     },
     primary_school_net_attendance_total: {
         name: 'Primary school net attendance rate',
@@ -282,7 +284,9 @@ export const PILLAR_CONFIG = {
         property: 'primary_school_net_attendance_total',
         description: 'Primary school net attendance rate',
         unit: 'Percent of population',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Kenya Population and Housing Census / SIHBS education extract',
+        dataYear: '2019'
     },
     percent_highest_level_secondary_education: {
         name: 'Secondary school completion rate (as highest level of education)',
@@ -290,7 +294,9 @@ export const PILLAR_CONFIG = {
         property: 'percent_highest_level_secondary_education',
         description: 'Secondary school completion rate (as highest level of education)',
         unit: 'Percent of population',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Somalia Integrated Household Budget Survey (SIHBS)',
+        dataYear: '2022'
     },
     net_attendance_total: {
         name: 'Secondary school net attendance rate',
@@ -298,7 +304,9 @@ export const PILLAR_CONFIG = {
         property: 'net_attendance_total',
         description: 'Secondary school net attendance rate',
         unit: 'Percent of population',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Kenya Population and Housing Census / SIHBS education extract',
+        dataYear: '2019'
     },
     school_access_pop: {
         name: 'Population with school access',
@@ -306,7 +314,9 @@ export const PILLAR_CONFIG = {
         property: 'school_access_pop',
         description: 'Population with school access',
         unit: 'Percent of population',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Heidelberg Institute for Geoinformation Technology',
+        dataYear: '2025'
     },
     on_payroll_pct: {
         name: 'Share of teachers on payroll',
@@ -314,7 +324,9 @@ export const PILLAR_CONFIG = {
         property: 'on_payroll_pct',
         description: 'Share of teachers on payroll',
         unit: 'Percent of teachers',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'National Education Census Report',
+        dataYear: '2021'
     },
     dropout_pct: {
         name: 'Student dropout rate',
@@ -322,7 +334,9 @@ export const PILLAR_CONFIG = {
         property: 'dropout_pct',
         description: 'Student dropout rate',
         unit: 'Percent of students',
-        polarity: -1
+        polarity: -1,
+        dataSource: 'National Education Census Report',
+        dataYear: '2021'
     },
 
     healthcare_access_pop: {
@@ -331,7 +345,9 @@ export const PILLAR_CONFIG = {
         property: 'healthcare_access_pop',
         description: 'Population with healthcare access',
         unit: 'Percent of population',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Heidelberg Institute for Geoinformation Technology',
+        dataYear: '2025'
     },
     health_fac_per_10k_pop: {
         name: 'Health facilities per 10,000 population',
@@ -339,7 +355,9 @@ export const PILLAR_CONFIG = {
         property: 'health_fac_per_10k_pop',
         description: 'Health facilities per 10,000 population',
         unit: 'Per 10,000 people',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Government of Kenya / WHO health facility registry',
+        dataYear: '2025'
     },
     hospitals_per_100k_pop: {
         name: 'Hospitals per 100,000 population',
@@ -347,7 +365,9 @@ export const PILLAR_CONFIG = {
         property: 'hospitals_per_100k_pop',
         description: 'Hospitals per 100,000 population',
         unit: 'Per 100,000 people',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Government of Kenya / WHO health facility registry',
+        dataYear: '2025'
     },
 
     pop_frac_3plus: {
@@ -356,7 +376,9 @@ export const PILLAR_CONFIG = {
         property: 'pop_frac_3plus',
         description: 'Fraction of population in IPC (Integrated Food Security Phase Classification) Phase 3 or higher',
         unit: 'proportion (0-1) in population',
-        polarity: -1
+        polarity: -1,
+        dataSource: 'Integrated Food Security Phase Classification (IPC) via HDX HAPI',
+        dataYear: '2025'
     },
 
     poverty_headcount_pct: {
@@ -365,7 +387,9 @@ export const PILLAR_CONFIG = {
         property: 'poverty_headcount_pct',
         description: 'Poverty headcount (population below poverty line)',
         unit: 'Percent of population',
-        polarity: -1
+        polarity: -1,
+        dataSource: 'Oxford Poverty & Human Development Initiative',
+        dataYear: '2022'
     },
     gcp_pc: {
         name: 'Gross County Product Per Capita',
@@ -373,7 +397,9 @@ export const PILLAR_CONFIG = {
         property: 'gcp_pc',
         description: 'Gross County Product Per Capita',
         unit: 'KSh per person',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Kenya National Bureau of Statistics (KNBS)',
+        dataYear: '2022'
     },
     total_expenditure_usd: {
         name: 'Mean total household expenditure',
@@ -381,7 +407,9 @@ export const PILLAR_CONFIG = {
         property: 'total_expenditure_usd',
         description: 'Mean total household expenditure',
         unit: 'USD',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Somalia National Bureau of Statistics (SNBS)',
+        dataYear: '2023'
     },
     annual_cmb_mean: {
         name: 'Average annual CMB (Cost of Minimum Expenditure Basket) cost',
@@ -389,7 +417,9 @@ export const PILLAR_CONFIG = {
         property: 'annual_cmb_mean',
         description: 'Average annual CMB (Cost of Minimum Expenditure Basket) cost',
         unit: 'USD',
-        polarity: -1
+        polarity: -1,
+        dataSource: 'CLiMIS South Sudan / South Sudan National Bureau of Statistics and Ministry of Agriculture and Food Security',
+        dataYear: '2024'
     },
 
     rs_ndvi: {
@@ -398,7 +428,9 @@ export const PILLAR_CONFIG = {
         property: 'rs_ndvi',
         description: 'Normalized Difference Vegetation Index',
         unit: 'index',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Google Earth Engine',
+        dataYear: '2023'
     },
     rs_soil_moist: {
         name: 'Soil Moisture Anomaly',
@@ -406,7 +438,9 @@ export const PILLAR_CONFIG = {
         property: 'rs_soil_moist',
         description: 'Soil Moisture Anomaly',
         unit: 'index',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Google Earth Engine',
+        dataYear: '2023'
     },
     rs_fapar: {
         name: 'Fraction of Absorbed Photosynthetically Active Radiation',
@@ -414,7 +448,9 @@ export const PILLAR_CONFIG = {
         property: 'rs_fapar',
         description: 'Fraction of Absorbed Photosynthetically Active Radiation',
         unit: 'index',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Google Earth Engine',
+        dataYear: '2023'
     },
     rs_pdsi: {
         name: 'Palmer Drought Severity Index',
@@ -422,7 +458,9 @@ export const PILLAR_CONFIG = {
         property: 'rs_pdsi',
         description: 'Palmer Drought Severity Index',
         unit: 'index',
-        polarity: 1
+        polarity: 1,
+        dataSource: 'Google Earth Engine',
+        dataYear: '2023'
     },
 
     conflict_events: {
