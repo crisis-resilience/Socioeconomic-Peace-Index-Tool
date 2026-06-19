@@ -800,6 +800,10 @@ export class InfoPanel {
                     layer.description && String(layer.description).trim()
                         ? `<div class="layer-description">${escapeHtml(layer.description)}</div>`
                         : '';
+                const dataSourceHtml =
+                    layer.dataSource
+                        ? `<div class="layer-data-source">Source: ${escapeHtml(layer.dataSource)}${layer.dataYear ? ` (${escapeHtml(layer.dataYear)})` : ''}</div>`
+                        : '';
                 const dashboardHtml = layer.dashboardContent
                     ? renderSepiDashboardHtml(layer.dashboardContent)
                     : '';
@@ -814,6 +818,7 @@ export class InfoPanel {
                     <span class="layer-type">${escapeHtml(layer.type)}</span>
                 </div>
                 ${desc}
+                ${dataSourceHtml}
                 <div class="layer-details">
                     ${detailsHtml}
                 </div>
@@ -889,7 +894,7 @@ export class InfoPanel {
         }).join('');
 
         if (titleEl) {
-            titleEl.textContent = `${layerName.replace(/^Pillar:\s*/i, '')} District Ranking`;
+            titleEl.textContent = `${layerName.replace(/^Pillar:\s*/i, '')} district ranking`;
         }
         if (subtitleEl) {
             subtitleEl.textContent = 'Ranked from highest to lowest score.';

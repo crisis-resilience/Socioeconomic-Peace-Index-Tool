@@ -1,0 +1,137 @@
+{
+  "primary_school_net_attendance_total": {
+    "label": "Primary school net attendance rate ",
+    "dataSource": "Kenya Population and Housing Census / SIHBS education extract",
+    "dataYear": "2019"
+  },
+  "net_attendance_total": {
+    "label": "Secondary school net attendance rate",
+    "dataSource": "Kenya Population and Housing Census / SIHBS education extract",
+    "dataYear": "2019"
+  },
+  "school_access_pop": {
+    "label": "Population with school access",
+    "dataSource": "Heidelberg Institute for Geoinformation Technology",
+    "dataYear": "2025"
+  },
+  "healthcare_access_pop": {
+    "label": "Population with healthcare access",
+    "dataSource": "Heidelberg Institute for Geoinformation Technology",
+    "dataYear": "2025"
+  },
+  "health_fac_per_10k_pop": {
+    "label": "Health facilities per 10,000 population",
+    "dataSource": "Government of Kenya / WHO health facility registry",
+    "dataYear": "2025"
+  },
+  "hospitals_per_100k_pop": {
+    "label": "Hospitals per 100,000 population",
+    "dataSource": "Government of Kenya / WHO health facility registry",
+    "dataYear": "2025"
+  },
+  "pop_frac_3plus": {
+    "label": "Fraction of population in IPC (Integrated Food Security Phase Classification) Phase 3 or higher",
+    "dataSource": "Integrated Food Security Phase Classification (IPC) via HDX HAPI",
+    "dataYear": "2025"
+  },
+  "poverty_headcount_pct": {
+    "label": "Poverty headcount (population below poverty line)",
+    "dataSource": "Oxford Poverty & Human Development Initiative",
+    "dataYear": "2022"
+  },
+  "gcp_pc": {
+    "label": "Gross County Product Per Capita",
+    "dataSource": "Kenya National Bureau of Statistics (KNBS)",
+    "dataYear": "2022"
+  },
+  "rs_ndvi": {
+    "label": "Normalized Difference Vegetation Index",
+    "dataSource": "Google Earth Engine",
+    "dataYear": "2023"
+  },
+  "rs_soil_moist": {
+    "label": "Soil Moisture Anomaly",
+    "dataSource": "Google Earth Engine",
+    "dataYear": "2023"
+  },
+  "rs_fapar": {
+    "label": "Fraction of Absorbed Photosynthetically Active Radiation",
+    "dataSource": "Google Earth Engine",
+    "dataYear": "2023"
+  },
+  "rs_pdsi": {
+    "label": "Palmer Drought Severity Index",
+    "dataSource": "Google Earth Engine",
+    "dataYear": "2023"
+  },
+  "literacy_percent_total": {
+    "label": "Literacy percent total",
+    "dataSource": "Somalia Integrated Household Budget Survey (SIHBS)",
+    "dataYear": "2022"
+  },
+  "percent_highest_level_secondary_education": {
+    "label": "Secondary school completion rate (as highest level of education)",
+    "dataSource": "Somalia Integrated Household Budget Survey (SIHBS)",
+    "dataYear": "2022"
+  },
+  "total_expenditure_usd": {
+    "label": "Mean total household expenditure",
+    "dataSource": "Somalia National Bureau of Statistics (SNBS)",
+    "dataYear": "2023"
+  },
+  "on_payroll_pct": {
+    "label": "Share of teachers on payroll",
+    "dataSource": "National Education Census Report",
+    "dataYear": "2021"
+  },
+  "dropout_pct": {
+    "label": "Student dropout rate",
+    "dataSource": "National Education Census Report",
+    "dataYear": "2021"
+  },
+  "annual_cmb_mean": {
+    "label": "Average annual CMB (Cost of Minimum Expenditure Basket) cost",
+    "dataSource": "CLiMIS South Sudan- South Sudan National Bureau of Statistics and Ministry of Agriculture and Food Security",
+    "dataYear": "2024"
+  },
+  "total_fatalities": {
+    "label": "Total Fatalities",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "total_fatalities_per_100k": {
+    "label": "Total Fatalities per 100,000 Population",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "count_conflict_events": {
+    "label": "Count of Conflict Events",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "count_conflict_events_per_100k": {
+    "label": "Count of Conflict Events per 100,000 Population",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "conflict_events": {
+    "label": "Count of Conflict Events",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "conflict_fatalities": {
+    "label": "Total Fatalities",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "conflict_events_per_1k": {
+    "label": "Conflict Events per 100,000 Population",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  },
+  "conflict_fatalities_per_1k": {
+    "label": "Conflict Fatalities per 100,000 Population",
+    "dataSource": "ACLED API",
+    "dataYear": "2016-2025"
+  }
+}
