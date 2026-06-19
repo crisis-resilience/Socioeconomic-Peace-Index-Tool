@@ -946,7 +946,7 @@ export class SimplifiedPillarManager {
         
         return `
             <div class="sepi-popup-header">
-                <h3 class="sepi-popup-title">${isConflictData ? district : `📊 ${district}`}</h3>
+                <h3 class="sepi-popup-title">${district}</h3>
             </div>
             <div style="padding: 15px;">
                 <div style="background: ${isConflictData ? '#fff5f5' : '#e8f5e8'}; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid ${headerColor};">
@@ -984,16 +984,6 @@ export class SimplifiedPillarManager {
                     </div>
                 ` : ''}
                 
-                ${additionalInfo.length > 0 ? `
-                    <div style="margin-bottom: 12px;">
-                        <h4 style="margin: 0 0 8px 0; color: #6c757d; font-size: 13px; text-transform: uppercase; border-bottom: 1px solid #6c757d; padding-bottom: 3px;">
-                            Additional Data
-                        </h4>
-                        <div style="max-height: 150px; overflow-y: auto; overflow-x: hidden;">
-                            ${additionalInfo.join('')}
-                        </div>
-                    </div>
-                ` : ''}
                 
                 <div style="font-size: 11px; color: #999; text-align: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
                     Click and drag to explore • Use opacity slider to adjust transparency
