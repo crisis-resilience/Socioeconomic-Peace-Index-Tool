@@ -329,7 +329,7 @@ export class InfoPanel {
                     
                     <div class="info-panel-section results-section">
                         <div class="section-header">
-                            <h4>Report Results</h4>
+                            <h4>Conflict Analysis</h4>
                         </div>
                         <div class="results-content">
                             <p class="no-results-message">No reports generated yet</p>
@@ -1958,88 +1958,29 @@ export class InfoPanel {
     }
     
     /**
-     * Download report as PDF (placeholder - would need a PDF library)
+     * Download the static conflict report PDF for the current country.
      */
-    async downloadReport() {
-        const button = this.container.querySelector('.download-btn');
-        const originalText = button.textContent;
-        
-        try {
-            // Show loading state
-            button.disabled = true;
-            button.textContent = '📄 Generating PDF...';
-            
-            // Get the report container
-            const reportElement = this.container.querySelector('.report-container');
-            if (!reportElement) {
-                throw new Error('Report container not found');
-            }
-            
-            // Create canvas from the report element (requires html2canvas library)
-            if (typeof html2canvas !== 'undefined') {
-                const canvas = await html2canvas(reportElement, {
-                    scale: 2,
-                    useCORS: true,
-                    allowTaint: false,
-                    backgroundColor: '#ffffff',
-                    width: reportElement.scrollWidth,
-                    height: reportElement.scrollHeight,
-                    windowWidth: reportElement.scrollWidth
-                });
-                
-                // Initialize jsPDF (requires jspdf library)
-                if (typeof window.jspdf !== 'undefined') {
-                    const { jsPDF } = window.jspdf;
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    
-                    const pageWidth = 210;
-                    const pageHeight = 297;
-                    const marginX = 14;
-                    const marginY = 14;
-                    const contentWidth = pageWidth - marginX * 2;
-                    const contentHeight = pageHeight - marginY * 2;
-                    const imgHeight = (canvas.height * contentWidth) / canvas.width;
-                    let heightLeft = imgHeight;
-                    let position = marginY;
-                    
-                    const imgData = canvas.toDataURL('image/png');
-                    
-                    pdf.addImage(imgData, 'PNG', marginX, position, contentWidth, imgHeight);
-                    heightLeft -= contentHeight;
-                    
-                    while (heightLeft > 0) {
-                        position = marginY - (imgHeight - heightLeft);
-                        pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', marginX, position, contentWidth, imgHeight);
-                        heightLeft -= contentHeight;
-                    }
-                    
-                    // Generate filename with timestamp
-                    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-                    const countrySlug = (this._lastCountryReport?.country || getCurrentCountry() || 'country')
-                        .replace(/_/g, '-')
-                        .toLowerCase();
-                    const filename = `sepi-country-report-${countrySlug}-${timestamp}.pdf`;
-                    
-                    // Save the PDF
-                    pdf.save(filename);
-                    
-                    console.log('PDF generated successfully:', filename);
-                } else {
-                    throw new Error('jsPDF library not available');
-                }
-            } else {
-                throw new Error('html2canvas library not available');
-            }
-            
-        } catch (error) {
-            console.error('Error generating PDF:', error);
-            alert('Failed to generate PDF. Please try again or ensure required libraries are loaded.');
-        } finally {
-            // Restore button state
-            button.disabled = false;
-            button.textContent = originalText;
+    downloadReport() {
+        const REPORT_PDFS = {
+            Kenya: 'assets/conflict-reports/Kenya_Conflict_Report.pdf',
+            Somalia: 'assets/conflict-reports/Somalia_Conflict_Report.pdf',
+            South_Sudan: 'assets/conflict-reports/South_Sudan_Conflict_Report.pdf'
+        };
+
+        const country = this._lastCountryReport?.country || getCurrentCountry();
+        const path = REPORT_PDFS[country];
+
+        if (!path) {
+            alert('No conflict report available for this country.');
+            return;
         }
+
+        const a = document.createElement('a');
+        a.href = path;
+        a.download = path.split('/').pop();
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 }
 

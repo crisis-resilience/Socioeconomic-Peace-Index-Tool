@@ -249,7 +249,7 @@ function renderActorsHtml(actors, conflictStyle = false) {
 
 function renderParagraphs(paragraphs) {
     if (!paragraphs?.length) return '';
-    return paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('');
+    return paragraphs.map((p) => `<p>${escapeHtml(p).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</p>`).join('');
 }
 
 function renderCallouts(callouts) {
@@ -470,10 +470,6 @@ function renderSepiReportHTML(report) {
                 </button>
             </div>
             <div class="report-body">
-                <p class="report-intro report-muted">
-                    Generated ${escapeHtml(timestamp)} · ${districtCount} regions with SEPI scores ·
-                    Data source: country district GeoJSON bundle
-                </p>
                 ${renderNarrativeHtml(narrative, report.regionRows)}
             </div>
         </div>
