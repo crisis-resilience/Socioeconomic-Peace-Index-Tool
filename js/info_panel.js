@@ -329,7 +329,7 @@ export class InfoPanel {
                     
                     <div class="info-panel-section results-section">
                         <div class="section-header">
-                            <h4>Conflict Analysis</h4>
+                            <h4>SEPI Analysis</h4>
                         </div>
                         <div class="results-content">
                             <p class="no-results-message">No reports generated yet</p>
@@ -584,6 +584,27 @@ export class InfoPanel {
             panel.classList.toggle('active', isActive);
             panel.hidden = !isActive;
         });
+
+        if (tabName === 'analysis') {
+            this._updateAnalysisForConflict();
+        }
+    }
+
+    _isAnalysisTabActive() {
+        const panel = this.container?.querySelector('[data-panel="analysis"]');
+        return !!panel && !panel.hidden;
+    }
+
+    _updateAnalysisForConflict() {
+        const analysisSectionDiv = this.container?.querySelector('.analysis-section');
+        if (!analysisSectionDiv) return;
+        const resultsSectionHeader = this.container?.querySelector('.results-section .section-header');
+        const isConflict = this.activeLayers.has('conflict');
+        analysisSectionDiv.style.display = isConflict ? 'none' : '';
+        if (resultsSectionHeader) resultsSectionHeader.style.display = isConflict ? 'none' : '';
+        if (isConflict && !this._reportInProgress) {
+            this.generateSummaryReport();
+        }
     }
     
     /**
@@ -746,9 +767,18 @@ export class InfoPanel {
             properties: layerInfo.properties || {},
             ...layerInfo
         });
-        
+
         if (this.isVisible) {
             this.updateLayersList();
+        }
+
+        if (id === 'conflict' && this._isAnalysisTabActive()) {
+            const newAttr = layerInfo.selectedAttribute || null;
+            if (newAttr !== this._lastConflictAttribute) {
+                this._lastConflictAttribute = newAttr;
+                this._lastCountryReport = null;
+                this._updateAnalysisForConflict();
+            }
         }
     }
     
@@ -757,10 +787,21 @@ export class InfoPanel {
      * @param {string} id - Layer ID
      */
     removeLayer(id) {
+        const wasPresent = this.activeLayers.has(id);
         this.activeLayers.delete(id);
-        
+
         if (this.isVisible) {
             this.updateLayersList();
+        }
+
+        if (id === 'conflict' && wasPresent && this._isAnalysisTabActive()) {
+            this._lastConflictAttribute = null;
+            this._lastCountryReport = null;
+            const resultsContent = this.container?.querySelector('.results-content');
+            if (resultsContent) {
+                resultsContent.innerHTML = '<p class="no-results-message">No reports generated yet</p>';
+            }
+            this._updateAnalysisForConflict();
         }
     }
     
@@ -1090,13 +1131,16 @@ export class InfoPanel {
      * Generate country SEPI report for the selected country (Analysis → Report Results).
      */
     async generateSummaryReport() {
+        if (this._reportInProgress) return;
+        this._reportInProgress = true;
+
         const button = this.container.querySelector('.run-analysis-btn');
         const resultsContent = this.container.querySelector('.results-content');
         const country = getCurrentCountry();
         const countryLabel = getCountryDisplayLabel(country);
 
-        button.disabled = true;
-        button.textContent = 'Generating...';
+        if (button) button.disabled = true;
+        if (button) button.textContent = 'Generating...';
         resultsContent.innerHTML = `
             <div class="analysis-loading">
                 <div class="loading-spinner"></div>
@@ -1124,8 +1168,9 @@ export class InfoPanel {
                 </div>
             `;
         } finally {
-            button.disabled = false;
-            button.textContent = 'Generate Report';
+            this._reportInProgress = false;
+            if (button) button.disabled = false;
+            if (button) button.textContent = 'Generate Report';
         }
     }
     
