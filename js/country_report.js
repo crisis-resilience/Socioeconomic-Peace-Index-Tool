@@ -274,7 +274,6 @@ function renderConflictContextSection(ctx) {
         if (!section?.paragraphs?.length) return '';
         return `
             <div class="cr-context-block">
-                <h6 class="cr-context-heading">${escapeHtml(section.title)}</h6>
                 ${section.paragraphs
                     .map(
                         (p) => `
@@ -319,10 +318,11 @@ function renderPeacebuildingSections(narrative, regionRows, conflictStyle = fals
         conflictStyle ? `<div class="cr-ranking-subtitle">${escapeHtml(text)}</div>` : '';
 
     return `
+        ${!conflictStyle ? `
         <div class="report-section cr-peacebuilding-block">
-            ${sectionLabel('MAIN ACTORS')}
+            ${sectionLabel('MAIN CONFLICT ACTORS')}
             ${renderActorsHtml(narrative.mainActors, conflictStyle)}
-        </div>
+        </div>` : ''}
 
         <div class="report-section cr-peacebuilding-block">
             ${sectionLabel('REGIONS WITH STRONG PEACEBUILDING CAPACITY')}
@@ -415,22 +415,9 @@ function renderConflictReportHTML(report) {
         <div class="report-container country-report conflict-report">
             <div class="report-header conflict-report-header">
                 <h5>${escapeHtml(countryLabel)} Conflict Analysis</h5>
-                <button type="button" class="download-btn" onclick="window.infoPanelInstance.downloadReport()">
-                    Download PDF
-                </button>
             </div>
 
             <div class="report-body">
-                <div class="cr-metric-strip">
-                    <span class="cr-metric-pill">${escapeHtml(metricName)}</span>
-                    <span class="cr-metric-pill cr-metric-pill-year">Year ${escapeHtml(String(year))}</span>
-                    <span class="cr-metric-pill cr-metric-pill-source">ACLED · Display only</span>
-                </div>
-
-                <p class="report-intro report-muted">
-                    Generated ${escapeHtml(timestamp)} · ${districtCount} regions · Active conflict layer on map
-                </p>
-
                 ${renderConflictContextSection(conflictContext)}
 
                 <div class="report-section cr-charts-section">
@@ -453,7 +440,6 @@ function renderConflictReportHTML(report) {
                     ${renderConflictMetricTable(conflictRanking, metricName, year, perCapita)}
                 </div>
 
-                ${renderPeacebuildingSections(narrative, regionRows, true)}
             </div>
         </div>
     `;
