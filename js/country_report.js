@@ -536,7 +536,7 @@ function drawLineChart(canvasId, labels, values, options = {}) {
 
     ctx.strokeStyle = '#e9ecef';
     ctx.fillStyle = '#666';
-    ctx.font = '11px Calibri';
+    ctx.font = '11px "Proxima Nova", Calibri';
     for (let i = 0; i <= 4; i++) {
         const y = padding + chartHeight - (i / 4) * chartHeight;
         const val = (i / 4) * maxVal;
@@ -572,7 +572,7 @@ function drawLineChart(canvasId, labels, values, options = {}) {
     });
 
     ctx.fillStyle = '#333';
-    ctx.font = 'bold 12px Calibri';
+    ctx.font = 'bold 12px "Proxima Nova", Calibri';
     ctx.textAlign = 'center';
     ctx.fillText(options.title || '', width / 2, 18);
 }

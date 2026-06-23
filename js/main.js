@@ -1048,7 +1048,7 @@ function showErrorMessage(message) {
         border-radius: 5px;
         z-index: 10000;
         max-width: 300px;
-        font-family: Arial, sans-serif;
+        font-family: 'Proxima Nova', Calibri, sans-serif;
     `;
     errorDiv.textContent = message;
     

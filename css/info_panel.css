@@ -17,7 +17,7 @@
     z-index: 2001;
     display: none;
     overflow: hidden;
-    font-family: Calibri, sans-serif;
+    font-family: 'Proxima Nova', Calibri, sans-serif;
     border: 1px solid #ddd;
     resize: both;
 }

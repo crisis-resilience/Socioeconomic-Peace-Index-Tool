@@ -802,7 +802,7 @@ export class SimplifiedPillarManager {
             : 'No data';
         const metric = typeof config?.name === 'string' ? config.name : 'Indicator';
         return `
-            <div style="text-align: center; font-family: Calibri, sans-serif;">
+            <div style="text-align: center; font-family: 'Proxima Nova', Calibri, sans-serif;">
                 <strong>${districtName}</strong><br>
                 <span style="font-weight: bold;">${metric}: ${scoreText}</span>
             </div>

@@ -78,7 +78,7 @@ export class WelcomePopup {
             max-width: 700px;
             max-height: 80vh;
             overflow-y: auto;
-            font-family: Calibri, sans-serif;
+            font-family: 'Proxima Nova', Calibri, sans-serif;
             animation: welcomeSlideIn 0.4s ease-out;
         `;
         

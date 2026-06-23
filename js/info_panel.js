@@ -92,7 +92,7 @@ export class InfoPanel {
                 z-index: 2001;
                 display: none;
                 overflow: hidden;
-                font-family: Calibri, sans-serif;
+                font-family: 'Proxima Nova', Calibri, sans-serif;
                 border: 1px solid #ddd;
                 resize: both;
             `;
@@ -999,7 +999,7 @@ export class InfoPanel {
         ctx.fillRect(0, 0, width, height);
 
         ctx.fillStyle = '#2f3b47';
-        ctx.font = 'bold 12px Calibri, sans-serif';
+        ctx.font = 'bold 12px "Proxima Nova", Calibri, sans-serif';
         const titleSuffix = timelineData.districtName ? ` • ${timelineData.districtName}` : ` • ${timelineData.aggregationLabel}`;
         ctx.fillText(`${timelineData.metricName}${titleSuffix}`, leftPad, 16);
 
@@ -1037,7 +1037,7 @@ export class InfoPanel {
             }
 
             ctx.fillStyle = '#555';
-            ctx.font = '11px Calibri, sans-serif';
+            ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(String(year), gx, topPad + chartH + 16);
         });
@@ -1051,7 +1051,7 @@ export class InfoPanel {
         ctx.stroke();
 
         ctx.fillStyle = '#444';
-        ctx.font = '11px Calibri, sans-serif';
+        ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('0', 6, topPad + chartH + 4);
         ctx.fillText(`${yMax.toFixed(yMax >= 10 ? 0 : 2)}`, 6, topPad + 4);
@@ -1725,7 +1725,7 @@ export class InfoPanel {
         ctx.strokeStyle = '#e9ecef';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#666';
-        ctx.font = '11px Calibri';
+        ctx.font = '11px "Proxima Nova", Calibri';
         
         // X-axis grid and labels
         const xGridLines = 5;
@@ -1791,7 +1791,7 @@ export class InfoPanel {
             // Add region labels for first 3 points as example
             if (index < 3) {
                 ctx.fillStyle = '#333';
-                ctx.font = '9px Calibri';
+                ctx.font = '9px "Proxima Nova", Calibri';
                 ctx.textAlign = 'left';
                 ctx.fillText(point.region.substring(0, 8), x + 8, y - 8);
             }
@@ -1815,7 +1815,7 @@ export class InfoPanel {
         
         // Axis labels - UPDATED for SEPI
         ctx.fillStyle = '#333';
-        ctx.font = 'bold 12px Calibri';
+        ctx.font = 'bold 12px "Proxima Nova", Calibri';
         
         // X-axis title
         ctx.textAlign = 'center';
@@ -1830,7 +1830,7 @@ export class InfoPanel {
         ctx.restore();
         
         // Chart title
-        ctx.font = 'bold 14px Calibri';
+        ctx.font = 'bold 14px "Proxima Nova", Calibri';
         ctx.textAlign = 'center';
         ctx.fillText(`Correlation: r = ${reportData.correlation}`, width / 2, 25);
     }
@@ -1903,7 +1903,7 @@ export class InfoPanel {
         ctx.strokeStyle = '#e9ecef';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#666';
-        ctx.font = '11px Calibri';
+        ctx.font = '11px "Proxima Nova", Calibri';
         
         const gridLines = 5;
         for (let i = 0; i <= gridLines; i++) {
@@ -1942,13 +1942,13 @@ export class InfoPanel {
             
             // Value on top of bar
             ctx.fillStyle = '#333';
-            ctx.font = '10px Calibri';
+            ctx.font = '10px "Proxima Nova", Calibri';
             ctx.textAlign = 'center';
             ctx.fillText(item.primaryValue.toFixed(2), x + barWidth / 2, y - 5);
             
             // Region name at bottom (rotated)
             ctx.fillStyle = '#333';
-            ctx.font = '11px Calibri';
+            ctx.font = '11px "Proxima Nova", Calibri';
             ctx.save();
             ctx.translate(x + barWidth / 2, height - bottomPadding + 40);
             ctx.rotate(-Math.PI / 4);
@@ -1975,7 +1975,7 @@ export class InfoPanel {
         
         // Y-axis title (rotated) - UPDATED for primary layer
         ctx.fillStyle = '#333';
-        ctx.font = 'bold 12px Calibri';
+        ctx.font = 'bold 12px "Proxima Nova", Calibri';
         ctx.save();
         ctx.translate(20, height / 2);
         ctx.rotate(-Math.PI / 2);
@@ -1988,7 +1988,7 @@ export class InfoPanel {
         ctx.fillText('Regions', width / 2, height - 15);
         
         // Chart title - UPDATED for primary layer
-        ctx.font = 'bold 14px Calibri';
+        ctx.font = 'bold 14px "Proxima Nova", Calibri';
         ctx.fillText('Primary Layer by Region', width / 2, 25);
     }
     

@@ -2,6 +2,44 @@
    * Simplified Main Styles - Reduced from 600+ lines to ~200 lines
    * ========================================= */
 
+/* Proxima Nova (UNDP Prima Nova) */
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('../assets/font/Proxima Nova Reg.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('../assets/font/ProximaNova-RegularItalic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+}
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('../assets/font/ProximaNova-Semibold.otf') format('opentype');
+    font-weight: 600;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('../assets/font/Proxima Nova Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('../assets/font/Proxima Nova Xbold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Proxima Nova';
+    src: url('../assets/font/Proxima Nova Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+}
+
 /* Base Layout */
 body {
     margin: 0;
@@ -9,7 +47,7 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    font-family: Calibri, sans-serif;
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 /* Navigation Bar — one strip: logos flank center; title + rule + menu in center column only */
@@ -948,7 +986,7 @@ body {
     border-radius: 4px;
     background-color: #f8f8f8;
     font-size: 14px;
-    font-family: Calibri, sans-serif;
+    font-family: 'Proxima Nova', Calibri, sans-serif;
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
