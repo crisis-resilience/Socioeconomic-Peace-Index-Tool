@@ -300,6 +300,11 @@ export class InfoPanel {
                         <div class="layers-list" id="layers-list">
                             <p class="no-layers-message">No layers currently active</p>
                         </div>
+                        <div id="district-overview-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #ffc107; border-radius: 8px; background: #fff8e1; border-left: 4px solid #ffc107;">
+                            <h5 id="district-overview-name" style="margin: 0 0 6px 0; color: #856404; font-size: 13px; font-weight: 600;"></h5>
+                            <div id="district-overview-content" style="font-size: 12px; color: #555; line-height: 1.5;"></div>
+                            <div id="district-overview-source" style="margin-top: 6px; font-size: 11px; color: #856404;"></div>
+                        </div>
                         <div id="sepi-ranking-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #dee2e6; border-radius: 8px; background: #f8f9fa;">
                             <h5 style="margin: 0 0 8px 0;">SEPI District Ranking</h5>
                             <p style="margin: 0 0 10px 0; font-size: 12px; color: #555;">Ranked from highest to lowest Overall Peace Index score.</p>
@@ -561,12 +566,41 @@ export class InfoPanel {
                 this.generateSummaryReport();
             }
         });
+
+        // District overview from map popup
+        window.addEventListener('districtOverviewReady', (e) => {
+            if (e.detail) this.setDistrictOverview(e.detail);
+        });
+        window.addEventListener('districtOverviewCleared', () => {
+            this.clearDistrictOverview();
+        });
         
         // Make panel draggable and resizable only in floating mode
         if (!this.options.docked) {
             this.makeDraggable();
             this.makeResizable();
         }
+    }
+
+    setDistrictOverview({ districtName, districtDetails, sourceUrl, sourceYear }) {
+        const panel = document.getElementById('district-overview-panel');
+        const nameEl = document.getElementById('district-overview-name');
+        const contentEl = document.getElementById('district-overview-content');
+        const sourceEl = document.getElementById('district-overview-source');
+        if (!panel || !nameEl || !contentEl) return;
+        nameEl.textContent = districtName || '';
+        contentEl.textContent = districtDetails || '';
+        if (sourceEl) {
+            sourceEl.innerHTML = sourceUrl
+                ? `<strong>Source:</strong> <a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" style="color:#856404;">Reference link</a>${sourceYear ? ` &nbsp;|&nbsp; <strong>Year:</strong> ${escapeHtml(String(sourceYear))}` : ''}`
+                : '';
+        }
+        panel.style.display = 'block';
+    }
+
+    clearDistrictOverview() {
+        const panel = document.getElementById('district-overview-panel');
+        if (panel) panel.style.display = 'none';
     }
 
     setActiveTab(tabName) {
