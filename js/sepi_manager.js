@@ -237,8 +237,8 @@ export class SEPIManager {
         
         // Create chart HTML
         let chartHTML = `
-    <div class="sepi-breakdown-chart" style="margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #2c5f2d; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <h4 style="margin: 0 0 12px 0; color: #2c5f2d; font-size: 14px; font-weight: 600;"> SEPI Pillar Breakdown</h4>
+    <div class="sepi-breakdown-chart" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #0076B6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h4 style="margin: 0 0 8px 0; color: #003974; font-size: 13px; font-weight: 600;"> SEPI Pillar Breakdown</h4>
 `;
         
         pillars.forEach(pillar => {
@@ -250,7 +250,7 @@ chartHTML += `
         <div class="pillar-bar-container" style="flex: 1; height: 18px; background: #e9ecef; border-radius: 9px; margin: 0 8px; position: relative; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);">
             <div class="pillar-bar-fill" style="width: ${percentage}%; height: 100%; border-radius: 9px; background: ${pillarColor}; transition: width 0.4s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></div>
         </div>
-        <div class="pillar-value" style="min-width: 35px; text-align: right; font-weight: 600; color: #2c5f2d; font-size: 11px;">${pillar.value.toFixed(2)}</div>
+        <div class="pillar-value" style="min-width: 35px; text-align: right; font-weight: 600; color: #0076B6; font-size: 11px;">${pillar.value.toFixed(2)}</div>
     </div>
 `;
         });
@@ -393,59 +393,75 @@ chartHTML += `
         });
 
         layer.bindPopup(this.createPopupContent(properties), {
-            minWidth: 360,
-            maxWidth: 450,
+            minWidth: 280,
+            maxWidth: 340,
             className: 'sepi-popup',
             autoPan: true,
             autoPanPadding: L.point(50, 50),
             offset: L.point(20, 0)
+        });
+
+        const csvOverview = this.getAdm1OverviewEntry(properties, districtName);
+        const districtDetails = csvOverview?.overview || this.districtInfo[districtName];
+        const sourceUrl = csvOverview?.sourceUrl || '';
+        const sourceYear = this.extractYearHint(sourceUrl) || this.extractYearHint(districtDetails);
+
+        layer.on('popupopen', () => {
+            if (districtDetails) {
+                window.dispatchEvent(new CustomEvent('districtOverviewReady', {
+                    detail: { districtName, districtDetails, sourceUrl, sourceYear }
+                }));
+            } else {
+                window.dispatchEvent(new CustomEvent('districtOverviewCleared'));
+            }
+        });
+        layer.on('popupclose', () => {
+            window.dispatchEvent(new CustomEvent('districtOverviewCleared'));
         });
     }
  
     /**
      * Create popup content for SEPI features - UPDATED
      */
+    _descBgStyle(value) {
+        const v = Number(value);
+        if (value == null || isNaN(v)) return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
+        if (v >= 0.8) return { bg: '#d4edda', border: '#28a745', text: '#155724' };
+        if (v >= 0.6) return { bg: '#e2f0d8', border: '#5cb85c', text: '#2d6a4f' };
+        if (v >= 0.4) return { bg: '#fff9e0', border: '#ffc107', text: '#856404' };
+        if (v >= 0.2) return { bg: '#fde8d4', border: '#fd7e14', text: '#7d3500' };
+        return { bg: '#fde8e8', border: '#dc3545', text: '#721c24' };
+    }
+
     createPopupContent(properties) {
         const chartHTML = this.createSEPIBreakdownChart(properties);
         const sepiValue = properties[this.config.property];
-        
+
         // Try multiple possible field names for district
-        const districtName = properties.ADM1_EN || properties.adm1_name || properties.NAME_1 || 
-                           properties.admin1_name || properties.region || 
+        const districtName = properties.ADM1_EN || properties.adm1_name || properties.NAME_1 ||
+                           properties.admin1_name || properties.region ||
                            properties.district || 'Unknown District';
-        
+
         const csvOverview = this.getAdm1OverviewEntry(properties, districtName);
         const districtDetails = csvOverview?.overview || this.districtInfo[districtName];
         const sourceUrl = csvOverview?.sourceUrl || '';
         const sourceYear = this.extractYearHint(sourceUrl) || this.extractYearHint(districtDetails);
-        
+
+        const { bg: descBg, border: descBorder, text: descText } = this._descBgStyle(sepiValue);
+
         return `
             <div class="sepi-popup-header">
                 <h3 class="sepi-popup-title">🕊️ ${districtName}</h3>
             </div>
-            <div style="padding: 15px;">
+            <div style="padding: 10px;">
                 ${chartHTML}
-                
-                <div style="background: #f8f9fa; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid #6c757d;">
-                    <div style="text-align: center; font-size: 16px; font-weight: 600; color: #495057;">
+
+                <div style="background: ${descBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${descBorder};">
+                    <div style="text-align: center; font-size: 14px; font-weight: 600; color: ${descText};">
                         ${sepiValue != null ? this.getDescription(sepiValue) : 'No data'}
                     </div>
                 </div>
-                
-                ${districtDetails ? `
-                    <div style="background: #fff3cd; padding: 12px; border-radius: 6px; border-left: 4px solid #ffc107;">
-                        <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 13px; font-weight: 600;">District Overview</h4>
-                        <div style="font-size: 12px; color: #856404; line-height: 1.4;">
-                            ${districtDetails}
-                        </div>
-                        ${sourceUrl ? `
-                            <div style="margin-top: 8px; font-size: 11px; color: #856404;">
-                                <strong>Source:</strong> <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" style="color: #856404; text-decoration: underline;">Reference link</a>
-                                ${sourceYear ? `&nbsp;|&nbsp;<strong>Year:</strong> ${sourceYear}` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                ` : ''}
+
             </div>
         `;
     }
