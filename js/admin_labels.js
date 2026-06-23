@@ -185,23 +185,20 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
  */
 function addOutlineOptions(select) {
     const outlineOptions = [
-        { value: '', label: 'No Outline' },
-        { value: 'show_all', label: 'Show All' },
         { value: 'somalia', label: 'Somalia' },
         { value: 'kenya', label: 'Kenya' },
         { value: 'south_sudan', label: 'South Sudan' }
     ];
-    
-    outlineOptions.forEach(option => {
+
+    outlineOptions.forEach((option, index) => {
         const optionElement = document.createElement('option');
         optionElement.value = option.value;
         optionElement.textContent = option.label;
-        
-        // Set Show All as default
-        if (option.value === 'show_all') {
+
+        if (index === 0) {
             optionElement.selected = true;
         }
-        
+
         select.appendChild(optionElement);
     });
 }
