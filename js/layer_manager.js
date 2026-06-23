@@ -862,14 +862,32 @@ export class SimplifiedPillarManager {
                 layer.bindPopup(
                     this.createIndicatorPopup(config, feature.properties, district, value, pillarId),
                     {
-                        minWidth: 360,
-                        maxWidth: 450,
+                        minWidth: 280,
+                        maxWidth: 340,
                         className: 'sepi-popup',
                         autoPan: true,
                         autoPanPadding: L.point(50, 50),
                         offset: L.point(20, 0)
                     }
                 );
+
+                const csvOv = this.getAdm1OverviewEntry(feature.properties, district);
+                const distDet = csvOv?.overview || this.districtInfo[district];
+                const srcUrl = csvOv?.sourceUrl || '';
+                const srcYear = this.extractYearHint(srcUrl) || this.extractYearHint(distDet);
+
+                layer.on('popupopen', () => {
+                    if (distDet) {
+                        window.dispatchEvent(new CustomEvent('districtOverviewReady', {
+                            detail: { districtName: district, districtDetails: distDet, sourceUrl: srcUrl, sourceYear: srcYear }
+                        }));
+                    } else {
+                        window.dispatchEvent(new CustomEvent('districtOverviewCleared'));
+                    }
+                });
+                layer.on('popupclose', () => {
+                    window.dispatchEvent(new CustomEvent('districtOverviewCleared'));
+                });
 
                 layer.bindTooltip(
                     this.buildIndicatorTooltipHtml(config, district, value, pillarId),
@@ -923,6 +941,36 @@ export class SimplifiedPillarManager {
     /**
      * Create SEPI-style popup for indicators - Updated to match SEPI popup structure
      */
+    _descBgStyle(value) {
+        const v = Number(value);
+        if (value == null || isNaN(v)) return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
+        if (v >= 0.8) return { bg: '#d4edda', border: '#28a745', text: '#155724' };
+        if (v >= 0.6) return { bg: '#e2f0d8', border: '#5cb85c', text: '#2d6a4f' };
+        if (v >= 0.4) return { bg: '#fff9e0', border: '#ffc107', text: '#856404' };
+        if (v >= 0.2) return { bg: '#fde8d4', border: '#fd7e14', text: '#7d3500' };
+        return { bg: '#fde8e8', border: '#dc3545', text: '#721c24' };
+    }
+
+    _subDescBgStyle(value, polarity = 1) {
+        if (value == null || isNaN(value)) return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
+        const numericValue = Number(value);
+        const breaks = this.subIndicatorBreaks || [0, 0, 0, 0];
+        let idx = 0;
+        if (numericValue >= breaks[3]) idx = 4;
+        else if (numericValue >= breaks[2]) idx = 3;
+        else if (numericValue >= breaks[1]) idx = 2;
+        else if (numericValue >= breaks[0]) idx = 1;
+        if (Number(polarity) === -1) idx = 4 - idx;
+        const styles = [
+            { bg: '#fde8e8', border: '#dc3545', text: '#721c24' },
+            { bg: '#fde8d4', border: '#fd7e14', text: '#7d3500' },
+            { bg: '#fff9e0', border: '#ffc107', text: '#856404' },
+            { bg: '#e2f0d8', border: '#5cb85c', text: '#2d6a4f' },
+            { bg: '#d4edda', border: '#28a745', text: '#155724' },
+        ];
+        return styles[idx];
+    }
+
     createIndicatorPopup(config, properties, district, value, pillarId) {
         const isConflictData = pillarId?.startsWith('conflict_');
         const isSubIndicator = isSubIndicatorPillar(pillarId);
@@ -936,56 +984,49 @@ export class SimplifiedPillarManager {
         const districtDetails = csvOverview?.overview || this.districtInfo[district];
         const sourceUrl = csvOverview?.sourceUrl || '';
         const sourceYear = this.extractYearHint(sourceUrl) || this.extractYearHint(districtDetails);
-        
+
         // Use consistent color scheme
-        const headerColor = isConflictData ? '#dc3545' : '#2c5f2d';
+        const headerColor = isConflictData ? '#dc3545' : '#003974';
         const valueColor = this.getIndicatorFillColor(value, config, pillarId);
-        
+
+        // Dynamic green-to-red background for non-conflict indicators
+        const { bg: valueBg, border: valueBorder, text: descText } = isConflictData
+            ? { bg: '#fff5f5', border: headerColor, text: headerColor }
+            : isSubIndicator
+                ? this._subDescBgStyle(value, config.polarity ?? 1)
+                : this._descBgStyle(value);
+
         // Get additional properties (similar to SEPI)
         const additionalInfo = this.getAdditionalProperties(properties, this.currentPropertyName);
-        
+
         return `
             <div class="sepi-popup-header">
                 <h3 class="sepi-popup-title">${district}</h3>
             </div>
-            <div style="padding: 15px;">
-                <div style="background: ${isConflictData ? '#fff5f5' : '#e8f5e8'}; padding: 12px; border-radius: 6px; margin: 15px 0; border-left: 4px solid ${headerColor};">
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <strong style="color: ${headerColor}; font-size: 14px; flex: 1 1 180px; min-width: 0; overflow-wrap: anywhere;">${config.name}:</strong>
-                        <span style="font-size: 18px; font-weight: bold; color: ${valueColor}; flex: 0 0 auto; text-align: right;">
+            <div style="padding: 10px;">
+                <div style="background: ${valueBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${valueBorder};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
+                        <strong style="color: ${headerColor}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.name}:</strong>
+                        <span style="font-size: 16px; font-weight: bold; color: ${valueColor}; flex: 0 0 auto; text-align: right;">
                             ${formattedValue}
                         </span>
                     </div>
-                    <div style="margin-top: 5px; font-size: 12px; color: ${headerColor}; font-weight: 500;">
+                    <div style="margin-top: 4px; font-size: 12px; color: ${descText}; font-weight: 500;">
                         ${this.getIndicatorDescription(value, config, pillarId)}
                     </div>
                 </div>
-                
-                <div style="margin-bottom: 15px; padding: 12px; background: ${isConflictData ? '#ffeaa7' : '#e8f5e8'}; border-radius: 5px; border-left: 4px solid ${isConflictData ? '#fdcb6e' : '#4a8b3a'};">
-                    <h4 style="margin: 0 0 8px 0; color: ${headerColor}; font-size: 14px;">About This Indicator</h4>
-                    <div style="font-size: 13px; color: ${headerColor}; line-height: 1.4;">
+
+                <div style="margin-bottom: 10px; padding: 8px; background: ${isConflictData ? '#ffeaa7' : '#e8f3fc'}; border-radius: 5px; border-left: 4px solid ${isConflictData ? '#fdcb6e' : '#0076B6'};">
+                    <h4 style="margin: 0 0 6px 0; color: ${headerColor}; font-size: 13px;">About This Indicator</h4>
+                    <div style="font-size: 12px; color: ${headerColor}; line-height: 1.4;">
                         ${config.description}
                         ${config.unit ? `<div style="margin-top: 8px; font-size: 12px; color: ${headerColor}; font-weight: 600;">Unit: ${config.unit}</div>` : ''}
                     </div>
                 </div>
                 
-                ${districtDetails ? `
-                    <div style="background: #fff3cd; padding: 12px; border-radius: 6px; border-left: 4px solid #ffc107; margin-bottom: 15px;">
-                        <h4 style="margin: 0 0 8px 0; color: #856404; font-size: 13px; font-weight: 600;">District Overview</h4>
-                        <div style="font-size: 12px; color: #856404; line-height: 1.4;">
-                            ${districtDetails}
-                        </div>
-                        ${sourceUrl ? `
-                            <div style="margin-top: 8px; font-size: 11px; color: #856404;">
-                                <strong>Source:</strong> <a href="${sourceUrl}" target="_blank" rel="noopener noreferrer" style="color: #856404; text-decoration: underline;">Reference link</a>
-                                ${sourceYear ? `&nbsp;|&nbsp;<strong>Year:</strong> ${sourceYear}` : ''}
-                            </div>
-                        ` : ''}
-                    </div>
-                ` : ''}
                 
                 
-                <div style="font-size: 11px; color: #999; text-align: center; margin-top: 10px; border-top: 1px solid #eee; padding-top: 8px;">
+                <div style="font-size: 10px; color: #999; text-align: center; margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px;">
                     Click and drag to explore • Use opacity slider to adjust transparency
                 </div>
             </div>
