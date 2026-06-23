@@ -143,12 +143,9 @@ export class InfoPanel {
                             <p style="margin:0 0 8px; font-size:12px; line-height:1.5; color:#3e3e3e;">
                                 The SEPI Analysis Tool maps the Socioeconomic Peace Index and its component pillars at the sub-national (Admin-1) level across three countries. SEPI measures structural socioeconomic conditions associated with conflict vulnerability, covering education, health, food security, poverty, and climate resilience.
                             </p>
-                            <p style="margin:0 0 10px; font-size:12px; line-height:1.5; color:#3e3e3e;">
-                                Scores run from 0 to 1, where higher values reflect stronger conditions and lower vulnerability. Scores are relative within each country and are not comparable across countries.
+                            <p style="margin:0 0 14px; font-size:12px; line-height:1.5; color:#3e3e3e;">
+                                Scores run from 0 to 1, where higher values reflect stronger conditions and lower vulnerability.
                             </p>
-                            <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-bottom:14px;">
-                                Scores are relative within each country and are not comparable across countries.
-                            </div>
 
                             <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">HOW TO USE</div>
                             <div style="position:relative; margin-bottom:14px;">
@@ -237,52 +234,6 @@ export class InfoPanel {
                                     </div>
                                 </div>
 
-                                <div class="welcome-conflict-block">
-                                    <div class="block-label">Year Selector</div>
-                                    <div class="welcome-conflict-slider-track" aria-hidden="true"></div>
-                                    <div class="welcome-conflict-years">
-                                        <span>2016</span><span>2017</span><span>2018</span><span>2019</span><span>2020</span>
-                                        <span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span>
-                                    </div>
-                                    <p style="margin-top:8px;">Use the slider in the left panel to select a single year. The map updates to show data for that year only.</p>
-                                </div>
-
-                                <div class="welcome-conflict-block">
-                                    <div class="block-label">Map Legend</div>
-                                    <div class="welcome-conflict-legend-bar" aria-hidden="true"></div>
-                                    <div class="welcome-conflict-legend-labels">
-                                        <span>Higher severity</span>
-                                        <span>Lower severity</span>
-                                    </div>
-                                    <p>Each indicator uses its own scale. Red indicates higher conflict severity; yellow indicates lower. Scales are not shared across indicators.</p>
-                                </div>
-
-                                <div class="welcome-conflict-opens">
-                                    <div class="welcome-conflict-opens-header">Clicking a conflict indicator opens</div>
-                                    <div class="welcome-conflict-opens-item">
-                                        <span class="item-icon" aria-hidden="true">📋</span>
-                                        <div>
-                                            <strong>Indicator overview</strong>
-                                            <p>A description of what the indicator measures and how to interpret its values.</p>
-                                        </div>
-                                    </div>
-                                    <div class="welcome-conflict-opens-item">
-                                        <span class="item-icon" aria-hidden="true">📈</span>
-                                        <div>
-                                            <strong>Time series (2016–2025)</strong>
-                                            <p>Annual trend chart showing how the indicator has changed over the full data period for the selected country.</p>
-                                        </div>
-                                    </div>
-                                    <div class="welcome-conflict-opens-item">
-                                        <span class="item-icon" aria-hidden="true">💡</span>
-                                        <div>
-                                            <strong>Country analysis</strong>
-                                            <p>A brief contextual summary highlighting key patterns and notable regions for the selected country.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <p class="welcome-conflict-disclaimer">SEPI is a structural baseline, not a real-time early warning tool. Results should be read alongside contextual knowledge and other data sources.</p>
                             </div>
 
                             <div class="welcome-disclaimer">
