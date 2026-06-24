@@ -745,7 +745,7 @@ export class SimplifiedPillarManager {
                     : this.pickAvailableProperty(config.property, config.fallbackProperty);
                 this.currentPropertyName = this.resolvePropertyName(desiredProperty);
                 this.subIndicatorBreaks = isSubIndicator
-                    ? this.computeQuantileBreaks(this.currentPropertyName)
+                    ? (config.fixedBreaks ?? this.computeQuantileBreaks(this.currentPropertyName))
                     : null;
                 this.dispatchConflictYearsAvailable(false);
                 this.dispatchConflictTimelineUpdated(null);
@@ -1007,7 +1007,7 @@ export class SimplifiedPillarManager {
                 <div style="background: ${valueBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${valueBorder};">
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
                         <strong style="color: ${headerColor}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.name}:</strong>
-                        <span style="font-size: 16px; font-weight: bold; color: ${valueColor}; flex: 0 0 auto; text-align: right;">
+                        <span style="font-size: 16px; font-weight: bold; color: ${valueBorder}; flex: 0 0 auto; text-align: right;">
                             ${formattedValue}
                         </span>
                     </div>
@@ -1376,10 +1376,6 @@ export class SimplifiedPillarManager {
         else if (numericValue >= breaks[2]) idx = 3;
         else if (numericValue >= breaks[1]) idx = 2;
         else if (numericValue >= breaks[0]) idx = 1;
-
-        if (Number(polarity) === -1) {
-            idx = 4 - idx;
-        }
 
         return `${tierNames[idx]} relative to other regions in this country`;
     }
