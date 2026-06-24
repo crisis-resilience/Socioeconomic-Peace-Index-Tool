@@ -1,0 +1,24 @@
+{
+    "pillarScales": {
+        "conflict_events": {
+            "useLog1p": true,
+            "transformLow": 0,
+            "transformHigh": 6.7523
+        },
+        "conflict_fatalities": {
+            "useLog1p": true,
+            "transformLow": 0,
+            "transformHigh": 7.5390
+        },
+        "conflict_events_per_1k": {
+            "useLog1p": true,
+            "transformLow": 0,
+            "transformHigh": 4.2448
+        },
+        "conflict_fatalities_per_1k": {
+            "useLog1p": true,
+            "transformLow": 0,
+            "transformHigh": 5.6101
+        }
+    }
+}
