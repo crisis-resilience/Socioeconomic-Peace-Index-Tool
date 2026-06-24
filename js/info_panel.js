@@ -925,7 +925,7 @@ export class InfoPanel {
         if (subtitleEl) {
             subtitleEl.textContent = 'Ranked from highest to lowest score.';
         }
-        const rankingHtml = `<div class="sepi-ranking-scroll" style="max-height: 280px; overflow-y: auto; padding-right: 2px;">${html}</div>`;
+        const rankingHtml = `<div class="sepi-ranking-scroll">${html}</div>`;
         if (this._lastRankingHtml === rankingHtml) {
             panel.style.display = 'block';
             return;
