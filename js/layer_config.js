@@ -315,6 +315,7 @@ export const PILLAR_CONFIG = {
         description: 'Population with school access',
         unit: 'Percent of population',
         polarity: 1,
+        fixedBreaks: [10, 25, 50, 75],
         dataSource: 'Heidelberg Institute for Geoinformation Technology',
         dataYear: '2025'
     },
@@ -346,6 +347,7 @@ export const PILLAR_CONFIG = {
         description: 'Population with healthcare access',
         unit: 'Percent of population',
         polarity: 1,
+        fixedBreaks: [20, 40, 60, 80],
         dataSource: 'Heidelberg Institute for Geoinformation Technology',
         dataYear: '2025'
     },
@@ -356,6 +358,7 @@ export const PILLAR_CONFIG = {
         description: 'Health facilities per 10,000 population',
         unit: 'Per 10,000 people',
         polarity: 1,
+        fixedBreaks: [0.5, 1.0, 2.0, 3.0],
         dataSource: 'Government of Kenya / WHO health facility registry',
         dataYear: '2025'
     },
@@ -366,6 +369,7 @@ export const PILLAR_CONFIG = {
         description: 'Hospitals per 100,000 population',
         unit: 'Per 100,000 people',
         polarity: 1,
+        fixedBreaks: [0.25, 0.5, 1.0, 1.5],
         dataSource: 'Government of Kenya / WHO health facility registry',
         dataYear: '2025'
     },
@@ -390,6 +394,7 @@ export const PILLAR_CONFIG = {
         description: 'Poverty headcount (population below poverty line)',
         unit: 'Percent of population',
         polarity: -1,
+        fixedBreaks: [20, 35, 50, 70],
         dataSource: 'Oxford Poverty & Human Development Initiative',
         dataYear: '2022'
     },
@@ -449,8 +454,16 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'rs_fapar',
         description: 'Fraction of Absorbed Photosynthetically Active Radiation',
-        unit: 'index',
+        unit: 'Anomaly (standard deviation units)',
         polarity: 1,
+        fixedBreaks: [-2, -1, 1, 2],
+        legendLabels: [
+            'Very Low ≤ −2 (much lower than normal)',
+            'Low (−2 to −1)',
+            'Moderate (−1 to +1, near normal)',
+            'High (+1 to +2)',
+            'Very High ≥ +2 (much higher than normal)'
+        ],
         dataSource: 'Google Earth Engine',
         dataYear: '2023'
     },
@@ -461,6 +474,14 @@ export const PILLAR_CONFIG = {
         description: 'Palmer Drought Severity Index',
         unit: 'index',
         polarity: 1,
+        fixedBreaks: [-4, -2, 0, 2],
+        legendLabels: [
+            'Very Low ≤ −4 (extreme drought)',
+            'Low (−4 to −2, severe drought)',
+            'Moderate (−2 to 0, near normal)',
+            'High (0 to +2, moderately wet)',
+            'Very High ≥ +2 (very wet)'
+        ],
         dataSource: 'Google Earth Engine',
         dataYear: '2023'
     },

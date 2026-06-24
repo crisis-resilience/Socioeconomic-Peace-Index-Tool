@@ -512,6 +512,8 @@ export class SimplifiedPillarManager {
         this.conflictBreaks = null;
         /** Quantile breaks for sub-pillar raw values (percentages, counts, etc.) */
         this.subIndicatorBreaks = null;
+        /** Optional fixed legend label strings from config.legendLabels */
+        this.subIndicatorLegendLabels = null;
         /** Loaded from data/conflict_pooled_breaks.json; null = use legacy per-map quantiles */
         this.conflictPooledScale = null;
         this._conflictPooledCatalog = undefined;
@@ -707,6 +709,7 @@ export class SimplifiedPillarManager {
             this.currentPropertyName = null;
             this.conflictBreaks = null;
             this.subIndicatorBreaks = null;
+            this.subIndicatorLegendLabels = null;
             this.conflictPooledScale = null;
             this.dispatchConflictYearsAvailable(false);
             return;
@@ -747,6 +750,7 @@ export class SimplifiedPillarManager {
                 this.subIndicatorBreaks = isSubIndicator
                     ? (config.fixedBreaks ?? this.computeQuantileBreaks(this.currentPropertyName))
                     : null;
+                this.subIndicatorLegendLabels = isSubIndicator ? (config.legendLabels ?? null) : null;
                 this.dispatchConflictYearsAvailable(false);
                 this.dispatchConflictTimelineUpdated(null);
             }
@@ -1381,6 +1385,8 @@ export class SimplifiedPillarManager {
     }
 
     getSubIndicatorLegendLabels() {
+        if (this.subIndicatorLegendLabels) return this.subIndicatorLegendLabels;
+
         const breaks = this.subIndicatorBreaks || [0, 0, 0, 0];
         const format = (v) => Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 });
 
