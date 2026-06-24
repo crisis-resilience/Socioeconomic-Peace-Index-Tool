@@ -377,6 +377,8 @@ export const PILLAR_CONFIG = {
         description: 'Fraction of population in IPC (Integrated Food Security Phase Classification) Phase 3 or higher',
         unit: 'proportion (0-1) in population',
         polarity: -1,
+        // Fixed global thresholds so the legend is consistent across all countries
+        fixedBreaks: [0.05, 0.10, 0.20, 0.35],
         dataSource: 'Integrated Food Security Phase Classification (IPC) via HDX HAPI',
         dataYear: '2025'
     },
@@ -416,7 +418,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'annual_cmb_mean',
         description: 'Average annual CMB (Cost of Minimum Expenditure Basket) cost',
-        unit: 'USD',
+        unit: 'SSP',
         polarity: -1,
         dataSource: 'CLiMIS South Sudan / South Sudan National Bureau of Statistics and Ministry of Agriculture and Food Security',
         dataYear: '2024'
