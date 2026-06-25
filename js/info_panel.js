@@ -271,22 +271,6 @@ export class InfoPanel {
 
                 <section class="info-panel-tab-panel" data-panel="analysis" role="tabpanel" hidden>
                     <div class="info-panel-section analysis-section">
-                        <div class="section-header">
-                            <h4>Analysis & Reports</h4>
-                        </div>
-                        <div class="analysis-content">
-                            <div class="analysis-tool">
-                                <h5>Country SEPI Report</h5>
-                                <p>Build a country report from the analysis documents. With a conflict layer active, the report follows the Conflict Analysis layout (context narrative, trends, SEPI peacebuilding tables).</p>
-                                <button class="run-analysis-btn" data-analysis="summary">Generate Report</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-panel-section results-section">
-                        <div class="section-header">
-                            <h4>SEPI Analysis</h4>
-                        </div>
                         <div class="results-content">
                             <p class="no-results-message">No reports generated yet</p>
                         </div>
@@ -505,15 +489,9 @@ export class InfoPanel {
             tab.addEventListener('click', () => this.setActiveTab(tab.dataset.tab));
         });
 
-        // Analysis button
-        const analysisBtn = this.container.querySelector('.run-analysis-btn');
-        if (analysisBtn) {
-            analysisBtn.addEventListener('click', () => this.generateSummaryReport());
-        }
-
         // Re-generate report automatically when the user switches country
         document.addEventListener('countryChanged', () => {
-            if (this._lastCountryReport) {
+            if (this._isAnalysisTabActive()) {
                 this.generateSummaryReport();
             }
         });
@@ -572,6 +550,9 @@ export class InfoPanel {
 
         if (tabName === 'analysis') {
             this._updateAnalysisForConflict();
+            if (!this._reportInProgress) {
+                this.generateSummaryReport();
+            }
         }
     }
 
@@ -581,13 +562,7 @@ export class InfoPanel {
     }
 
     _updateAnalysisForConflict() {
-        const analysisSectionDiv = this.container?.querySelector('.analysis-section');
-        if (!analysisSectionDiv) return;
-        const resultsSectionHeader = this.container?.querySelector('.results-section .section-header');
-        const isConflict = this.activeLayers.has('conflict');
-        analysisSectionDiv.style.display = isConflict ? 'none' : '';
-        if (resultsSectionHeader) resultsSectionHeader.style.display = isConflict ? 'none' : '';
-        if (isConflict && !this._reportInProgress) {
+        if (this.activeLayers.has('conflict') && !this._reportInProgress) {
             this.generateSummaryReport();
         }
     }
@@ -782,11 +757,9 @@ export class InfoPanel {
         if (id === 'conflict' && wasPresent && this._isAnalysisTabActive()) {
             this._lastConflictAttribute = null;
             this._lastCountryReport = null;
-            const resultsContent = this.container?.querySelector('.results-content');
-            if (resultsContent) {
-                resultsContent.innerHTML = '<p class="no-results-message">No reports generated yet</p>';
+            if (!this._reportInProgress) {
+                this.generateSummaryReport();
             }
-            this._updateAnalysisForConflict();
         }
     }
     
