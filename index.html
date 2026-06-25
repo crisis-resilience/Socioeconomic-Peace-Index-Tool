@@ -4,7 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Online Tool for Socioeconomic Peace Index Tool</title>
-    
+    <link rel="icon" type="image/png" href="assets/undp_logo.png">
+    <script>
+        (function () {
+            const img = new Image();
+            img.onload = function () {
+                const size = img.width; // top portion is square
+                const canvas = document.createElement('canvas');
+                canvas.width = 64; canvas.height = 64;
+                canvas.getContext('2d').drawImage(img, 0, 0, size, size, 0, 0, 64, 64);
+                document.querySelector("link[rel='icon']").href = canvas.toDataURL('image/png');
+            };
+            img.src = 'assets/undp_logo.png';
+        })();
+    </script>
+
     <!-- Simplified CSS structure -->
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/info_panel.css">

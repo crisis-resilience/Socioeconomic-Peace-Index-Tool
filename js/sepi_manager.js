@@ -353,7 +353,7 @@ chartHTML += `
         // Bind tooltip
         const scoreText = sepiValue != null ? Number(sepiValue).toFixed(2) : 'No data';
         layer.bindTooltip(`
-            <div style="text-align: center; font-family: Calibri, sans-serif;">
+            <div style="text-align: center; font-family: 'Proxima Nova', Calibri, sans-serif;">
                 <strong>${districtName}</strong><br>
                 <span style="font-weight: bold;">SEPI: ${scoreText}</span>
             </div>

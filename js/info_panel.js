@@ -92,7 +92,7 @@ export class InfoPanel {
                 z-index: 2001;
                 display: none;
                 overflow: hidden;
-                font-family: Calibri, sans-serif;
+                font-family: 'Proxima Nova', Calibri, sans-serif;
                 border: 1px solid #ddd;
                 resize: both;
             `;
@@ -143,12 +143,9 @@ export class InfoPanel {
                             <p style="margin:0 0 8px; font-size:12px; line-height:1.5; color:#3e3e3e;">
                                 The SEPI Analysis Tool maps the Socioeconomic Peace Index and its component pillars at the sub-national (Admin-1) level across three countries. SEPI measures structural socioeconomic conditions associated with conflict vulnerability, covering education, health, food security, poverty, and climate resilience.
                             </p>
-                            <p style="margin:0 0 10px; font-size:12px; line-height:1.5; color:#3e3e3e;">
-                                Scores run from 0 to 1, where higher values reflect stronger conditions and lower vulnerability. Scores are relative within each country and are not comparable across countries.
+                            <p style="margin:0 0 14px; font-size:12px; line-height:1.5; color:#3e3e3e;">
+                                Scores run from 0 to 1, where higher values reflect stronger conditions and lower vulnerability.
                             </p>
-                            <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-bottom:14px;">
-                                Scores are relative within each country and are not comparable across countries.
-                            </div>
 
                             <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">HOW TO USE</div>
                             <div style="position:relative; margin-bottom:14px;">
@@ -237,52 +234,6 @@ export class InfoPanel {
                                     </div>
                                 </div>
 
-                                <div class="welcome-conflict-block">
-                                    <div class="block-label">Year Selector</div>
-                                    <div class="welcome-conflict-slider-track" aria-hidden="true"></div>
-                                    <div class="welcome-conflict-years">
-                                        <span>2016</span><span>2017</span><span>2018</span><span>2019</span><span>2020</span>
-                                        <span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span>
-                                    </div>
-                                    <p style="margin-top:8px;">Use the slider in the left panel to select a single year. The map updates to show data for that year only.</p>
-                                </div>
-
-                                <div class="welcome-conflict-block">
-                                    <div class="block-label">Map Legend</div>
-                                    <div class="welcome-conflict-legend-bar" aria-hidden="true"></div>
-                                    <div class="welcome-conflict-legend-labels">
-                                        <span>Higher severity</span>
-                                        <span>Lower severity</span>
-                                    </div>
-                                    <p>Each indicator uses its own scale. Red indicates higher conflict severity; yellow indicates lower. Scales are not shared across indicators.</p>
-                                </div>
-
-                                <div class="welcome-conflict-opens">
-                                    <div class="welcome-conflict-opens-header">Clicking a conflict indicator opens</div>
-                                    <div class="welcome-conflict-opens-item">
-                                        <span class="item-icon" aria-hidden="true">📋</span>
-                                        <div>
-                                            <strong>Indicator overview</strong>
-                                            <p>A description of what the indicator measures and how to interpret its values.</p>
-                                        </div>
-                                    </div>
-                                    <div class="welcome-conflict-opens-item">
-                                        <span class="item-icon" aria-hidden="true">📈</span>
-                                        <div>
-                                            <strong>Time series (2016–2025)</strong>
-                                            <p>Annual trend chart showing how the indicator has changed over the full data period for the selected country.</p>
-                                        </div>
-                                    </div>
-                                    <div class="welcome-conflict-opens-item">
-                                        <span class="item-icon" aria-hidden="true">💡</span>
-                                        <div>
-                                            <strong>Country analysis</strong>
-                                            <p>A brief contextual summary highlighting key patterns and notable regions for the selected country.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <p class="welcome-conflict-disclaimer">SEPI is a structural baseline, not a real-time early warning tool. Results should be read alongside contextual knowledge and other data sources.</p>
                             </div>
 
                             <div class="welcome-disclaimer">
@@ -320,22 +271,6 @@ export class InfoPanel {
 
                 <section class="info-panel-tab-panel" data-panel="analysis" role="tabpanel" hidden>
                     <div class="info-panel-section analysis-section">
-                        <div class="section-header">
-                            <h4>Analysis & Reports</h4>
-                        </div>
-                        <div class="analysis-content">
-                            <div class="analysis-tool">
-                                <h5>Country SEPI Report</h5>
-                                <p>Build a country report from the analysis documents. With a conflict layer active, the report follows the Conflict Analysis layout (context narrative, trends, SEPI peacebuilding tables).</p>
-                                <button class="run-analysis-btn" data-analysis="summary">Generate Report</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="info-panel-section results-section">
-                        <div class="section-header">
-                            <h4>SEPI Analysis</h4>
-                        </div>
                         <div class="results-content">
                             <p class="no-results-message">No reports generated yet</p>
                         </div>
@@ -554,15 +489,9 @@ export class InfoPanel {
             tab.addEventListener('click', () => this.setActiveTab(tab.dataset.tab));
         });
 
-        // Analysis button
-        const analysisBtn = this.container.querySelector('.run-analysis-btn');
-        if (analysisBtn) {
-            analysisBtn.addEventListener('click', () => this.generateSummaryReport());
-        }
-
         // Re-generate report automatically when the user switches country
         document.addEventListener('countryChanged', () => {
-            if (this._lastCountryReport) {
+            if (this._isAnalysisTabActive()) {
                 this.generateSummaryReport();
             }
         });
@@ -621,6 +550,9 @@ export class InfoPanel {
 
         if (tabName === 'analysis') {
             this._updateAnalysisForConflict();
+            if (!this._reportInProgress) {
+                this.generateSummaryReport();
+            }
         }
     }
 
@@ -630,13 +562,7 @@ export class InfoPanel {
     }
 
     _updateAnalysisForConflict() {
-        const analysisSectionDiv = this.container?.querySelector('.analysis-section');
-        if (!analysisSectionDiv) return;
-        const resultsSectionHeader = this.container?.querySelector('.results-section .section-header');
-        const isConflict = this.activeLayers.has('conflict');
-        analysisSectionDiv.style.display = isConflict ? 'none' : '';
-        if (resultsSectionHeader) resultsSectionHeader.style.display = isConflict ? 'none' : '';
-        if (isConflict && !this._reportInProgress) {
+        if (this.activeLayers.has('conflict') && !this._reportInProgress) {
             this.generateSummaryReport();
         }
     }
@@ -831,11 +757,9 @@ export class InfoPanel {
         if (id === 'conflict' && wasPresent && this._isAnalysisTabActive()) {
             this._lastConflictAttribute = null;
             this._lastCountryReport = null;
-            const resultsContent = this.container?.querySelector('.results-content');
-            if (resultsContent) {
-                resultsContent.innerHTML = '<p class="no-results-message">No reports generated yet</p>';
+            if (!this._reportInProgress) {
+                this.generateSummaryReport();
             }
-            this._updateAnalysisForConflict();
         }
     }
     
@@ -974,7 +898,7 @@ export class InfoPanel {
         if (subtitleEl) {
             subtitleEl.textContent = 'Ranked from highest to lowest score.';
         }
-        const rankingHtml = `<div class="sepi-ranking-scroll" style="max-height: 280px; overflow-y: auto; padding-right: 2px;">${html}</div>`;
+        const rankingHtml = `<div class="sepi-ranking-scroll">${html}</div>`;
         if (this._lastRankingHtml === rankingHtml) {
             panel.style.display = 'block';
             return;
@@ -1048,7 +972,7 @@ export class InfoPanel {
         ctx.fillRect(0, 0, width, height);
 
         ctx.fillStyle = '#2f3b47';
-        ctx.font = 'bold 12px Calibri, sans-serif';
+        ctx.font = 'bold 12px "Proxima Nova", Calibri, sans-serif';
         const titleSuffix = timelineData.districtName ? ` • ${timelineData.districtName}` : ` • ${timelineData.aggregationLabel}`;
         ctx.fillText(`${timelineData.metricName}${titleSuffix}`, leftPad, 16);
 
@@ -1086,7 +1010,7 @@ export class InfoPanel {
             }
 
             ctx.fillStyle = '#555';
-            ctx.font = '11px Calibri, sans-serif';
+            ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(String(year), gx, topPad + chartH + 16);
         });
@@ -1100,7 +1024,7 @@ export class InfoPanel {
         ctx.stroke();
 
         ctx.fillStyle = '#444';
-        ctx.font = '11px Calibri, sans-serif';
+        ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('0', 6, topPad + chartH + 4);
         ctx.fillText(`${yMax.toFixed(yMax >= 10 ? 0 : 2)}`, 6, topPad + 4);
@@ -1774,7 +1698,7 @@ export class InfoPanel {
         ctx.strokeStyle = '#e9ecef';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#666';
-        ctx.font = '11px Calibri';
+        ctx.font = '11px "Proxima Nova", Calibri';
         
         // X-axis grid and labels
         const xGridLines = 5;
@@ -1840,7 +1764,7 @@ export class InfoPanel {
             // Add region labels for first 3 points as example
             if (index < 3) {
                 ctx.fillStyle = '#333';
-                ctx.font = '9px Calibri';
+                ctx.font = '9px "Proxima Nova", Calibri';
                 ctx.textAlign = 'left';
                 ctx.fillText(point.region.substring(0, 8), x + 8, y - 8);
             }
@@ -1864,7 +1788,7 @@ export class InfoPanel {
         
         // Axis labels - UPDATED for SEPI
         ctx.fillStyle = '#333';
-        ctx.font = 'bold 12px Calibri';
+        ctx.font = 'bold 12px "Proxima Nova", Calibri';
         
         // X-axis title
         ctx.textAlign = 'center';
@@ -1879,7 +1803,7 @@ export class InfoPanel {
         ctx.restore();
         
         // Chart title
-        ctx.font = 'bold 14px Calibri';
+        ctx.font = 'bold 14px "Proxima Nova", Calibri';
         ctx.textAlign = 'center';
         ctx.fillText(`Correlation: r = ${reportData.correlation}`, width / 2, 25);
     }
@@ -1952,7 +1876,7 @@ export class InfoPanel {
         ctx.strokeStyle = '#e9ecef';
         ctx.lineWidth = 1;
         ctx.fillStyle = '#666';
-        ctx.font = '11px Calibri';
+        ctx.font = '11px "Proxima Nova", Calibri';
         
         const gridLines = 5;
         for (let i = 0; i <= gridLines; i++) {
@@ -1991,13 +1915,13 @@ export class InfoPanel {
             
             // Value on top of bar
             ctx.fillStyle = '#333';
-            ctx.font = '10px Calibri';
+            ctx.font = '10px "Proxima Nova", Calibri';
             ctx.textAlign = 'center';
             ctx.fillText(item.primaryValue.toFixed(2), x + barWidth / 2, y - 5);
             
             // Region name at bottom (rotated)
             ctx.fillStyle = '#333';
-            ctx.font = '11px Calibri';
+            ctx.font = '11px "Proxima Nova", Calibri';
             ctx.save();
             ctx.translate(x + barWidth / 2, height - bottomPadding + 40);
             ctx.rotate(-Math.PI / 4);
@@ -2024,7 +1948,7 @@ export class InfoPanel {
         
         // Y-axis title (rotated) - UPDATED for primary layer
         ctx.fillStyle = '#333';
-        ctx.font = 'bold 12px Calibri';
+        ctx.font = 'bold 12px "Proxima Nova", Calibri';
         ctx.save();
         ctx.translate(20, height / 2);
         ctx.rotate(-Math.PI / 2);
@@ -2037,7 +1961,7 @@ export class InfoPanel {
         ctx.fillText('Regions', width / 2, height - 15);
         
         // Chart title - UPDATED for primary layer
-        ctx.font = 'bold 14px Calibri';
+        ctx.font = 'bold 14px "Proxima Nova", Calibri';
         ctx.fillText('Primary Layer by Region', width / 2, 25);
     }
     

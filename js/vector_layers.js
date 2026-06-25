@@ -483,7 +483,7 @@ function createSEPIPopup(properties) {
     const districtName = properties.ADM1_EN;
     
     return `
-        <div style="font-family: Calibri, sans-serif; max-width: 300px;">
+        <div style="font-family: 'Proxima Nova', Calibri, sans-serif; max-width: 300px;">
             <h3 style="margin: 0 0 10px 0; color: #2c5f2d;">
                 ${districtName || 'District Information'}
             </h3>

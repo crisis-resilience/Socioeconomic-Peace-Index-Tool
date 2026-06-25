@@ -270,6 +270,7 @@ function renderCallouts(callouts) {
 
 function renderConflictContextSection(ctx) {
     if (!ctx) return '';
+    const renderP = (p) => escapeHtml(p).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     const renderBlock = (section) => {
         if (!section?.paragraphs?.length) return '';
         return `
@@ -278,7 +279,7 @@ function renderConflictContextSection(ctx) {
                     .map(
                         (p) => `
                     <div class="cr-intensive-item">
-                        <p>${escapeHtml(p)}</p>
+                        <p>${renderP(p)}</p>
                     </div>`
                     )
                     .join('')}
@@ -294,15 +295,6 @@ function renderConflictContextSection(ctx) {
             ${renderBlock(ctx.profile)}
             ${renderBlock(ctx.trends)}
             ${renderBlock(ctx.intensive)}
-            <div class="cr-legend-block">
-                <div class="cr-legend-label">Map legend (conflict layers)</div>
-                <div class="welcome-conflict-legend-bar" aria-hidden="true"></div>
-                <div class="welcome-conflict-legend-labels">
-                    <span>Higher severity</span>
-                    <span>Lower severity</span>
-                </div>
-                <p class="report-muted">Red indicates higher conflict severity; yellow indicates lower. Each indicator uses its own pooled scale.</p>
-            </div>
         </div>`;
 }
 
@@ -318,12 +310,6 @@ function renderPeacebuildingSections(narrative, regionRows, conflictStyle = fals
         conflictStyle ? `<div class="cr-ranking-subtitle">${escapeHtml(text)}</div>` : '';
 
     return `
-        ${!conflictStyle ? `
-        <div class="report-section cr-peacebuilding-block">
-            ${sectionLabel('MAIN CONFLICT ACTORS')}
-            ${renderActorsHtml(narrative.mainActors, conflictStyle)}
-        </div>` : ''}
-
         <div class="report-section cr-peacebuilding-block">
             ${sectionLabel('REGIONS WITH STRONG PEACEBUILDING CAPACITY')}
             ${renderCallouts(narrative.strongRegions?.callouts)}
@@ -418,8 +404,6 @@ function renderConflictReportHTML(report) {
             </div>
 
             <div class="report-body">
-                ${renderConflictContextSection(conflictContext)}
-
                 <div class="report-section cr-charts-section">
                     <div class="cr-section-banner">CONFLICT DATA · NATIONAL TRENDS</div>
                     <p class="report-muted">Totals aggregated from district-level ACLED fields (2016–2025).</p>
@@ -435,10 +419,14 @@ function renderConflictReportHTML(report) {
                     </div>
                 </div>
 
-                <div class="report-section">
-                    <div class="cr-section-banner">HIGHEST-CONFLICT REGIONS · ${escapeHtml(metricName.toUpperCase())} (${year})</div>
-                    ${renderConflictMetricTable(conflictRanking, metricName, year, perCapita)}
-                </div>
+                ${narrative?.mainActors?.length ? `
+                <div class="report-section cr-peacebuilding-block">
+                    <div class="cr-section-banner">MAIN CONFLICT ACTORS</div>
+                    ${renderActorsHtml(narrative.mainActors, true)}
+                </div>` : ''}
+
+                ${renderConflictContextSection(conflictContext)}
+
 
             </div>
         </div>
@@ -536,7 +524,7 @@ function drawLineChart(canvasId, labels, values, options = {}) {
 
     ctx.strokeStyle = '#e9ecef';
     ctx.fillStyle = '#666';
-    ctx.font = '11px Calibri';
+    ctx.font = '11px "Proxima Nova", Calibri';
     for (let i = 0; i <= 4; i++) {
         const y = padding + chartHeight - (i / 4) * chartHeight;
         const val = (i / 4) * maxVal;
@@ -572,7 +560,7 @@ function drawLineChart(canvasId, labels, values, options = {}) {
     });
 
     ctx.fillStyle = '#333';
-    ctx.font = 'bold 12px Calibri';
+    ctx.font = 'bold 12px "Proxima Nova", Calibri';
     ctx.textAlign = 'center';
     ctx.fillText(options.title || '', width / 2, 18);
 }

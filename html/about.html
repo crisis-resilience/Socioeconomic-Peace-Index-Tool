@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - Socioeconomic Peace Index Tool</title>
 
+    <link rel="icon" type="image/png" href="../assets/undp_logo.png">
+    <script>
+        (function () {
+            const img = new Image();
+            img.onload = function () {
+                const size = img.width;
+                const canvas = document.createElement('canvas');
+                canvas.width = 64; canvas.height = 64;
+                canvas.getContext('2d').drawImage(img, 0, 0, size, size, 0, 0, 64, 64);
+                document.querySelector("link[rel='icon']").href = canvas.toDataURL('image/png');
+            };
+            img.src = '../assets/undp_logo.png';
+        })();
+    </script>
     <!-- CSS styles -->
     <link rel="stylesheet" href="../css/styles.css">
 
@@ -132,10 +146,10 @@
         <div class="navbar-inner">
             <div class="navbar-cluster-left">
                 <div class="navbar-logo">
-                    <img src="../assets/pigeon2.png" alt="SDG AI Lab" class="logo-image_left">
+                    <img src="../assets/icpsd_logo.png" alt="ICPSD" class="logo-image_left">
                 </div>
                 <div class="navbar-logo">
-                    <img src="../assets/icpsd_logo.png" alt="ICPSD" class="logo-image_left">
+                    <img src="../assets/undp_logo.png" alt="UNDP" class="logo-image_right">
                 </div>
             </div>
             <div class="navbar-center">
@@ -143,15 +157,10 @@
                 <ul class="navbar-menu">
                     <li><a href="../index.html" class="larger-nav-link">Map</a></li>
                     <li><a href="more.html" class="larger-nav-link">About SEPI</a></li>
-                    <li><a href="about.html" class="larger-nav-link nav-link-current" aria-current="page">About Us</a>
-                    </li>
+                    <li><a href="about.html" class="larger-nav-link nav-link-current" aria-current="page">About Us</a></li>
                 </ul>
             </div>
-            <div class="navbar-cluster-right">
-                <div class="navbar-logo">
-                    <img src="../assets/undp_logo.png" alt="UNDP" class="logo-image_right">
-                </div>
-            </div>
+            <div class="navbar-cluster-right"></div>
         </div>
     </nav>
 

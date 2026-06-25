@@ -231,35 +231,35 @@ export function isSubIndicatorPillar(pillarId) {
  */
 export const PILLAR_CONFIG = {
     education: {
-        name: 'Education Index',
+        name: 'Education Pillar',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'education',
         fallbackProperty: 'pillar_education',
         description: 'Access to and participation in education'
     },
     food_security: {
-        name: 'Food Security Index',
+        name: 'Food Security Pillar',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'Food_security',
         fallbackProperty: 'pillar_food_security',
         description: 'Population-level food and nutrition adequacy'
     },
     poverty: {
-        name: 'Poverty Reduction Index',
+        name: 'Poverty Reduction Pillar',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'poverty',
         fallbackProperty: 'pillar_economic',
         description: 'Economic welfare per capita'
     },
     health: {
-        name: 'Health Access Index',
+        name: 'Health Access Pillar',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'health',
         fallbackProperty: 'pillar_health',
         description: 'Healthcare services availability based on facilities per population and density'
     },
     climate_vulnerability: {
-        name: 'Climate Resilience Index',
+        name: 'Climate Resilience Pillar',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'climate_vulnerability',
         fallbackProperty: 'pillar_climate',
@@ -315,6 +315,7 @@ export const PILLAR_CONFIG = {
         description: 'Population with school access',
         unit: 'Percent of population',
         polarity: 1,
+        fixedBreaks: [10, 25, 50, 75],
         dataSource: 'Heidelberg Institute for Geoinformation Technology',
         dataYear: '2025'
     },
@@ -346,6 +347,7 @@ export const PILLAR_CONFIG = {
         description: 'Population with healthcare access',
         unit: 'Percent of population',
         polarity: 1,
+        fixedBreaks: [20, 40, 60, 80],
         dataSource: 'Heidelberg Institute for Geoinformation Technology',
         dataYear: '2025'
     },
@@ -356,6 +358,7 @@ export const PILLAR_CONFIG = {
         description: 'Health facilities per 10,000 population',
         unit: 'Per 10,000 people',
         polarity: 1,
+        fixedBreaks: [0.5, 1.0, 2.0, 3.0],
         dataSource: 'Government of Kenya / WHO health facility registry',
         dataYear: '2025'
     },
@@ -366,6 +369,7 @@ export const PILLAR_CONFIG = {
         description: 'Hospitals per 100,000 population',
         unit: 'Per 100,000 people',
         polarity: 1,
+        fixedBreaks: [0.25, 0.5, 1.0, 1.5],
         dataSource: 'Government of Kenya / WHO health facility registry',
         dataYear: '2025'
     },
@@ -377,6 +381,8 @@ export const PILLAR_CONFIG = {
         description: 'Fraction of population in IPC (Integrated Food Security Phase Classification) Phase 3 or higher',
         unit: 'proportion (0-1) in population',
         polarity: -1,
+        // Fixed global thresholds so the legend is consistent across all countries
+        fixedBreaks: [0.05, 0.10, 0.20, 0.35],
         dataSource: 'Integrated Food Security Phase Classification (IPC) via HDX HAPI',
         dataYear: '2025'
     },
@@ -388,6 +394,7 @@ export const PILLAR_CONFIG = {
         description: 'Poverty headcount (population below poverty line)',
         unit: 'Percent of population',
         polarity: -1,
+        fixedBreaks: [20, 35, 50, 70],
         dataSource: 'Oxford Poverty & Human Development Initiative',
         dataYear: '2022'
     },
@@ -416,7 +423,7 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'annual_cmb_mean',
         description: 'Average annual CMB (Cost of Minimum Expenditure Basket) cost',
-        unit: 'USD',
+        unit: 'SSP',
         polarity: -1,
         dataSource: 'CLiMIS South Sudan / South Sudan National Bureau of Statistics and Ministry of Agriculture and Food Security',
         dataYear: '2024'
@@ -447,8 +454,16 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'rs_fapar',
         description: 'Fraction of Absorbed Photosynthetically Active Radiation',
-        unit: 'index',
+        unit: 'Anomaly (standard deviation units)',
         polarity: 1,
+        fixedBreaks: [-2, -1, 1, 2],
+        legendLabels: [
+            'Very Low ≤ −2 (much lower than normal)',
+            'Low (−2 to −1)',
+            'Moderate (−1 to +1, near normal)',
+            'High (+1 to +2)',
+            'Very High ≥ +2 (much higher than normal)'
+        ],
         dataSource: 'Google Earth Engine',
         dataYear: '2023'
     },
@@ -459,6 +474,14 @@ export const PILLAR_CONFIG = {
         description: 'Palmer Drought Severity Index',
         unit: 'index',
         polarity: 1,
+        fixedBreaks: [-4, -2, 0, 2],
+        legendLabels: [
+            'Very Low ≤ −4 (extreme drought)',
+            'Low (−4 to −2, severe drought)',
+            'Moderate (−2 to 0, near normal)',
+            'High (0 to +2, moderately wet)',
+            'Very High ≥ +2 (very wet)'
+        ],
         dataSource: 'Google Earth Engine',
         dataYear: '2023'
     },

@@ -54,7 +54,7 @@ export class LayerTemplates {
                     <div class="sepi-pillars-label">Peacebuilding Pillars:</div>
                     
                     <div class="sepi-option" data-sepi-type="pillar" data-pillar-id="education">
-                        <span class="sepi-option-text">Education Index</span>
+                        <span class="sepi-option-text">Education Pillar</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="education">
@@ -89,7 +89,7 @@ export class LayerTemplates {
                     </div>
                     
                     <div class="sepi-option" data-sepi-type="pillar" data-pillar-id="food_security">
-                        <span class="sepi-option-text">Food Security Index</span>
+                        <span class="sepi-option-text">Food Security Pillar</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="food_security">
@@ -100,7 +100,7 @@ export class LayerTemplates {
                     </div>
                     
                     <div class="sepi-option" data-sepi-type="pillar" data-pillar-id="poverty">
-                        <span class="sepi-option-text">Poverty Reduction Index</span>
+                        <span class="sepi-option-text">Poverty Reduction Pillar</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="poverty">
@@ -123,7 +123,7 @@ export class LayerTemplates {
                     </div>
                     
                     <div class="sepi-option" data-sepi-type="pillar" data-pillar-id="health">
-                        <span class="sepi-option-text">Health Access Index</span>
+                        <span class="sepi-option-text">Health Access Pillar</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="health">
@@ -142,7 +142,7 @@ export class LayerTemplates {
                     </div>
                     
                     <div class="sepi-option" data-sepi-type="pillar" data-pillar-id="climate_vulnerability">
-                        <span class="sepi-option-text">Climate Resilience Index</span>
+                        <span class="sepi-option-text">Climate Resilience Pillar</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
                     <div class="sepi-subpillars" data-parent-pillar="climate_vulnerability">
