@@ -4,6 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About SEPI - Socioeconomic Peace Index Tool</title>
+    <link rel="icon" type="image/png" href="../assets/undp_logo.png">
+    <script>
+        (function () {
+            const img = new Image();
+            img.onload = function () {
+                const size = img.width;
+                const canvas = document.createElement('canvas');
+                canvas.width = 64; canvas.height = 64;
+                canvas.getContext('2d').drawImage(img, 0, 0, size, size, 0, 0, 64, 64);
+                document.querySelector("link[rel='icon']").href = canvas.toDataURL('image/png');
+            };
+            img.src = '../assets/undp_logo.png';
+        })();
+    </script>
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="../css/more-page.css">
     <meta name="description" content="About the Socio-Economic Peacebuilding Index (SEPI): methodology, data sources, and indicators for Kenya, Somalia, and South Sudan.">
@@ -35,10 +49,10 @@
         <div class="navbar-inner">
             <div class="navbar-cluster-left">
                 <div class="navbar-logo">
-                    <img src="../assets/pigeon2.png" alt="SDG AI Lab" class="logo-image_left">
+                    <img src="../assets/icpsd_logo.png" alt="ICPSD" class="logo-image_left">
                 </div>
                 <div class="navbar-logo">
-                    <img src="../assets/icpsd_logo.png" alt="ICPSD" class="logo-image_left">
+                    <img src="../assets/undp_logo.png" alt="UNDP" class="logo-image_right">
                 </div>
             </div>
             <div class="navbar-center">
@@ -49,11 +63,7 @@
                     <li><a href="about.html" class="larger-nav-link">About Us</a></li>
                 </ul>
             </div>
-            <div class="navbar-cluster-right">
-                <div class="navbar-logo">
-                    <img src="../assets/undp_logo.png" alt="UNDP" class="logo-image_right">
-                </div>
-            </div>
+            <div class="navbar-cluster-right"></div>
         </div>
     </nav>
 
@@ -96,23 +106,23 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>Education Index</td>
+                        <td>Education Pillar</td>
                         <td>School attendance, literacy, school access, teacher presence</td>
                     </tr>
                     <tr>
-                        <td>Food Security Index</td>
+                        <td>Food Security Pillar</td>
                         <td>Share of population in IPC Crisis or Worse (Phase 3+)</td>
                     </tr>
                     <tr>
-                        <td>Poverty Reduction Index</td>
+                        <td>Poverty Reduction Pillar</td>
                         <td>Poverty headcount, income/expenditure per capita</td>
                     </tr>
                     <tr>
-                        <td>Health Access Index</td>
+                        <td>Health Access Pillar</td>
                         <td>Healthcare access, health facility density, hospital density</td>
                     </tr>
                     <tr>
-                        <td>Climate Resilience Index</td>
+                        <td>Climate Resilience Pillar</td>
                         <td>Vegetation health, soil moisture, drought severity</td>
                     </tr>
                 </tbody>
@@ -293,7 +303,7 @@
                         <td>Population with school access (%) + Teachers on payroll (%) + Student dropout rate (%)</td>
                     </tr>
                     <tr>
-                        <td>Health</td>
+                        <td>Health Access</td>
                         <td>Population with healthcare access (%) + Health facilities per 10k pop + Hospitals per 100k pop</td>
                         <td>Population with healthcare access (%) + Health facilities per 10k pop + Hospitals per 100k pop</td>
                         <td>Population with healthcare access (%) + Health facilities per 10k pop + Hospitals per 100k pop</td>
@@ -305,13 +315,13 @@
                         <td>Population in IPC Phase 3+</td>
                     </tr>
                     <tr>
-                        <td>Economic</td>
+                        <td>Poverty Reduction</td>
                         <td>Poverty headcount (%) + Gross county product per capita (KSh)</td>
                         <td>Poverty headcount (%) + Household expenditure (USD)</td>
                         <td>Poverty headcount (%) + Avg. minimum consumption basket cost (USD)</td>
                     </tr>
                     <tr>
-                        <td>Environment</td>
+                        <td>Climate Resilience</td>
                         <td>NDVI + Soil moisture anomaly + FAPAR anomaly + Palmer Drought Severity Index</td>
                         <td>NDVI + Soil moisture anomaly + FAPAR anomaly + Palmer Drought Severity Index</td>
                         <td>NDVI + Soil moisture anomaly + FAPAR anomaly + Palmer Drought Severity Index</td>
@@ -366,8 +376,8 @@
                     <li>Food security data (IPC): 2024–2025</li>
                     <li>Health facility data: 2024–2026</li>
                     <li>Education data: 2019–2026</li>
-                    <li>Economic indicators: 2022–2024</li>
-                    <li>Climate indicators: 2023–2024</li>
+                    <li>Poverty reduction indicators: 2022–2024</li>
+                    <li>Climate resilience indicators: 2023–2024</li>
                 </ul>
                 <p>See the full sources by clicking each sub-pillar on the map.</p>
             </div>

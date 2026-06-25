@@ -843,11 +843,6 @@ function updateInfoPanelWithSEPI() {
             if (!isConflictData) {
                 pillarOverview = pillarOverviewByDashboardName.get(dashboardName) || '';
             }
-            let conflictNote = '';
-            if (isConflictData && layerManager.pillarManager?.conflictPooledScale) {
-                conflictNote = 'Scale: pooled 2nd–98th percentile across Kenya, Somalia, and South Sudan (counts use log before pooling).';
-            }
-
             const indicatorMeta = indicatorDetails[currentPillar] || {};
             infoPanel.addLayer(layerType, {
                 name: displayName,
@@ -857,7 +852,7 @@ function updateInfoPanelWithSEPI() {
                 rankingAttribute: layerManager.pillarManager?.currentPropertyName || currentPillar,
                 featureCount: layerManager.pillarManager.getCurrentLayer()?.getLayers?.()?.length || 0,
                 description: shortDescription,
-                overview: pillarOverview || conflictNote,
+                overview: pillarOverview,
                 dataSource: indicatorMeta.dataSource || '',
                 dataYear: indicatorMeta.dataYear || ''
             });
@@ -888,11 +883,11 @@ function updateInfoPanelWithSEPI() {
 
 function getPillarDisplayName(pillarId) {
     const pillarNames = {
-        education: 'Education Index',
-        food_security: 'Food Security Index',
-        poverty: 'Poverty Reduction Index',
-        health: 'Health Access Index',
-        climate_vulnerability: 'Climate Resilience Index',
+        education: 'Education Pillar',
+        food_security: 'Food Security Pillar',
+        poverty: 'Poverty Reduction Pillar',
+        health: 'Health Access Pillar',
+        climate_vulnerability: 'Climate Resilience Pillar',
         literacy_percent_total: 'Literacy rate',
         primary_school_net_attendance_total: 'Primary school net attendance rate',
         percent_highest_level_secondary_education: 'Secondary education completion rate',
