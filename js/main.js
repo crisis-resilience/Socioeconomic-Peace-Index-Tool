@@ -832,9 +832,7 @@ function updateInfoPanelWithSEPI() {
         if (currentPillar) {
             const isConflictData = currentPillar.startsWith('conflict_');
             const layerType = isConflictData ? 'conflict' : 'pillar';
-            const displayName = isConflictData 
-                ? `Conflict: ${getPillarDisplayName(currentPillar)}`
-                : `Pillar: ${getPillarDisplayName(currentPillar)}`;
+            const displayName = getPillarDisplayName(currentPillar);
 
             const pillarCfg = PILLAR_CONFIG[currentPillar];
             const dashboardName = getPillarDisplayName(currentPillar);

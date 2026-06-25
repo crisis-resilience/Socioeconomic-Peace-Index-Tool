@@ -1020,13 +1020,6 @@ export class SimplifiedPillarManager {
                     </div>
                 </div>
 
-                <div style="margin-bottom: 10px; padding: 8px; background: ${isConflictData ? '#ffeaa7' : '#e8f3fc'}; border-radius: 5px; border-left: 4px solid ${isConflictData ? '#fdcb6e' : '#0076B6'};">
-                    <h4 style="margin: 0 0 6px 0; color: ${headerColor}; font-size: 13px;">About This Indicator</h4>
-                    <div style="font-size: 12px; color: ${headerColor}; line-height: 1.4;">
-                        ${config.description}
-                        ${config.unit ? `<div style="margin-top: 8px; font-size: 12px; color: ${headerColor}; font-weight: 600;">Unit: ${config.unit}</div>` : ''}
-                    </div>
-                </div>
                 
                 
                 

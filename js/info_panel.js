@@ -816,7 +816,6 @@ export class InfoPanel {
                     <span class="layer-name">${escapeHtml(layer.name)}</span>
                     <span class="layer-type">${escapeHtml(layer.type)}</span>
                 </div>
-                ${desc}
                 ${dataSourceHtml}
                 <div class="layer-details">
                     ${detailsHtml}
