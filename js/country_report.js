@@ -152,6 +152,27 @@ function collectConflictRanking(geojson, pillarId, year) {
     return rows;
 }
 
+function collectSepiConflictData(geojson) {
+    const sepiKey = geojson.features?.[0]?.properties
+        ? detectSepiKey(geojson.features[0].properties)
+        : 'sepi';
+    const data = [];
+    for (const feature of geojson.features || []) {
+        const p = feature.properties || {};
+        const name = getDistrictName(p);
+        if (!name || name === 'Unknown District') continue;
+        const sepi = parseRankingValue(p[sepiKey]);
+        if (sepi == null) continue;
+        const conflictVals = CONFLICT_YEARS
+            .map(y => parseRankingValue(p[`count_conflicts_events_per_1k_${y}`]))
+            .filter(v => v != null);
+        if (conflictVals.length === 0) continue;
+        const avgConflict = conflictVals.reduce((a, b) => a + b, 0) / conflictVals.length;
+        data.push({ name, sepi, avgConflictPer100k: avgConflict });
+    }
+    return data;
+}
+
 function aggregateConflictSeries(geojson) {
     const events = {};
     const fatalities = {};
@@ -379,7 +400,7 @@ function renderConflictMetricTable(rows, metricLabel, year, perCapita) {
         </div>`;
 }
 
-function renderConflictReportHTML(report) {
+export function renderConflictReportHTML(report) {
     const {
         countryLabel,
         timestamp,
@@ -444,6 +465,10 @@ function renderSepiReportHTML(report) {
                 </button>
             </div>
             <div class="report-body">
+                <div class="sepi-conflict-chart-section">
+                    <div class="cr-section-banner">SEPI – CONFLICT EVENTS CORRELATION</div>
+                    <canvas id="sepi-conflict-scatter" width="480" height="260" style="width:100%; max-width:100%; height:auto; border-radius:4px; display:block;"></canvas>
+                </div>
                 ${renderNarrativeHtml(narrative, report.regionRows)}
             </div>
         </div>
@@ -466,10 +491,8 @@ export async function buildCountryReport({ country, activeLayers }) {
     );
     const regionRows = collectAllRegionRows(geojson);
     const narrative = getCountryReportNarrative(country);
-    const conflictLayer = activeLayers?.get?.('conflict') || null;
-    const isConflictReport = Boolean(conflictLayer);
 
-    const base = {
+    return {
         country,
         countryLabel: getCountryDisplayLabel(country),
         timestamp: new Date().toLocaleString(),
@@ -477,33 +500,46 @@ export async function buildCountryReport({ country, activeLayers }) {
         regionRows,
         narrative,
         districtCount: regionRows.length,
-        mode: isConflictReport ? 'conflict' : 'sepi'
+        mode: 'sepi',
+        sepiConflictData: collectSepiConflictData(geojson)
     };
+}
 
-    if (!isConflictReport) {
-        return base;
+export async function buildConflictReport({ country, activeLayers }) {
+    const geojsonPath = getSepiDistrictGeoJSONPathForAdm1Labels(country);
+    const response = await fetch(geojsonPath);
+    if (!response.ok) {
+        throw new Error(`Could not load district data for ${getCountryDisplayLabel(country)}`);
     }
-
-    const pillarId = conflictLayer.selectedAttribute || 'conflict_events';
-    const year = Number(conflictLayer.year) || DEFAULT_CONFLICT_YEAR;
+    const geojson = await response.json();
+    const countryLabel = country.replace(/_/g, ' ');
+    geojson.features = geojson.features.filter(
+        f => f.properties?.country === countryLabel
+    );
+    const narrative = getCountryReportNarrative(country);
+    const conflictLayer = activeLayers?.get?.('conflict') || null;
+    const pillarId = conflictLayer?.selectedAttribute || 'conflict_events';
+    const year = Number(conflictLayer?.year) || DEFAULT_CONFLICT_YEAR;
 
     return {
-        ...base,
+        country,
+        countryLabel: getCountryDisplayLabel(country),
+        timestamp: new Date().toLocaleString(),
+        mode: 'conflict',
+        narrative,
         conflictContext: getConflictContextContent(country),
         conflictSeries: aggregateConflictSeries(geojson),
         conflictLayer: {
-            ...conflictLayer,
+            ...(conflictLayer || {}),
             pillarId,
-            year
+            year,
+            selectedAttribute: pillarId
         },
         conflictRanking: collectConflictRanking(geojson, pillarId, year)
     };
 }
 
 export function renderCountryReportHTML(report) {
-    if (report.mode === 'conflict') {
-        return renderConflictReportHTML(report);
-    }
     return renderSepiReportHTML(report);
 }
 
@@ -577,4 +613,133 @@ export function drawCountryReportCharts(report) {
         title: 'Fatalities (national sum)',
         color: '#6a1b9a'
     });
+}
+
+export function drawSepiConflictScatter(canvasId, data, highlightedName) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    const padL = 56, padR = 24, padT = 12, padB = 50;
+    const plotW = W - padL - padR;
+    const plotH = H - padT - padB;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, W, H);
+
+    const xVals = data.map(d => d.avgConflictPer100k);
+    const xMax = (Math.max(...xVals) || 1) * 1.1;
+    const xMin = 0;
+    const yMin = 0;
+    const yMax = 1;
+
+    const toX = v => padL + ((v - xMin) / (xMax - xMin)) * plotW;
+    const toY = v => padT + plotH - ((v - yMin) / (yMax - yMin)) * plotH;
+
+    // Y gridlines
+    const yTicks = [0, 0.2, 0.4, 0.6, 0.8, 1.0];
+    ctx.strokeStyle = '#ebebeb';
+    ctx.lineWidth = 1;
+    yTicks.forEach(t => {
+        const y = toY(t);
+        ctx.beginPath();
+        ctx.moveTo(padL, y);
+        ctx.lineTo(padL + plotW, y);
+        ctx.stroke();
+    });
+
+    // Axes
+    ctx.strokeStyle = '#aaa';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(padL, padT);
+    ctx.lineTo(padL, padT + plotH);
+    ctx.lineTo(padL + plotW, padT + plotH);
+    ctx.stroke();
+
+    // Y-axis labels
+    ctx.fillStyle = '#666';
+    ctx.font = '10px "Proxima Nova", Calibri, sans-serif';
+    ctx.textAlign = 'right';
+    yTicks.forEach(t => {
+        ctx.fillText(t.toFixed(1), padL - 6, toY(t) + 4);
+    });
+
+    // X-axis labels
+    ctx.textAlign = 'center';
+    const xTickCount = 5;
+    for (let i = 0; i <= xTickCount; i++) {
+        const v = xMin + (xMax - xMin) * i / xTickCount;
+        ctx.fillText(v.toFixed(1), toX(v), padT + plotH + 14);
+    }
+
+    // X-axis title
+    ctx.fillStyle = '#555';
+    ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Avg. Conflict Events per 100k (2016–2025)', padL + plotW / 2, H - 6);
+
+    // Y-axis title (rotated)
+    ctx.save();
+    ctx.translate(13, padT + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('SEPI Score (2025)', 0, 0);
+    ctx.restore();
+
+    // Linear regression line
+    if (data.length >= 2) {
+        const n = data.length;
+        const sumX = data.reduce((s, d) => s + d.avgConflictPer100k, 0);
+        const sumY = data.reduce((s, d) => s + d.sepi, 0);
+        const sumXY = data.reduce((s, d) => s + d.avgConflictPer100k * d.sepi, 0);
+        const sumX2 = data.reduce((s, d) => s + d.avgConflictPer100k * d.avgConflictPer100k, 0);
+        const denom = n * sumX2 - sumX * sumX;
+        if (denom !== 0) {
+            const slope = (n * sumXY - sumX * sumY) / denom;
+            const intercept = (sumY - slope * sumX) / n;
+            const clamp = v => Math.max(yMin, Math.min(yMax, v));
+            const y0 = clamp(intercept + slope * xMin);
+            const y1 = clamp(intercept + slope * xMax);
+            ctx.save();
+            ctx.setLineDash([5, 4]);
+            ctx.strokeStyle = 'rgba(180, 80, 30, 0.55)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(toX(xMin), toY(y0));
+            ctx.lineTo(toX(xMax), toY(y1));
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+
+    // Non-highlighted dots first
+    data.forEach(d => {
+        if (d.name === highlightedName) return;
+        ctx.beginPath();
+        ctx.arc(toX(d.avgConflictPer100k), toY(d.sepi), 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(70, 130, 180, 0.55)';
+        ctx.fill();
+    });
+
+    // Highlighted dot on top with label
+    const hl = data.find(d => d.name === highlightedName);
+    if (hl) {
+        const hx = toX(hl.avgConflictPer100k);
+        const hy = toY(hl.sepi);
+        ctx.beginPath();
+        ctx.arc(hx, hy, 7, 0, Math.PI * 2);
+        ctx.fillStyle = '#e05c2e';
+        ctx.fill();
+        ctx.strokeStyle = '#b33a10';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        const labelRight = hx > padL + plotW * 0.72;
+        ctx.fillStyle = '#b33a10';
+        ctx.font = 'bold 11px "Proxima Nova", Calibri, sans-serif';
+        ctx.textAlign = labelRight ? 'right' : 'left';
+        ctx.fillText(hl.name, hx + (labelRight ? -10 : 10), hy + 4);
+    }
 }
