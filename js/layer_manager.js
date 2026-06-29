@@ -795,20 +795,9 @@ export class SimplifiedPillarManager {
     }
 
     buildIndicatorTooltipHtml(config, districtName, value, pillarId) {
-        const isConflictData = pillarId?.startsWith('conflict_');
-        const isSubIndicator = isSubIndicatorPillar(pillarId);
-        const decimals = isConflictData
-            ? (pillarId?.includes('_per_1k') ? 3 : 0)
-            : 2;
-        const num = value !== undefined ? Number(value) : NaN;
-        const scoreText = Number.isFinite(num)
-            ? (isSubIndicator ? num.toLocaleString(undefined, { maximumFractionDigits: decimals }) : num.toFixed(decimals))
-            : 'No data';
-        const metric = typeof config?.name === 'string' ? config.name : 'Indicator';
         return `
             <div style="text-align: center; font-family: 'Proxima Nova', Calibri, sans-serif;">
-                <strong>${districtName}</strong><br>
-                <span style="font-weight: bold;">${metric}: ${scoreText}</span>
+                <strong>${districtName}</strong>
             </div>
         `;
     }
