@@ -4,8 +4,11 @@ import { renderSepiDashboardHtml } from './sepi_dashboard_content.js';
 import { getCurrentCountry } from './layer_config.js';
 import {
     buildCountryReport,
+    buildConflictReport,
     renderCountryReportHTML,
-    drawCountryReportCharts
+    renderConflictReportHTML,
+    drawCountryReportCharts,
+    drawSepiConflictScatter
 } from './country_report.js';
 import { getCountryDisplayLabel } from './conflict_context_content.js';
 
@@ -128,6 +131,9 @@ export class InfoPanel {
                 </button>
                 <button class="info-panel-tab" type="button" data-tab="analysis" role="tab" aria-selected="false">
                     Analysis
+                </button>
+                <button class="info-panel-tab" type="button" data-tab="conflict-context" role="tab" aria-selected="false">
+                    Conflict Context
                 </button>
             </div>
 
@@ -273,6 +279,14 @@ export class InfoPanel {
                     <div class="info-panel-section analysis-section">
                         <div class="results-content">
                             <p class="no-results-message">No reports generated yet</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="info-panel-tab-panel" data-panel="conflict-context" role="tabpanel" hidden>
+                    <div class="info-panel-section analysis-section">
+                        <div class="conflict-results-content">
+                            <p class="no-results-message">No conflict report generated yet</p>
                         </div>
                     </div>
                 </section>
@@ -489,19 +503,28 @@ export class InfoPanel {
             tab.addEventListener('click', () => this.setActiveTab(tab.dataset.tab));
         });
 
-        // Re-generate report automatically when the user switches country
+        // Re-generate reports automatically when the user switches country
         document.addEventListener('countryChanged', () => {
-            if (this._isAnalysisTabActive()) {
+            this._lastCountryReport = null;
+            this._lastConflictReport = null;
+            if (this._isAnalysisTabActive() && !this._reportInProgress) {
                 this.generateSummaryReport();
+            }
+            if (this._isConflictTabActive() && !this._conflictReportInProgress) {
+                this.generateConflictReport();
             }
         });
 
         // District overview from map popup
         window.addEventListener('districtOverviewReady', (e) => {
-            if (e.detail) this.setDistrictOverview(e.detail);
+            if (e.detail) {
+                this.setDistrictOverview(e.detail);
+                this._updateSepiConflictChart(e.detail.districtName);
+            }
         });
         window.addEventListener('districtOverviewCleared', () => {
             this.clearDistrictOverview();
+            this._clearSepiConflictChart();
         });
         
         // Make panel draggable and resizable only in floating mode
@@ -532,6 +555,15 @@ export class InfoPanel {
         if (panel) panel.style.display = 'none';
     }
 
+    _updateSepiConflictChart(districtName) {
+        if (!this._lastCountryReport?.sepiConflictData?.length) return;
+        drawSepiConflictScatter('sepi-conflict-scatter', this._lastCountryReport.sepiConflictData, districtName);
+    }
+
+    _clearSepiConflictChart() {
+        this._updateSepiConflictChart(null);
+    }
+
     setActiveTab(tabName) {
         const tabs = this.container.querySelectorAll('.info-panel-tab');
         const panels = this.container.querySelectorAll('.info-panel-tab-panel');
@@ -549,9 +581,13 @@ export class InfoPanel {
         });
 
         if (tabName === 'analysis') {
-            this._updateAnalysisForConflict();
             if (!this._reportInProgress) {
                 this.generateSummaryReport();
+            }
+        }
+        if (tabName === 'conflict-context') {
+            if (!this._conflictReportInProgress) {
+                this.generateConflictReport();
             }
         }
     }
@@ -561,9 +597,14 @@ export class InfoPanel {
         return !!panel && !panel.hidden;
     }
 
+    _isConflictTabActive() {
+        const panel = this.container?.querySelector('[data-panel="conflict-context"]');
+        return !!panel && !panel.hidden;
+    }
+
     _updateAnalysisForConflict() {
-        if (this.activeLayers.has('conflict') && !this._reportInProgress) {
-            this.generateSummaryReport();
+        if (!this._conflictReportInProgress) {
+            this.generateConflictReport();
         }
     }
     
@@ -732,11 +773,11 @@ export class InfoPanel {
             this.updateLayersList();
         }
 
-        if (id === 'conflict' && this._isAnalysisTabActive()) {
+        if (id === 'conflict') {
             const newAttr = layerInfo.selectedAttribute || null;
             if (newAttr !== this._lastConflictAttribute) {
                 this._lastConflictAttribute = newAttr;
-                this._lastCountryReport = null;
+                this._lastConflictReport = null;
                 this._updateAnalysisForConflict();
             }
         }
@@ -754,11 +795,11 @@ export class InfoPanel {
             this.updateLayersList();
         }
 
-        if (id === 'conflict' && wasPresent && this._isAnalysisTabActive()) {
+        if (id === 'conflict' && wasPresent) {
             this._lastConflictAttribute = null;
-            this._lastCountryReport = null;
-            if (!this._reportInProgress) {
-                this.generateSummaryReport();
+            this._lastConflictReport = null;
+            if (!this._conflictReportInProgress) {
+                this.generateConflictReport();
             }
         }
     }
@@ -1115,7 +1156,10 @@ export class InfoPanel {
             resultsContent.innerHTML = renderCountryReportHTML(reportData);
             this.setActiveTab('analysis');
 
-            setTimeout(() => drawCountryReportCharts(reportData), 100);
+            setTimeout(() => {
+                drawCountryReportCharts(reportData);
+                drawSepiConflictScatter('sepi-conflict-scatter', reportData.sepiConflictData, null);
+            }, 100);
         } catch (error) {
             console.error('Error generating report:', error);
             resultsContent.innerHTML = `
@@ -1130,7 +1174,45 @@ export class InfoPanel {
             if (button) button.textContent = 'Generate Report';
         }
     }
-    
+
+    async generateConflictReport() {
+        if (this._conflictReportInProgress) return;
+        this._conflictReportInProgress = true;
+
+        const conflictResultsContent = this.container.querySelector('.conflict-results-content');
+        const country = getCurrentCountry();
+        const countryLabel = getCountryDisplayLabel(country);
+
+        conflictResultsContent.innerHTML = `
+            <div class="analysis-loading">
+                <div class="loading-spinner"></div>
+                <p>Building conflict report for ${escapeHtml(countryLabel)}…</p>
+            </div>
+        `;
+
+        try {
+            const reportData = await buildConflictReport({
+                country,
+                activeLayers: this.activeLayers
+            });
+
+            this._lastConflictReport = reportData;
+            conflictResultsContent.innerHTML = renderConflictReportHTML(reportData);
+
+            setTimeout(() => drawCountryReportCharts(reportData), 100);
+        } catch (error) {
+            console.error('Error generating conflict report:', error);
+            conflictResultsContent.innerHTML = `
+                <div class="analysis-error">
+                    <h5>Report Generation Error</h5>
+                    <p>Failed to generate conflict report: ${escapeHtml(error.message)}</p>
+                </div>
+            `;
+        } finally {
+            this._conflictReportInProgress = false;
+        }
+    }
+
     /**
      * Show message when no suitable data is available
      */
