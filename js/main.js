@@ -694,6 +694,7 @@ function setupInfoPanel() {
         
         infoPanel.setMap(map);
         setupAnalysisSidebarResizer();
+        setupLeftSidebarResizer();
         
         // Update info panel with current layer state
         setInterval(updateInfoPanelWithSEPI, 2000);
@@ -745,6 +746,42 @@ function setupAnalysisSidebarResizer() {
         dragging = true;
         startX = event.clientX;
         startWidth = sidebar.getBoundingClientRect().width;
+        document.body.style.userSelect = 'none';
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+}
+
+function setupLeftSidebarResizer() {
+    const sidebar = document.getElementById('sidebar');
+    const handle = document.getElementById('sidebar-resize-handle');
+    if (!sidebar || !handle) return;
+
+    let startX = 0;
+    let startWidth = 0;
+    let dragging = false;
+
+    const onMouseMove = (event) => {
+        if (!dragging) return;
+        const delta = event.clientX - startX;
+        const newWidth = Math.max(200, Math.min(window.innerWidth * 0.45, startWidth + delta));
+        sidebar.style.width = `${newWidth}px`;
+    };
+
+    const onMouseUp = () => {
+        dragging = false;
+        handle.classList.remove('dragging');
+        document.body.style.userSelect = '';
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    handle.addEventListener('mousedown', (event) => {
+        event.preventDefault();
+        dragging = true;
+        startX = event.clientX;
+        startWidth = sidebar.getBoundingClientRect().width;
+        handle.classList.add('dragging');
         document.body.style.userSelect = 'none';
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
@@ -832,9 +869,7 @@ function updateInfoPanelWithSEPI() {
         if (currentPillar) {
             const isConflictData = currentPillar.startsWith('conflict_');
             const layerType = isConflictData ? 'conflict' : 'pillar';
-            const displayName = isConflictData 
-                ? `Conflict: ${getPillarDisplayName(currentPillar)}`
-                : `Pillar: ${getPillarDisplayName(currentPillar)}`;
+            const displayName = getPillarDisplayName(currentPillar);
 
             const pillarCfg = PILLAR_CONFIG[currentPillar];
             const dashboardName = getPillarDisplayName(currentPillar);

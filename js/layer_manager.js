@@ -795,20 +795,9 @@ export class SimplifiedPillarManager {
     }
 
     buildIndicatorTooltipHtml(config, districtName, value, pillarId) {
-        const isConflictData = pillarId?.startsWith('conflict_');
-        const isSubIndicator = isSubIndicatorPillar(pillarId);
-        const decimals = isConflictData
-            ? (pillarId?.includes('_per_1k') ? 3 : 0)
-            : 2;
-        const num = value !== undefined ? Number(value) : NaN;
-        const scoreText = Number.isFinite(num)
-            ? (isSubIndicator ? num.toLocaleString(undefined, { maximumFractionDigits: decimals }) : num.toFixed(decimals))
-            : 'No data';
-        const metric = typeof config?.name === 'string' ? config.name : 'Indicator';
         return `
             <div style="text-align: center; font-family: 'Proxima Nova', Calibri, sans-serif;">
-                <strong>${districtName}</strong><br>
-                <span style="font-weight: bold;">${metric}: ${scoreText}</span>
+                <strong>${districtName}</strong>
             </div>
         `;
     }
@@ -1020,13 +1009,6 @@ export class SimplifiedPillarManager {
                     </div>
                 </div>
 
-                <div style="margin-bottom: 10px; padding: 8px; background: ${isConflictData ? '#ffeaa7' : '#e8f3fc'}; border-radius: 5px; border-left: 4px solid ${isConflictData ? '#fdcb6e' : '#0076B6'};">
-                    <h4 style="margin: 0 0 6px 0; color: ${headerColor}; font-size: 13px;">About This Indicator</h4>
-                    <div style="font-size: 12px; color: ${headerColor}; line-height: 1.4;">
-                        ${config.description}
-                        ${config.unit ? `<div style="margin-top: 8px; font-size: 12px; color: ${headerColor}; font-weight: 600;">Unit: ${config.unit}</div>` : ''}
-                    </div>
-                </div>
                 
                 
                 

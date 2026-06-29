@@ -595,11 +595,11 @@ export function getConflictDescription(value, type = 'events') {
     const numValue = Number(value);
     const label = type === 'events' ? 'conflict events' : 'fatalities';
     
-    if (numValue >= 1500) return `Very High: ${numValue} ${label}`;
-    if (numValue >= 1000) return `High: ${numValue} ${label}`;
-    if (numValue >= 500) return `Moderate: ${numValue} ${label}`;
-    if (numValue >= 1) return `Low: ${numValue} ${label}`;
-    return `None recorded: ${numValue} ${label}`;
+    if (numValue >= 1500) return `Very High ${label}`;
+    if (numValue >= 1000) return `High ${label}`;
+    if (numValue >= 500) return `Moderate ${label}`;
+    if (numValue >= 1) return `Low ${label}`;
+    return `None recorded`;
 }
 /**
  * Get color for pillar value using Green-to-Red scale

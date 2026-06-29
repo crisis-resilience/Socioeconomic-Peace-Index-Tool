@@ -133,6 +133,20 @@
             margin-bottom: 10px;
         }
 
+        .partner-logos {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .partner-logos img {
+            height: 60px;
+            width: auto;
+            object-fit: contain;
+        }
+
         @media (max-width: 600px) {
             .team-members {
                 grid-template-columns: 1fr;
@@ -167,22 +181,29 @@
     <!-- Main content container -->
     <div class="content-container">
         <div class="content-section">
-            <h1>About the Socioeconomic Peace Index Tool</h1>
+            <h2>Our mission</h2>
             <p>
-                The Socioeconomic Peace Index (SEPI) online tool helps researchers, policymakers, and practitioners
-                explore and interpret socioeconomic and peace-related indicators on an interactive map. By combining
-                curated data with clear visualization, it supports evidence-based discussion and planning in fragile and
-                development contexts.
+                Our mission is to transform complex socioeconomic and conflict data into accessible insights that empower stakeholders to identify critical patterns and compare regional dynamics. By translating deep analysis into targeted, evidence-based decisions, we support efforts to build resilience and channel resources to where they are most urgently needed.
             </p>
+            <p>To achieve this, we aim to:</p>
+            <ul>
+                <li>Make intricate multidimensional indicators intuitive to navigate, helping users discover how different drivers of peace, deprivation, and socioeconomic development interact.</li>
+                <li>Visualize sub-national differences to clearly illustrate within-country disparities, providing stakeholders with clear, data-driven insights on local deprivation-resilience dynamics.</li>
+                <li>Bridge the gap between complex micro level data and local implementation, ensuring peacebuilding and development investments are directed precisely to communities under stress.</li>
+            </ul>
         </div>
 
         <div class="content-section">
-            <h2>Our mission</h2>
+            <h2>Partners</h2>
             <p>
-                We aim to make complex socioeconomic and peace data easier to access and understand, so stakeholders can
-                see patterns, compare areas, and connect analysis to action—especially where institutions and
-                communities are under stress.
+                The Socioeconomic Peace Index tool is developed in collaboration with partners committed to stronger
+                data and analysis for peace and development.
             </p>
+            <div class="partner-logos">
+                <img src="../assets/partner-logos/icpsd_logo.png" alt="ICPSD">
+                <img src="../assets/partner-logos/bpps.png" alt="BPPS">
+                <img src="../assets/partner-logos/sdg-ai.png" alt="SDG AI Lab">
+            </div>
         </div>
 
         <div class="content-section">
@@ -262,20 +283,6 @@
             </div>
         </div>
 
-        <div class="content-section">
-            <h2>Partners</h2>
-            <p>
-                The Socioeconomic Peace Index tool is developed in collaboration with partners committed to stronger
-                data and analysis for peace and development. Key partners include:
-            </p>
-            <ul>
-                <li>United Nations Development Programme (UNDP)</li>
-                <li>Istanbul International Center for Private Sector in Development (ICPSD)</li>
-                <li>Sustainable Development Goals AI Lab (SDG AI Lab)</li>
-                <li>Bureau for Programme and Policy Support (BPPS)</li>
-                <li>National statistical offices and in-country partners contributing data or review</li>
-            </ul>
-        </div>
     </div>
 
     <!-- Simple footer -->
