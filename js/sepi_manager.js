@@ -452,6 +452,7 @@ chartHTML += `
         return `
             <div class="sepi-popup-header">
                 <h3 class="sepi-popup-title">🕊️ ${districtName}</h3>
+                <button class="popup-header-close-btn" onclick="this.closest('.leaflet-popup').querySelector('.leaflet-popup-close-button').click()">&#x2715;</button>
             </div>
             <div style="padding: 10px;">
                 ${chartHTML}

@@ -995,6 +995,7 @@ export class SimplifiedPillarManager {
         return `
             <div class="sepi-popup-header">
                 <h3 class="sepi-popup-title">${district}</h3>
+                <button class="popup-header-close-btn" onclick="this.closest('.leaflet-popup').querySelector('.leaflet-popup-close-button').click()">&#x2715;</button>
             </div>
             <div style="padding: 10px;">
                 <div style="background: ${valueBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${valueBorder};">
@@ -1012,9 +1013,6 @@ export class SimplifiedPillarManager {
                 
                 
                 
-                <div style="font-size: 10px; color: #999; text-align: center; margin-top: 6px; border-top: 1px solid #eee; padding-top: 6px;">
-                    Click and drag to explore • Use opacity slider to adjust transparency
-                </div>
             </div>
         `;
     }
