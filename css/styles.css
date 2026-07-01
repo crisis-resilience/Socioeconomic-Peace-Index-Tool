@@ -253,14 +253,17 @@ body {
 }
 
 .country-selection-toolbar {
-    display: grid;
-    grid-template-columns: auto 1fr;
+    display: flex;
     align-items: center;
     gap: 10px;
     background: #f1f1f1;
     border: 1px solid #d9d9d9;
     border-radius: 16px;
     padding: 8px 10px;
+}
+
+.country-selection-toolbar .country-dots-selector {
+    flex: 1;
 }
 
 .country-sepi-learn-btn {
@@ -308,9 +311,10 @@ body {
 .country-dots-selector {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 10px;
+    justify-content: stretch;
+    gap: 4px;
     min-width: 0;
+    width: 100%;
 }
 
 .country-dot-option {
@@ -325,7 +329,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     padding: 2px 4px;
-    min-width: 62px;
+    flex: 1 1 0;
+    min-width: 0;
     transition: all 0.2s ease;
 }
 
@@ -351,6 +356,13 @@ body {
     background: #0076B6;
     border-color: #0076B6;
     box-shadow: 0 0 0 2px rgba(0, 118, 182, 0.2);
+}
+
+.country-dot-label {
+    text-align: center;
+    word-break: break-word;
+    line-height: 1.2;
+    width: 100%;
 }
 
 .country-dot-option.active .country-dot-label {
