@@ -1031,9 +1031,9 @@ body {
     font-size: 12px;
     padding: 4px 8px;
     background-color: rgba(255, 255, 255, 0.85);
-    border: 1.5px solid #2c5f2d;
+    border: 1.5px solid #003974;
     border-radius: 4px;
-    color: #2c5f2d;
+    color: #003974;
     white-space: nowrap;
     text-align: center;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -1048,11 +1048,11 @@ body {
 
 .adm1-label {
     /* Specific styling for ADM1 region labels */
-    background-color: rgba(44, 95, 45, 0.08);
-    border-color: #4a8b3a;
-    color: #1a3d1c;
+    background-color: rgba(0, 57, 116, 0.08);
+    border-color: #0076B6;
+    color: #04294d;
     font-weight: 700;
-    box-shadow: 0 1px 4px rgba(44, 95, 45, 0.3), 
+    box-shadow: 0 1px 4px rgba(0, 57, 116, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
@@ -1063,11 +1063,11 @@ body {
 
 /* When zoomed in (zoom >= 8) - labels appear more solid */
 .leaflet-container.zoom-in-8 .adm1-label {
-    background-color: rgba(44, 95, 45, 0.12);
+    background-color: rgba(0, 57, 116, 0.12);
     border-width: 2px;
     font-size: 13px;
     padding: 5px 10px;
-    box-shadow: 0 2px 8px rgba(44, 95, 45, 0.35);
+    box-shadow: 0 2px 8px rgba(0, 57, 116, 0.35);
 }
 
 /* When moderately zoomed (zoom 5-7) - semi-transparent, slightly smaller */
@@ -1081,7 +1081,7 @@ body {
 /* When zoomed out (zoom < 5) - minimal and transparent */
 .leaflet-container.zoom-out-min .adm1-label {
     background-color: rgba(255, 255, 255, 0.6);
-    border-color: #2c5f2d;
+    border-color: #003974;
     border-width: 1px;
     font-size: 10px;
     padding: 2px 5px;
