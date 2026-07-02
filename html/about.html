@@ -73,14 +73,17 @@
         }
 
         .team-members {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 28px;
         }
 
         .team-member {
             display: flex;
             flex-direction: column;
+            flex: 1 1 160px;
+            max-width: 190px;
             background: #f8f9fa;
             border-radius: 8px;
             overflow: hidden;
@@ -148,8 +151,9 @@
         }
 
         @media (max-width: 600px) {
-            .team-members {
-                grid-template-columns: 1fr;
+            .team-member {
+                flex-basis: 100%;
+                max-width: 320px;
             }
         }
     </style>
