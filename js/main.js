@@ -625,6 +625,9 @@ function showAllCountryOutlines(activeCountryKey) {
     clearAllCountryOutlinesFromMap();
     Object.entries(countryOutlines).forEach(([key, outline]) => {
         if (!outline) return;
+        // Clear any stale hover style (e.g. the mouseout that would normally reset it
+        // never fires when a country switch pans the map out from under the cursor).
+        outline.resetStyle?.();
         addOutlineToMapBottom(outline);
 
         // Keep the selected country's outline on top so context remains clear.
