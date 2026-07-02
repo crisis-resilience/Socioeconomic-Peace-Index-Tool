@@ -761,6 +761,11 @@ export class SimplifiedPillarManager {
             this.updateIndicatorLegend(config);
             if (isConflictData) {
                 this.dispatchConflictTimelineUpdated(this.getConflictTimelinePayload(this.selectedConflictDistrict));
+                // Switching pillar/year rebuilds the layer from scratch, which
+                // closes any open popup. Reopen it for the same district so the
+                // popup doesn't vanish — its content already reflects the new
+                // year via the freshly-built layer's currentPropertyName.
+                this.reopenSelectedConflictPopup();
             }
             console.log(`✓ Indicator ${pillarId} loaded and displayed`);
             
@@ -792,6 +797,22 @@ export class SimplifiedPillarManager {
             p.district ||
             null;
         return typeof name === 'string' && name.trim() ? name.trim() : 'Unknown District';
+    }
+
+    /** Reopen the popup for the currently selected conflict district on the
+     * freshly-rebuilt layer (called after a pillar/year switch tears down and
+     * recreates `currentLayer`, which otherwise silently closes any open popup). */
+    reopenSelectedConflictPopup() {
+        if (!this.selectedConflictDistrict || !this.currentLayer) return;
+        const targetName = this.getDistrictDisplayName(this.selectedConflictDistrict);
+        let matchedLayer = null;
+        this.currentLayer.eachLayer((lyr) => {
+            if (matchedLayer) return;
+            if (this.getDistrictDisplayName(lyr.feature?.properties) === targetName) {
+                matchedLayer = lyr;
+            }
+        });
+        matchedLayer?.openPopup();
     }
 
     buildIndicatorTooltipHtml(config, districtName, value, pillarId) {

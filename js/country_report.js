@@ -163,12 +163,15 @@ function collectSepiConflictData(geojson) {
         if (!name || name === 'Unknown District') continue;
         const sepi = parseRankingValue(p[sepiKey]);
         if (sepi == null) continue;
-        const conflictVals = CONFLICT_YEARS
-            .map(y => parseRankingValue(p[`count_conflicts_events_per_1k_${y}`]))
-            .filter(v => v != null);
+        const conflictByYear = {};
+        CONFLICT_YEARS.forEach((y) => {
+            const v = parseRankingValue(p[`count_conflicts_events_per_1k_${y}`]);
+            if (v != null) conflictByYear[y] = v;
+        });
+        const conflictVals = Object.values(conflictByYear);
         if (conflictVals.length === 0) continue;
         const avgConflict = conflictVals.reduce((a, b) => a + b, 0) / conflictVals.length;
-        data.push({ name, sepi, avgConflictPer100k: avgConflict });
+        data.push({ name, sepi, avgConflictPer100k: avgConflict, conflictByYear });
     }
     return data;
 }
@@ -468,6 +471,16 @@ function renderSepiReportHTML(report) {
                 <div class="sepi-conflict-chart-section">
                     <div class="cr-section-banner">SEPI – CONFLICT EVENTS CORRELATION</div>
                     <canvas id="sepi-conflict-scatter" width="480" height="260" style="width:100%; max-width:100%; height:auto; border-radius:4px; display:block;"></canvas>
+                    <div class="sepi-conflict-chart-legend" style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-top:4px; font-size:10px; color:#777;">
+                        <span style="display:inline-flex; align-items:center; gap:4px;">
+                            <span style="width:9px; height:9px; border-radius:50%; background:#e05c2e; border:1.5px solid #b33a10; display:inline-block;"></span>
+                            Selected region's average conflict events per 100k (2016–2025)
+                        </span>
+                        <span style="display:inline-flex; align-items:center; gap:4px;">
+                            <span style="width:8px; height:8px; background:#fff; border:2px solid #7b1fa2; transform:rotate(45deg); display:inline-block;"></span>
+                            Selected region's conflict events per 100k for the chosen year
+                        </span>
+                    </div>
                 </div>
                 ${renderNarrativeHtml(narrative, report.regionRows)}
             </div>
@@ -615,7 +628,7 @@ export function drawCountryReportCharts(report) {
     });
 }
 
-export function drawSepiConflictScatter(canvasId, data, highlightedName) {
+export function drawSepiConflictScatter(canvasId, data, highlightedName, selectedYear) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -630,6 +643,9 @@ export function drawSepiConflictScatter(canvasId, data, highlightedName) {
     ctx.fillRect(0, 0, W, H);
 
     const xVals = data.map(d => d.avgConflictPer100k);
+    const highlighted = data.find(d => d.name === highlightedName);
+    const yearVal = selectedYear != null ? highlighted?.conflictByYear?.[selectedYear] : undefined;
+    if (yearVal != null) xVals.push(yearVal);
     const xMax = (Math.max(...xVals) || 1) * 1.1;
     const xMin = 0;
     const yMin = 0;
@@ -724,10 +740,14 @@ export function drawSepiConflictScatter(canvasId, data, highlightedName) {
     });
 
     // Highlighted dot on top with label
-    const hl = data.find(d => d.name === highlightedName);
+    const hl = highlighted;
     if (hl) {
         const hx = toX(hl.avgConflictPer100k);
         const hy = toY(hl.sepi);
+
+        // Average dot is drawn first so the selected-year diamond (drawn after,
+        // below) always renders on top of it — otherwise, when the two values
+        // are close, the solid average dot would fully cover the diamond.
         ctx.beginPath();
         ctx.arc(hx, hy, 7, 0, Math.PI * 2);
         ctx.fillStyle = '#e05c2e';
@@ -736,10 +756,60 @@ export function drawSepiConflictScatter(canvasId, data, highlightedName) {
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        const labelRight = hx > padL + plotW * 0.72;
+        // Label above the dot by default; flip below if there isn't room
+        // (dot too close to the top of the plot area).
+        const placeAbove = (hy - padT) > 16;
+        const labelY = placeAbove ? hy - 12 : hy + 18;
+        let labelAlign = 'center';
+        if (hx < padL + 30) labelAlign = 'left';
+        else if (hx > padL + plotW - 30) labelAlign = 'right';
+        const labelX = labelAlign === 'left' ? hx - 6 : labelAlign === 'right' ? hx + 6 : hx;
+
         ctx.fillStyle = '#b33a10';
         ctx.font = 'bold 11px "Proxima Nova", Calibri, sans-serif';
-        ctx.textAlign = labelRight ? 'right' : 'left';
-        ctx.fillText(hl.name, hx + (labelRight ? -10 : 10), hy + 4);
+        ctx.textAlign = labelAlign;
+        ctx.fillText(hl.name, labelX, labelY);
+
+        // Selected-year marker for the same region: a hollow diamond in a color
+        // (purple) distinct from both the average dot's red/orange and the
+        // other-region blue dots, so it stays visible even when it overlaps the
+        // average dot. Linked with a dashed connector and labeled with the year
+        // so it's unambiguous that it's a single-year value, not the multi-year
+        // average the filled dot represents.
+        if (yearVal != null) {
+            const yx = toX(yearVal);
+            const yy = hy;
+
+            ctx.save();
+            ctx.setLineDash([3, 3]);
+            ctx.strokeStyle = 'rgba(123, 31, 162, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(hx, hy);
+            ctx.lineTo(yx, yy);
+            ctx.stroke();
+            ctx.restore();
+
+            const r = 6;
+            ctx.beginPath();
+            ctx.moveTo(yx, yy - r);
+            ctx.lineTo(yx + r, yy);
+            ctx.lineTo(yx, yy + r);
+            ctx.lineTo(yx - r, yy);
+            ctx.closePath();
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#7b1fa2';
+            ctx.stroke();
+
+            // Opposite vertical side from the region name label, so the two
+            // never collide when the diamond sits close to the average dot.
+            const yearLabelY = placeAbove ? yy + 16 : yy - 11;
+            ctx.fillStyle = '#7b1fa2';
+            ctx.font = 'bold 10px "Proxima Nova", Calibri, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(String(selectedYear), yx, yearLabelY);
+        }
     }
 }

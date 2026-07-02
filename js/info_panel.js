@@ -49,6 +49,8 @@ export class InfoPanel {
         this.activeLayers = new Map();
         this.container = null;
         this.map = null;
+        this._currentScatterDistrict = null;
+        this._currentConflictYear = null;
         
         this.init();
     }
@@ -507,6 +509,8 @@ export class InfoPanel {
         document.addEventListener('countryChanged', () => {
             this._lastCountryReport = null;
             this._lastConflictReport = null;
+            this._currentScatterDistrict = null;
+            this._currentConflictYear = null;
             if (this._isAnalysisTabActive() && !this._reportInProgress) {
                 this.generateSummaryReport();
             }
@@ -525,6 +529,21 @@ export class InfoPanel {
         window.addEventListener('districtOverviewCleared', () => {
             this.clearDistrictOverview();
             this._clearSepiConflictChart();
+        });
+
+        // Conflict Year slider: replot the scatter with the selected year's
+        // marker for whichever district is currently highlighted.
+        document.addEventListener('conflictYearChanged', (e) => {
+            this._currentConflictYear = e.detail?.year ?? null;
+            this._updateSepiConflictChart(this._currentScatterDistrict);
+        });
+
+        // A conflict pillar was (re)selected — this fires on the *first* click
+        // of a conflict indicator too, before the user ever touches the year
+        // slider, so it's the only way to know the default selected year.
+        document.addEventListener('conflictYearsAvailable', (e) => {
+            this._currentConflictYear = e.detail?.isConflict ? (e.detail.selectedYear ?? null) : null;
+            this._updateSepiConflictChart(this._currentScatterDistrict);
         });
         
         // Make panel draggable and resizable only in floating mode
@@ -556,8 +575,14 @@ export class InfoPanel {
     }
 
     _updateSepiConflictChart(districtName) {
+        this._currentScatterDistrict = districtName || null;
         if (!this._lastCountryReport?.sepiConflictData?.length) return;
-        drawSepiConflictScatter('sepi-conflict-scatter', this._lastCountryReport.sepiConflictData, districtName);
+        drawSepiConflictScatter(
+            'sepi-conflict-scatter',
+            this._lastCountryReport.sepiConflictData,
+            this._currentScatterDistrict,
+            this._currentConflictYear
+        );
     }
 
     _clearSepiConflictChart() {
@@ -1158,7 +1183,12 @@ export class InfoPanel {
 
             setTimeout(() => {
                 drawCountryReportCharts(reportData);
-                drawSepiConflictScatter('sepi-conflict-scatter', reportData.sepiConflictData, null);
+                drawSepiConflictScatter(
+                    'sepi-conflict-scatter',
+                    reportData.sepiConflictData,
+                    this._currentScatterDistrict,
+                    this._currentConflictYear
+                );
             }, 100);
         } catch (error) {
             console.error('Error generating report:', error);
