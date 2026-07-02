@@ -625,11 +625,11 @@ export function getPillarDescription(value) {
     if (value == null) return 'No data available';
     
     const numValue = Number(value);
-    if (numValue >= 0.8) return 'Very High Performance';
-    if (numValue >= 0.6) return 'High Performance';
-    if (numValue >= 0.4) return 'Moderate Performance';
-    if (numValue >= 0.2) return 'Low Performance';
-    return 'Very Low Performance';
+    if (numValue >= 0.8) return 'Very High relative to other regions in this country';
+    if (numValue >= 0.6) return 'High relative to other regions in this country';
+    if (numValue >= 0.4) return 'Moderate relative to other regions in this country';
+    if (numValue >= 0.2) return 'Low relative to other regions in this country';
+    return 'Very Low relative to other regions in this country';
 }
 
 /** polarity 1: low = red / high = green (default). polarity -1: inverted ramp (Green → Red along values). */
