@@ -30,6 +30,10 @@ export class SEPIManager {
         this.map = map;
         this.layers = layers;
         this.sepiLayer = null;
+        // Tracked so getFeatureStyle() (the base style Leaflet falls back to on
+        // resetStyle(), e.g. after a hover) always reflects the opacity slider
+        // instead of snapping back to a hardcoded default.
+        this.currentOpacity = 0.7;
         this.primaryConflictDriverLayer = L.layerGroup();
         this.primaryConflictDriverEnabled = false;
         this.config = {
@@ -286,7 +290,7 @@ chartHTML += `
             weight: 2,
             opacity: 1,
             color: '#ffffff',
-            fillOpacity: 0.7
+            fillOpacity: this.currentOpacity
         };
     }
     
@@ -541,11 +545,9 @@ chartHTML += `
      * Update layer opacity
      */
     updateOpacity(opacity) {
+        this.currentOpacity = opacity;
         if (this.sepiLayer) {
-            this.sepiLayer.setStyle((feature) => ({
-                ...this.getFeatureStyle(feature),
-                fillOpacity: opacity
-            }));
+            this.sepiLayer.setStyle((feature) => this.getFeatureStyle(feature));
         }
     }
     

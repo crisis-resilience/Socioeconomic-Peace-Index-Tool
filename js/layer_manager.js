@@ -508,6 +508,10 @@ export class SimplifiedPillarManager {
         this.currentLayer = null;
         this.currentPillarId = null;
         this.currentPropertyName = null;
+        // Tracked so the base style function (the one Leaflet falls back to on
+        // resetStyle(), e.g. after a hover) always reflects the opacity slider
+        // instead of snapping back to a hardcoded default.
+        this.currentOpacity = 0.7;
         this.pillarsData = null;
         this.conflictBreaks = null;
         /** Quantile breaks for sub-pillar raw values (percentages, counts, etc.) */
@@ -864,7 +868,7 @@ export class SimplifiedPillarManager {
                     weight: 2,
                     opacity: 1,
                     color: '#ffffff',
-                    fillOpacity: 0.7
+                    fillOpacity: this.currentOpacity
                 };
             },
             onEachFeature: (feature, layer) => {
@@ -1124,21 +1128,21 @@ export class SimplifiedPillarManager {
     }
     
     updateOpacity(opacity) {
+        this.currentOpacity = opacity;
         if (this.currentLayer && this.currentPillarId) {
             const config = PILLAR_CONFIG[this.currentPillarId];
-            
-            this.currentLayer.setStyle((feature) => ({
-                ...(() => {
-                    const value = this.getFeatureValue(feature, this.currentPropertyName);
-                    return {
-                fillColor: this.getIndicatorFillColor(value, config, this.currentPillarId)
-                    };
-                })(),
-                weight: 2,
-                opacity: 1,
-                color: '#ffffff',
-                fillOpacity: opacity
-            }));
+            const pillarId = this.currentPillarId;
+
+            this.currentLayer.setStyle((feature) => {
+                const value = this.getFeatureValue(feature, this.currentPropertyName);
+                return {
+                    fillColor: this.getIndicatorFillColor(value, config, pillarId),
+                    weight: 2,
+                    opacity: 1,
+                    color: '#ffffff',
+                    fillOpacity: this.currentOpacity
+                };
+            });
         }
     }
 
