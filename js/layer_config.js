@@ -544,18 +544,6 @@ export function conflictRawToNormalized(raw, pooled) {
     return Math.min(1, Math.max(0, (transformed - lo) / span));
 }
 
-/** Map normalized [0..1] to five-class yellow→red ramp (uniform inner breaks). */
-export function getConflictColorFromNormalized(n) {
-    if (n == null || !Number.isFinite(n)) return '#cccccc';
-    const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
-    const { breaks } = CONFLICT_COLOR_SCHEME;
-    if (n >= breaks[3]) return colors[4];
-    if (n >= breaks[2]) return colors[3];
-    if (n >= breaks[1]) return colors[2];
-    if (n >= breaks[0]) return colors[1];
-    return colors[0];
-}
-
 /** Legend edges on the raw-value axis (fractions span transformLow→transformHigh after log1p). */
 export function conflictLegendRawEdges(pooled) {
     const lo = Number(pooled.transformLow);
@@ -586,21 +574,6 @@ export function getConflictColor(value) {
     return colors[0]; // Very Low = Yellow
 }
 
-/**
- * NEW: Get description for conflict values
- */
-export function getConflictDescription(value, type = 'events') {
-    if (value == null) return 'No data available';
-    
-    const numValue = Number(value);
-    const label = type === 'events' ? 'conflict events' : 'fatalities';
-    
-    if (numValue >= 1500) return `Very High ${label}`;
-    if (numValue >= 1000) return `High ${label}`;
-    if (numValue >= 500) return `Moderate ${label}`;
-    if (numValue >= 1) return `Low ${label}`;
-    return `None recorded`;
-}
 /**
  * Get color for pillar value using Green-to-Red scale
  */

@@ -1,6 +1,6 @@
 // layer_manager.js - Updated with aligned popup styling
 
-import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, getPillarColorForPolarity, getPillarDescriptionForPolarity, getConflictDescription, conflictRawToNormalized, getConflictColorFromNormalized, conflictLegendRawEdges, getCurrentCountry, isSubIndicatorPillar } from './layer_config.js';
+import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, CONFLICT_COLOR_SCHEME, getPillarColorForPolarity, getPillarDescriptionForPolarity, conflictRawToNormalized, conflictLegendRawEdges, getCurrentCountry, isSubIndicatorPillar } from './layer_config.js';
 import { loadTiff } from './zoom-adaptive-tiff-loader.js';
 import { SEPIManager } from './sepi_manager.js';
 import { loadVectorLayer, loadPointLayer, updateVectorLayerStyle, updatePointLayerStyle, populateAttributeSelector } from './vector_layers.js';
@@ -845,8 +845,7 @@ export class SimplifiedPillarManager {
             return getPillarDescriptionForPolarity(value, config?.polarity ?? 1);
         }
         if (pillarId.startsWith('conflict_')) {
-            const conflictMetricType = pillarId.includes('events') ? 'events' : 'fatalities';
-            return getConflictDescription(value, conflictMetricType);
+            return this.getConflictDescriptionDynamic(value, pillarId);
         }
         if (isSubIndicatorPillar(pillarId)) {
             return this.getSubIndicatorDescription(value, config.polarity ?? 1);
@@ -1007,9 +1006,9 @@ export class SimplifiedPillarManager {
         const headerColor = isConflictData ? '#dc3545' : '#003974';
         const valueColor = this.getIndicatorFillColor(value, config, pillarId);
 
-        // Dynamic green-to-red background for non-conflict indicators
+        // Dynamic background, matching the same tier the map fill/legend uses.
         const { bg: valueBg, border: valueBorder, text: descText } = isConflictData
-            ? { bg: '#fff5f5', border: headerColor, text: headerColor }
+            ? this._conflictDescBgStyle(value)
             : isSubIndicator
                 ? this._subDescBgStyle(value, config.polarity ?? 1)
                 : this._descBgStyle(value);
@@ -1026,7 +1025,7 @@ export class SimplifiedPillarManager {
                 <div style="background: ${valueBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${valueBorder};">
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
                         <strong style="color: ${headerColor}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.name}:</strong>
-                        <span style="font-size: 16px; font-weight: bold; color: ${valueBorder}; flex: 0 0 auto; text-align: right;">
+                        <span style="font-size: 16px; font-weight: bold; color: ${descText}; flex: 0 0 auto; text-align: right;">
                             ${formattedValue}
                         </span>
                     </div>
@@ -1404,23 +1403,76 @@ export class SimplifiedPillarManager {
         ];
     }
 
-    getConflictColorDynamic(value) {
-        if (value == null || isNaN(value)) return '#cccccc';
+    /** Shared with getConflictColorDynamic(), the popup description, and the popup's
+     * background color, so the map fill, legend, and popup text/color always agree
+     * on which of the five tiers (0=Very Low .. 4=Very High) a value falls into. */
+    getConflictTierIndex(value) {
+        if (value == null || isNaN(value)) return null;
 
         if (this.conflictPooledScale) {
             const n = conflictRawToNormalized(value, this.conflictPooledScale);
-            return getConflictColorFromNormalized(n);
+            const { breaks } = CONFLICT_COLOR_SCHEME;
+            if (n >= breaks[3]) return 4;
+            if (n >= breaks[2]) return 3;
+            if (n >= breaks[1]) return 2;
+            if (n >= breaks[0]) return 1;
+            return 0;
         }
 
         const numericValue = Number(value);
-        const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
         const breaks = this.conflictBreaks || [0, 0, 0, 0];
+        if (numericValue >= breaks[3]) return 4;
+        if (numericValue >= breaks[2]) return 3;
+        if (numericValue >= breaks[1]) return 2;
+        if (numericValue >= breaks[0]) return 1;
+        return 0;
+    }
 
-        if (numericValue >= breaks[3]) return colors[4];
-        if (numericValue >= breaks[2]) return colors[3];
-        if (numericValue >= breaks[1]) return colors[2];
-        if (numericValue >= breaks[0]) return colors[1];
-        return colors[0];
+    getConflictColorDynamic(value) {
+        const idx = this.getConflictTierIndex(value);
+        if (idx == null) return '#cccccc';
+        const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
+        return colors[idx];
+    }
+
+    getConflictDescriptionDynamic(value, pillarId) {
+        const idx = this.getConflictTierIndex(value);
+        if (idx == null) return 'No data available';
+        const label = pillarId?.includes('events') ? 'conflict events' : 'fatalities';
+        const tierNames = ['Very Low', 'Low', 'Moderate', 'High', 'Very High'];
+        return `${tierNames[idx]} ${label}`;
+    }
+
+    /** Border is exactly the map fill / legend swatch color for this value's tier;
+     * bg/text are lightened/darkened tints of it, kept in sync automatically if
+     * CONFLICT_COLOR_SCHEME's colors ever change. */
+    _conflictDescBgStyle(value) {
+        const border = this.getConflictColorDynamic(value);
+        if (border === '#cccccc') return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
+        return {
+            bg: this._mixHexWith(border, '#ffffff', 0.85),
+            border,
+            text: this._mixHexWith(border, '#000000', 0.45)
+        };
+    }
+
+    /** Mix a hex color toward another (white for tints, black for shades) by `amount` [0..1]. */
+    _mixHexWith(hex, towardHex, amount) {
+        const a = this._hexToRgb(hex);
+        const b = this._hexToRgb(towardHex);
+        const mix = (c1, c2) => Math.round(c1 + (c2 - c1) * amount);
+        return this._rgbToHex(mix(a.r, b.r), mix(a.g, b.g), mix(a.b, b.b));
+    }
+
+    _hexToRgb(hex) {
+        const m = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+        if (!m) return { r: 0, g: 0, b: 0 };
+        return { r: parseInt(m[1], 16), g: parseInt(m[2], 16), b: parseInt(m[3], 16) };
+    }
+
+    _rgbToHex(r, g, b) {
+        const h = (n) => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0');
+        return `#${h(r)}${h(g)}${h(b)}`;
     }
 
     getConflictLegendLabels() {
