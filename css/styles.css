@@ -869,6 +869,12 @@ body {
     height: 100%;
     position: relative;
     z-index: 1;
+    /* Wins over leaflet.css's .leaflet-container font rule (loaded after this
+       stylesheet, so a same-specificity .leaflet-container rule here would
+       lose the cascade tie — an ID selector doesn't). Everything inside the
+       map (legend, tooltips, popups, controls without their own override)
+       should use the site's font, not Leaflet's Helvetica/Arial default. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 /* Right docked analysis sidebar */
@@ -904,6 +910,11 @@ body {
 
 .leaflet-container {
     transition: none !important;
+    /* Leaflet's own CSS defaults this to a Helvetica/Arial stack; without this
+       override, anything inside the map (legend, tooltips, popups, controls
+       that don't set their own font-family) falls back to that instead of
+       the site's Proxima Nova. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 #map-divider {
@@ -943,6 +954,9 @@ body {
     width: 200px;
     transition: all 0.3s ease;
     overflow: hidden;
+    /* Leaflet's own CSS sets .leaflet-container to a Helvetica/Arial stack,
+       which this control would otherwise inherit instead of the site font. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 .combined-control-toggle {
@@ -983,6 +997,8 @@ body {
     transition: all 0.3s;
     text-align: left;
     margin-bottom: 5px;
+    /* <button> elements don't reliably inherit font-family from ancestors. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 .combined-control-button:hover {
@@ -1026,7 +1042,7 @@ body {
 
 .admin-label {
     /* Base styling for all admin labels */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Proxima Nova', Calibri, sans-serif;
     font-weight: 600;
     font-size: 12px;
     padding: 4px 8px;
