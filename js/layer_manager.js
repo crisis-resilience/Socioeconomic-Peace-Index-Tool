@@ -715,7 +715,9 @@ export class SimplifiedPillarManager {
             this.subIndicatorBreaks = null;
             this.subIndicatorLegendLabels = null;
             this.conflictPooledScale = null;
+            this.selectedConflictDistrict = null;
             this.dispatchConflictYearsAvailable(false);
+            this.dispatchConflictTimelineUpdated(null);
             return;
         }
         
