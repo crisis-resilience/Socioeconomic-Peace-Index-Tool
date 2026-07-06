@@ -102,7 +102,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         map = setupMap('map');
         window.map = map;
         window.tiffLayers = tiffLayers;
-        
+        window.addEventListener('resize', () => map?.invalidateSize());
+
         setupCountrySelector();
 
         // Initialize UI components
@@ -727,12 +728,23 @@ function setupAnalysisSidebarResizer() {
     let startX = 0;
     let startWidth = 0;
     let dragging = false;
+    let resizeQueued = false;
+
+    const queueInvalidateSize = () => {
+        if (resizeQueued) return;
+        resizeQueued = true;
+        requestAnimationFrame(() => {
+            resizeQueued = false;
+            map?.invalidateSize();
+        });
+    };
 
     const onMouseMove = (event) => {
         if (!dragging) return;
         const delta = startX - event.clientX;
         const newWidth = Math.max(300, Math.min(window.innerWidth * 0.5, startWidth + delta));
         sidebar.style.width = `${newWidth}px`;
+        queueInvalidateSize();
     };
 
     const onMouseUp = () => {
@@ -740,6 +752,7 @@ function setupAnalysisSidebarResizer() {
         document.body.style.userSelect = '';
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
+        map?.invalidateSize();
     };
 
     handle.addEventListener('mousedown', (event) => {
@@ -761,12 +774,23 @@ function setupLeftSidebarResizer() {
     let startX = 0;
     let startWidth = 0;
     let dragging = false;
+    let resizeQueued = false;
+
+    const queueInvalidateSize = () => {
+        if (resizeQueued) return;
+        resizeQueued = true;
+        requestAnimationFrame(() => {
+            resizeQueued = false;
+            map?.invalidateSize();
+        });
+    };
 
     const onMouseMove = (event) => {
         if (!dragging) return;
         const delta = event.clientX - startX;
         const newWidth = Math.max(200, Math.min(window.innerWidth * 0.45, startWidth + delta));
         sidebar.style.width = `${newWidth}px`;
+        queueInvalidateSize();
     };
 
     const onMouseUp = () => {
@@ -775,6 +799,7 @@ function setupLeftSidebarResizer() {
         document.body.style.userSelect = '';
         document.removeEventListener('mousemove', onMouseMove);
         document.removeEventListener('mouseup', onMouseUp);
+        map?.invalidateSize();
     };
 
     handle.addEventListener('mousedown', (event) => {
