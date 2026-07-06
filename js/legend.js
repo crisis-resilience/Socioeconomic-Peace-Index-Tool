@@ -54,24 +54,24 @@ export function updateSEPILegend() {
     legend.style.display = 'block';
 }
 
-export function updatePrimaryConflictDriverLegend() {
+const PRIMARY_DRIVER_ICON_ITEMS = [
+    { icon: '<img src="assets/ocha-icons/education.svg" class="ocha-pillar-icon" alt="Education">', label: 'Education' },
+    { icon: '<img src="assets/ocha-icons/food-security.svg" class="ocha-pillar-icon" alt="Food Security">', label: 'Food Security' },
+    { icon: '<img src="assets/ocha-icons/livelihoods.svg" class="ocha-pillar-icon" alt="Poverty Reduction">', label: 'Poverty Reduction' },
+    { icon: '<img src="assets/ocha-icons/health.svg" class="ocha-pillar-icon" alt="Health Access">', label: 'Health Access' },
+    { icon: '<img src="assets/ocha-icons/drought.svg" class="ocha-pillar-icon" alt="Climate Resilience">', label: 'Climate Resilience' }
+];
+
+function renderPrimaryDriverLegend(title) {
     const legend = document.getElementById('legend');
     if (!legend) return;
 
-    const iconItems = [
-        { icon: '<img src="assets/ocha-icons/education.svg" class="ocha-pillar-icon" alt="Education">', label: 'Education' },
-        { icon: '<img src="assets/ocha-icons/food-security.svg" class="ocha-pillar-icon" alt="Food Security">', label: 'Food Security' },
-        { icon: '<img src="assets/ocha-icons/livelihoods.svg" class="ocha-pillar-icon" alt="Poverty Reduction">', label: 'Poverty Reduction' },
-        { icon: '<img src="assets/ocha-icons/health.svg" class="ocha-pillar-icon" alt="Health Access">', label: 'Health Access' },
-        { icon: '<img src="assets/ocha-icons/drought.svg" class="ocha-pillar-icon" alt="Climate Resilience">', label: 'Climate Resilience' }
-    ];
-
     legend.innerHTML = `
-        <h4>Primary Conflict Driver (Strongest Pillar)</h4>
+        <h4>${title}</h4>
         <div class="color-scheme">
             <p>Icons shown at district centers:</p>
             <div class="color-boxes">
-                ${iconItems
+                ${PRIMARY_DRIVER_ICON_ITEMS
                     .map(
                         (item) =>
                             `<div style="display:flex; align-items:center; margin-bottom:4px;">
@@ -86,6 +86,16 @@ export function updatePrimaryConflictDriverLegend() {
         </div>
     `;
     legend.style.display = 'block';
+}
+
+/** Strongest pillar per region — the pillar driving peace/resilience. */
+export function updatePrimaryPeaceDriverLegend() {
+    renderPrimaryDriverLegend('Primary Socioeconomic Peace Driver (Strongest Pillar)');
+}
+
+/** Weakest pillar per region — the pillar driving conflict vulnerability. */
+export function updatePrimaryConflictDriverLegend() {
+    renderPrimaryDriverLegend('Primary Conflict Driver (Weakest Pillar)');
 }
 
 /**

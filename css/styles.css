@@ -551,6 +551,12 @@ body {
     line-height: 1;
 }
 
+/* Red border marks this as the Primary Conflict Driver (weakest pillar) icon
+   stack, distinct from the default Primary Socioeconomic Peace Driver style. */
+.primary-driver-icon-stack--conflict {
+    border-color: #dc3545;
+}
+
 .primary-driver-icon-item {
     font-size: 14px;
     display: inline-flex;

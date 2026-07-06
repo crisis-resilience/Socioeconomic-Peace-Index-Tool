@@ -207,8 +207,7 @@
             const conflictYearControl = document.getElementById('conflictYearControl');
             const conflictYearSlider = document.getElementById('conflictYearSlider');
             const conflictYearValue = document.getElementById('conflictYearValue');
-            const primaryConflictDriverBtn = document.getElementById('primaryConflictDriverBtn');
-            
+
             if (sepiOptions.length === 0) return;
 
             const updateSubPillarVisibility = (activePillarId = null) => {
@@ -226,35 +225,77 @@
                 if (!conflictYearControl) return;
                 conflictYearControl.style.display = type === 'conflict' ? 'block' : 'none';
             };
-            
-            const setPrimaryConflictDriverState = (enabled) => {
-                if (!primaryConflictDriverBtn) return;
-                primaryConflictDriverBtn.classList.toggle('active', enabled);
-                primaryConflictDriverBtn.textContent = enabled
-                    ? 'Hide Primary Conflict Driver'
-                    : 'Show Primary Conflict Driver';
-                const event = new CustomEvent('primaryConflictDriverToggled', {
-                    detail: { enabled },
-                    bubbles: true
-                });
-                primaryConflictDriverBtn.dispatchEvent(event);
+
+            // Shared behavior for the "Primary Socioeconomic Peace Driver" (strongest
+            // pillar) and "Primary Conflict Driver" (weakest pillar) toggle buttons:
+            // both only make sense while the Overall Peace Index is the active layer,
+            // both dispatch their own toggle event for layer_manager.js to react to,
+            // and they're mutually exclusive — showing both icon layers on the map at
+            // once was confusing, so enabling one turns the other off.
+            const createPrimaryDriverController = (btnId, eventName, label) => {
+                const button = document.getElementById(btnId);
+                const controller = {
+                    isActive: () => Boolean(button?.classList.contains('active'))
+                };
+
+                controller.setState = (enabled) => {
+                    if (!button) return;
+                    button.classList.toggle('active', enabled);
+                    button.textContent = enabled ? `Hide ${label}` : `Show ${label}`;
+                    const event = new CustomEvent(eventName, {
+                        detail: { enabled },
+                        bubbles: true
+                    });
+                    button.dispatchEvent(event);
+                };
+
+                controller.sync = (activeType, activePillarId = null) => {
+                    if (!button) return;
+                    const mainIsActive = activeType === 'main' && !activePillarId;
+                    button.disabled = !mainIsActive;
+                    if (!mainIsActive && button.classList.contains('active')) {
+                        controller.setState(false);
+                    }
+                };
+
+                if (button) {
+                    button.addEventListener('click', function() {
+                        if (this.disabled) return;
+                        const nextEnabled = !this.classList.contains('active');
+                        if (nextEnabled && controller.sibling?.isActive()) {
+                            controller.sibling.setState(false);
+                        }
+                        controller.setState(nextEnabled);
+                    });
+                }
+
+                return controller;
             };
 
-            const syncPrimaryConflictDriverButton = (activeType, activePillarId = null) => {
-                if (!primaryConflictDriverBtn) return;
-                const mainIsActive = activeType === 'main' && !activePillarId;
-                primaryConflictDriverBtn.disabled = !mainIsActive;
-                if (!mainIsActive && primaryConflictDriverBtn.classList.contains('active')) {
-                    setPrimaryConflictDriverState(false);
-                }
+            const primaryPeaceDriver = createPrimaryDriverController(
+                'primaryPeaceDriverBtn',
+                'primaryPeaceDriverToggled',
+                'Primary Socioeconomic Peace Driver'
+            );
+            const primaryConflictDriver = createPrimaryDriverController(
+                'primaryConflictDriverBtn',
+                'primaryConflictDriverToggled',
+                'Primary Conflict Driver'
+            );
+            primaryPeaceDriver.sibling = primaryConflictDriver;
+            primaryConflictDriver.sibling = primaryPeaceDriver;
+
+            const syncPrimaryDriverButtons = (activeType, activePillarId = null) => {
+                primaryPeaceDriver.sync(activeType, activePillarId);
+                primaryConflictDriver.sync(activeType, activePillarId);
             };
-            
+
             // Set initial state - Overall Peace Index active by default (layer load: sidebarInitialized → main.js)
             const defaultOption = document.querySelector('.sepi-option[data-sepi-type="main"]');
             if (defaultOption) {
                 defaultOption.classList.add('active');
             }
-            syncPrimaryConflictDriverButton('main');
+            syncPrimaryDriverButtons('main');
             
             // Add click listeners to all SEPI options
             sepiOptions.forEach(option => {
@@ -270,7 +311,7 @@
                         deactivateSubPillars();
                         updateSubPillarVisibility(null);
                         updateConflictYearControlVisibility(null);
-                        syncPrimaryConflictDriverButton(null);
+                        syncPrimaryDriverButtons(null);
                         
                         // Add visual feedback that no layers are active
                         if (sepiSection) {
@@ -299,7 +340,7 @@
                         this.classList.add('active');
                         updateSubPillarVisibility(type === 'pillar' ? pillarId : null);
                         updateConflictYearControlVisibility(type);
-                        syncPrimaryConflictDriverButton(type, pillarId);
+                        syncPrimaryDriverButtons(type, pillarId);
                         
                         // Remove the no-active-layers visual state
                         if (sepiSection) {
@@ -333,7 +374,7 @@
                     sepiOptions.forEach(opt => opt.classList.remove('active'));
                     subPillarOptions.forEach(opt => opt.classList.remove('active'));
                     this.classList.add('active');
-                    syncPrimaryConflictDriverButton(type, pillarId);
+                    syncPrimaryDriverButtons(type, pillarId);
 
                     if (sepiSection) {
                         sepiSection.classList.remove('no-active-layers');
@@ -356,14 +397,6 @@
                         bubbles: true
                     });
                     this.dispatchEvent(event);
-                });
-            }
-
-            if (primaryConflictDriverBtn) {
-                primaryConflictDriverBtn.addEventListener('click', function() {
-                    if (this.disabled) return;
-                    const nextEnabled = !this.classList.contains('active');
-                    setPrimaryConflictDriverState(nextEnabled);
                 });
             }
 
