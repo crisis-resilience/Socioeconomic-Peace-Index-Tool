@@ -1,7 +1,7 @@
 // sepi_manager.js - Fixed for sepi_with_pillars_7.geojson
 // Replaces: sepi_integration.js + sepi_popups.js
 
-import { updateSEPILegend, updatePrimaryConflictDriverLegend } from './legend.js';
+import { updateSEPILegend, updatePrimaryPeaceDriverLegend, updatePrimaryConflictDriverLegend } from './legend.js';
 import { getCountryPath, AGGREGATE_GEOJSON_PATH, getCurrentCountry } from './layer_config.js';
 
 /**
@@ -30,6 +30,14 @@ export class SEPIManager {
         this.map = map;
         this.layers = layers;
         this.sepiLayer = null;
+        // Tracked so getFeatureStyle() (the base style Leaflet falls back to on
+        // resetStyle(), e.g. after a hover) always reflects the opacity slider
+        // instead of snapping back to a hardcoded default.
+        this.currentOpacity = 0.7;
+        // Strongest pillar per region (the pillar driving peace/resilience).
+        this.primaryPeaceDriverLayer = L.layerGroup();
+        this.primaryPeaceDriverEnabled = false;
+        // Weakest pillar per region (the pillar driving conflict vulnerability).
         this.primaryConflictDriverLayer = L.layerGroup();
         this.primaryConflictDriverEnabled = false;
         this.config = {
@@ -286,7 +294,7 @@ chartHTML += `
             weight: 2,
             opacity: 1,
             color: '#ffffff',
-            fillOpacity: 0.7
+            fillOpacity: this.currentOpacity
         };
     }
     
@@ -519,42 +527,98 @@ chartHTML += `
     addToMap() {
         if (this.sepiLayer && !this.map.hasLayer(this.sepiLayer)) {
             this.sepiLayer.addTo(this.map);
-            if (this.primaryConflictDriverEnabled) {
-                this.refreshPrimaryConflictDriverLayer();
-            } else {
+            if (this.primaryPeaceDriverEnabled) this.refreshPrimaryPeaceDriverLayer();
+            if (this.primaryConflictDriverEnabled) this.refreshPrimaryConflictDriverLayer();
+            if (!this.primaryPeaceDriverEnabled && !this.primaryConflictDriverEnabled) {
                 updateSEPILegend();
             }
         }
     }
-    
+
     /**
      * Remove layer from map
      */
     removeFromMap() {
+        this.clearPrimaryPeaceDriverLayer();
         this.clearPrimaryConflictDriverLayer();
         if (this.sepiLayer && this.map.hasLayer(this.sepiLayer)) {
             this.map.removeLayer(this.sepiLayer);
         }
     }
-    
+
     /**
      * Update layer opacity
      */
     updateOpacity(opacity) {
+        this.currentOpacity = opacity;
         if (this.sepiLayer) {
-            this.sepiLayer.setStyle((feature) => ({
-                ...this.getFeatureStyle(feature),
-                fillOpacity: opacity
-            }));
+            this.sepiLayer.setStyle((feature) => this.getFeatureStyle(feature));
         }
     }
-    
+
     /**
      * Check if layer is active on map
      */
     isActive() {
         return this.sepiLayer && this.map.hasLayer(this.sepiLayer);
     }
+
+    // --- Primary Socioeconomic Peace Driver: strongest pillar per region ---
+
+    setPrimaryPeaceDriverEnabled(enabled) {
+        this.primaryPeaceDriverEnabled = Boolean(enabled);
+        if (!this.isActive()) return;
+        if (this.primaryPeaceDriverEnabled) {
+            this.refreshPrimaryPeaceDriverLayer();
+        } else {
+            this.clearPrimaryPeaceDriverLayer();
+            if (!this.primaryConflictDriverEnabled) updateSEPILegend();
+        }
+    }
+
+    clearPrimaryPeaceDriverLayer() {
+        if (this.primaryPeaceDriverLayer && this.map.hasLayer(this.primaryPeaceDriverLayer)) {
+            this.map.removeLayer(this.primaryPeaceDriverLayer);
+        }
+        this.primaryPeaceDriverLayer?.clearLayers?.();
+    }
+
+    refreshPrimaryPeaceDriverLayer() {
+        if (!this.sepiLayer || !this.isActive()) return;
+        this.clearPrimaryPeaceDriverLayer();
+
+        this.sepiLayer.eachLayer((layer) => {
+            const props = layer?.feature?.properties || {};
+            const center = layer?.getBounds?.()?.getCenter?.();
+            if (!center) return;
+            const icons = this.getPrimaryPeaceDriverIcons(props);
+            if (!icons.length) return;
+
+            const iconHtml = `<div class="primary-driver-icon-stack">${icons
+                .map((icon) => `<span class="primary-driver-icon-item">${icon}</span>`)
+                .join('')}</div>`;
+            const marker = L.marker(center, {
+                icon: L.divIcon({
+                    className: 'primary-driver-div-icon',
+                    html: iconHtml,
+                    iconSize: [6 + 24 * icons.length, 26],
+                    iconAnchor: [3 + 12 * icons.length, 13]
+                }),
+                interactive: false,
+                keyboard: false
+            });
+            this.primaryPeaceDriverLayer.addLayer(marker);
+        });
+
+        this.primaryPeaceDriverLayer.addTo(this.map);
+        updatePrimaryPeaceDriverLegend();
+    }
+
+    getPrimaryPeaceDriverIcons(properties) {
+        return this._getExtremePillarIcons(properties, 'max');
+    }
+
+    // --- Primary Conflict Driver: weakest pillar per region ---
 
     setPrimaryConflictDriverEnabled(enabled) {
         this.primaryConflictDriverEnabled = Boolean(enabled);
@@ -563,7 +627,7 @@ chartHTML += `
             this.refreshPrimaryConflictDriverLayer();
         } else {
             this.clearPrimaryConflictDriverLayer();
-            updateSEPILegend();
+            if (!this.primaryPeaceDriverEnabled) updateSEPILegend();
         }
     }
 
@@ -585,7 +649,7 @@ chartHTML += `
             const icons = this.getPrimaryConflictDriverIcons(props);
             if (!icons.length) return;
 
-            const iconHtml = `<div class="primary-driver-icon-stack">${icons
+            const iconHtml = `<div class="primary-driver-icon-stack primary-driver-icon-stack--conflict">${icons
                 .map((icon) => `<span class="primary-driver-icon-item">${icon}</span>`)
                 .join('')}</div>`;
             const marker = L.marker(center, {
@@ -606,6 +670,12 @@ chartHTML += `
     }
 
     getPrimaryConflictDriverIcons(properties) {
+        return this._getExtremePillarIcons(properties, 'min');
+    }
+
+    /** Shared scoring for the peace/conflict driver layers: which pillar(s) are
+     * tied for the highest ('max') or lowest ('min') score in this region. */
+    _getExtremePillarIcons(properties, mode) {
         const sepiRaw = Number(properties?.[this.config.property]);
         if (!Number.isFinite(sepiRaw)) return [];
 
@@ -618,10 +688,12 @@ chartHTML += `
         );
         if (!allPillarsHaveData) return [];
 
-        const maxValue = Math.max(...scored.map((entry) => entry.value));
+        const targetValue = mode === 'min'
+            ? Math.min(...scored.map((entry) => entry.value))
+            : Math.max(...scored.map((entry) => entry.value));
         const epsilon = 1e-9;
         return scored
-            .filter((entry) => Math.abs(entry.value - maxValue) <= epsilon)
+            .filter((entry) => Math.abs(entry.value - targetValue) <= epsilon)
             .map((entry) => entry.icon);
     }
 

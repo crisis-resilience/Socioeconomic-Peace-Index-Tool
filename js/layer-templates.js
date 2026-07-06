@@ -46,6 +46,9 @@ export class LayerTemplates {
                         <span class="sepi-option-text">Overall Peace Index</span>
                         <span class="sepi-checkmark">✓</span>
                     </div>
+                    <button type="button" id="primaryPeaceDriverBtn" class="sepi-action-btn" disabled>
+                        Show Primary Socioeconomic Peace Driver
+                    </button>
                     <button type="button" id="primaryConflictDriverBtn" class="sepi-action-btn" disabled>
                         Show Primary Conflict Driver
                     </button>

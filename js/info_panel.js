@@ -8,7 +8,8 @@ import {
     renderCountryReportHTML,
     renderConflictReportHTML,
     drawCountryReportCharts,
-    drawSepiConflictScatter
+    drawSepiConflictScatter,
+    applyConflictReportDistrictSelection
 } from './country_report.js';
 import { getCountryDisplayLabel } from './conflict_context_content.js';
 
@@ -49,7 +50,13 @@ export class InfoPanel {
         this.activeLayers = new Map();
         this.container = null;
         this.map = null;
-        
+        this._currentScatterDistrict = null;
+        this._currentConflictYear = null;
+        // District currently selected on the map (any indicator type), driving
+        // whether the Conflict Context tab shows national totals or that
+        // region's conflict events/fatalities trend.
+        this._selectedConflictDistrictName = null;
+
         this.init();
     }
     
@@ -507,6 +514,8 @@ export class InfoPanel {
         document.addEventListener('countryChanged', () => {
             this._lastCountryReport = null;
             this._lastConflictReport = null;
+            this._currentScatterDistrict = null;
+            this._currentConflictYear = null;
             if (this._isAnalysisTabActive() && !this._reportInProgress) {
                 this.generateSummaryReport();
             }
@@ -515,16 +524,39 @@ export class InfoPanel {
             }
         });
 
-        // District overview from map popup
+        // District overview from map popup — fires for ANY indicator layer (pillar,
+        // sub-indicator, or conflict), so it's also the trigger for the Conflict
+        // Context tab's national-vs-region charts, regardless of which indicator
+        // is currently displayed on the map.
         window.addEventListener('districtOverviewReady', (e) => {
             if (e.detail) {
                 this.setDistrictOverview(e.detail);
                 this._updateSepiConflictChart(e.detail.districtName);
+                this._syncSelectedConflictDistrict(e.detail.districtName);
             }
         });
         window.addEventListener('districtOverviewCleared', () => {
             this.clearDistrictOverview();
             this._clearSepiConflictChart();
+            this._syncSelectedConflictDistrict(null);
+        });
+
+        // Conflict Year slider: replot the scatter with the selected year's
+        // marker for whichever district is currently highlighted, and enlarge
+        // that year's dot on the Conflict Context tab's line chart(s).
+        document.addEventListener('conflictYearChanged', (e) => {
+            this._currentConflictYear = e.detail?.year ?? null;
+            this._updateSepiConflictChart(this._currentScatterDistrict);
+            this._redrawConflictReportCharts();
+        });
+
+        // A conflict pillar was (re)selected — this fires on the *first* click
+        // of a conflict indicator too, before the user ever touches the year
+        // slider, so it's the only way to know the default selected year.
+        document.addEventListener('conflictYearsAvailable', (e) => {
+            this._currentConflictYear = e.detail?.isConflict ? (e.detail.selectedYear ?? null) : null;
+            this._updateSepiConflictChart(this._currentScatterDistrict);
+            this._redrawConflictReportCharts();
         });
         
         // Make panel draggable and resizable only in floating mode
@@ -556,8 +588,14 @@ export class InfoPanel {
     }
 
     _updateSepiConflictChart(districtName) {
+        this._currentScatterDistrict = districtName || null;
         if (!this._lastCountryReport?.sepiConflictData?.length) return;
-        drawSepiConflictScatter('sepi-conflict-scatter', this._lastCountryReport.sepiConflictData, districtName);
+        drawSepiConflictScatter(
+            'sepi-conflict-scatter',
+            this._lastCountryReport.sepiConflictData,
+            this._currentScatterDistrict,
+            this._currentConflictYear
+        );
     }
 
     _clearSepiConflictChart() {
@@ -917,9 +955,19 @@ export class InfoPanel {
         }
 
         filtered.sort((a, b) => b.value - a.value);
-        const maxValue = Math.max(...filtered.map((r) => r.value), 1);
+        // Min-max normalize against the actual value range rather than assuming a
+        // 0 baseline — otherwise negative values (e.g. climate anomaly indices)
+        // all divide out to a negative percentage and get clamped to the same
+        // floor width, making every negative bar look identical regardless of
+        // how negative it is.
+        const allValues = filtered.map((r) => r.value);
+        const minValue = Math.min(...allValues);
+        const maxValue = Math.max(...allValues);
+        const range = maxValue - minValue;
         const html = filtered.map((row, idx) => {
-            const pct = Math.max(2, (row.value / maxValue) * 100);
+            const pct = range > 0
+                ? Math.max(2, ((row.value - minValue) / range) * 100)
+                : 100;
             return `
                 <div style="display:flex; align-items:center; gap:8px; margin: 0 0 6px 0; font-size: 11px;">
                     <div style="width:22px; color:#6c757d; text-align:right; flex-shrink:0;">${idx + 1}.</div>
@@ -980,6 +1028,28 @@ export class InfoPanel {
         const panel = this.container?.querySelector('#conflict-timeline-panel');
         if (!panel) return;
         panel.style.display = 'none';
+    }
+
+    /** Keep the Conflict Context tab's national-vs-region charts in sync with
+     * whichever district (if any) is currently selected on the map — regardless
+     * of which indicator (pillar, sub-indicator, or conflict) is active there. */
+    _syncSelectedConflictDistrict(districtName) {
+        if (districtName === this._selectedConflictDistrictName) return;
+        this._selectedConflictDistrictName = districtName;
+
+        if (!this._lastConflictReport || this._conflictReportInProgress) return;
+        applyConflictReportDistrictSelection(this._lastConflictReport, districtName);
+        const conflictResultsContent = this.container.querySelector('.conflict-results-content');
+        if (!conflictResultsContent) return;
+        conflictResultsContent.innerHTML = renderConflictReportHTML(this._lastConflictReport);
+        setTimeout(() => drawCountryReportCharts(this._lastConflictReport, { highlightYear: this._currentConflictYear }), 100);
+    }
+
+    /** Cheap redraw (no HTML rebuild) for when only the highlighted year changes,
+     * not which district/national view is showing. */
+    _redrawConflictReportCharts() {
+        if (!this._lastConflictReport) return;
+        drawCountryReportCharts(this._lastConflictReport, { highlightYear: this._currentConflictYear });
     }
 
     renderConflictTimelineChart(timelineData) {
@@ -1158,7 +1228,12 @@ export class InfoPanel {
 
             setTimeout(() => {
                 drawCountryReportCharts(reportData);
-                drawSepiConflictScatter('sepi-conflict-scatter', reportData.sepiConflictData, null);
+                drawSepiConflictScatter(
+                    'sepi-conflict-scatter',
+                    reportData.sepiConflictData,
+                    this._currentScatterDistrict,
+                    this._currentConflictYear
+                );
             }, 100);
         } catch (error) {
             console.error('Error generating report:', error);
@@ -1193,13 +1268,14 @@ export class InfoPanel {
         try {
             const reportData = await buildConflictReport({
                 country,
-                activeLayers: this.activeLayers
+                activeLayers: this.activeLayers,
+                selectedDistrictName: this._selectedConflictDistrictName
             });
 
             this._lastConflictReport = reportData;
             conflictResultsContent.innerHTML = renderConflictReportHTML(reportData);
 
-            setTimeout(() => drawCountryReportCharts(reportData), 100);
+            setTimeout(() => drawCountryReportCharts(reportData, { highlightYear: this._currentConflictYear }), 100);
         } catch (error) {
             console.error('Error generating conflict report:', error);
             conflictResultsContent.innerHTML = `

@@ -226,6 +226,28 @@ export function isSubIndicatorPillar(pillarId) {
     return Boolean(pillarId) && !pillarId.startsWith('conflict_') && !MAIN_PILLAR_IDS.has(pillarId);
 }
 
+/** Short display sign for a sub-indicator's `unit` (used next to the popup's
+ * value, vs. the full unit text spelled out in the legend). Units with no
+ * conventional short sign (e.g. a 0–1 proportion, or a unitless "index") are
+ * intentionally left unmapped — the value is shown with no suffix rather than
+ * an invented abbreviation. */
+const UNIT_SHORT_SIGNS = {
+    'Percent of population': '%',
+    'Percent of teachers': '%',
+    'Percent of students': '%',
+    'Per 10,000 people': 'per 10k people',
+    'Per 100,000 people': 'per 100k people',
+    'KSh per person': 'KSh',
+    'USD': 'USD',
+    'SSP': 'SSP',
+    'Events': 'events',
+    'Fatalities': 'fatalities'
+};
+
+export function getUnitShortSign(unit) {
+    return UNIT_SHORT_SIGNS[unit] || '';
+}
+
 /**
  * Updated Pillar configuration using single pillars.geojson file
  */
@@ -353,6 +375,10 @@ export const PILLAR_CONFIG = {
     },
     health_fac_per_10k_pop: {
         name: 'Health facilities per 10,000 population',
+        // Shown as the popup's value label instead of `name` — the unit sign
+        // next to the number already says "per 10k people", so repeating it
+        // in the label is redundant there (legend/sidebar keep the full name).
+        popupLabel: 'Health facilities',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'health_fac_per_10k_pop',
         description: 'Health facilities per 10,000 population',
@@ -364,6 +390,7 @@ export const PILLAR_CONFIG = {
     },
     hospitals_per_100k_pop: {
         name: 'Hospitals per 100,000 population',
+        popupLabel: 'Hospitals',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'hospitals_per_100k_pop',
         description: 'Hospitals per 100,000 population',
@@ -491,28 +518,34 @@ export const PILLAR_CONFIG = {
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'count_conflict_events',
         fallbackProperty: 'ACLED_count_conflict_events',
-        description: 'Number of recorded conflict events by year'
+        description: 'Number of recorded conflict events by year',
+        unit: 'Events'
     },
     conflict_fatalities: {
         name: 'Conflict Fatalities',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'total_fatalities',
         fallbackProperty: 'total_fatalities',
-        description: 'Number of recorded fatalities from conflict events by year'
+        description: 'Number of recorded fatalities from conflict events by year',
+        unit: 'Fatalities'
     },
     conflict_events_per_1k: {
         name: 'Conflict Events per 100k population',
+        popupLabel: 'Conflict Events',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'count_conflicts_events_per_1k',
         fallbackProperty: 'ACLED_conflict_events_per_1k_pop',
-        description: 'Conflict events per 100,000 population by year'
+        description: 'Conflict events per 100,000 population by year',
+        unit: 'Per 100,000 people'
     },
     conflict_fatalities_per_1k: {
         name: 'Conflict Fatalities per 100k population',
+        popupLabel: 'Conflict Fatalities',
         file: () => getCountryPath('sepi_with_pillars_9_2.geojson'),
         property: 'total_fatalities_per_1k',
         fallbackProperty: 'total_fatalities_per_1k_pop',
-        description: 'Conflict fatalities per 100,000 population by year'
+        description: 'Conflict fatalities per 100,000 population by year',
+        unit: 'Per 100,000 people'
     }
 };
 
@@ -542,18 +575,6 @@ export function conflictRawToNormalized(raw, pooled) {
     const span = hi - lo;
     if (!(span > 0)) return 0.5;
     return Math.min(1, Math.max(0, (transformed - lo) / span));
-}
-
-/** Map normalized [0..1] to five-class yellow→red ramp (uniform inner breaks). */
-export function getConflictColorFromNormalized(n) {
-    if (n == null || !Number.isFinite(n)) return '#cccccc';
-    const colors = ['#ffffcc', '#ffeda0', '#fed976', '#fd8d3c', '#e31a1c'];
-    const { breaks } = CONFLICT_COLOR_SCHEME;
-    if (n >= breaks[3]) return colors[4];
-    if (n >= breaks[2]) return colors[3];
-    if (n >= breaks[1]) return colors[2];
-    if (n >= breaks[0]) return colors[1];
-    return colors[0];
 }
 
 /** Legend edges on the raw-value axis (fractions span transformLow→transformHigh after log1p). */
@@ -587,21 +608,6 @@ export function getConflictColor(value) {
 }
 
 /**
- * NEW: Get description for conflict values
- */
-export function getConflictDescription(value, type = 'events') {
-    if (value == null) return 'No data available';
-    
-    const numValue = Number(value);
-    const label = type === 'events' ? 'conflict events' : 'fatalities';
-    
-    if (numValue >= 1500) return `Very High ${label}`;
-    if (numValue >= 1000) return `High ${label}`;
-    if (numValue >= 500) return `Moderate ${label}`;
-    if (numValue >= 1) return `Low ${label}`;
-    return `None recorded`;
-}
-/**
  * Get color for pillar value using Green-to-Red scale
  */
 export function getPillarColor(value) {
@@ -625,11 +631,11 @@ export function getPillarDescription(value) {
     if (value == null) return 'No data available';
     
     const numValue = Number(value);
-    if (numValue >= 0.8) return 'Very High Performance';
-    if (numValue >= 0.6) return 'High Performance';
-    if (numValue >= 0.4) return 'Moderate Performance';
-    if (numValue >= 0.2) return 'Low Performance';
-    return 'Very Low Performance';
+    if (numValue >= 0.8) return 'Very High relative to other regions in this country';
+    if (numValue >= 0.6) return 'High relative to other regions in this country';
+    if (numValue >= 0.4) return 'Moderate relative to other regions in this country';
+    if (numValue >= 0.2) return 'Low relative to other regions in this country';
+    return 'Very Low relative to other regions in this country';
 }
 
 /** polarity 1: low = red / high = green (default). polarity -1: inverted ramp (Green → Red along values). */

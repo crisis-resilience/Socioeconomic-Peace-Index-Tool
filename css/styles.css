@@ -551,6 +551,12 @@ body {
     line-height: 1;
 }
 
+/* Red border marks this as the Primary Conflict Driver (weakest pillar) icon
+   stack, distinct from the default Primary Socioeconomic Peace Driver style. */
+.primary-driver-icon-stack--conflict {
+    border-color: #dc3545;
+}
+
 .primary-driver-icon-item {
     font-size: 14px;
     display: inline-flex;
@@ -869,6 +875,12 @@ body {
     height: 100%;
     position: relative;
     z-index: 1;
+    /* Wins over leaflet.css's .leaflet-container font rule (loaded after this
+       stylesheet, so a same-specificity .leaflet-container rule here would
+       lose the cascade tie — an ID selector doesn't). Everything inside the
+       map (legend, tooltips, popups, controls without their own override)
+       should use the site's font, not Leaflet's Helvetica/Arial default. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 /* Right docked analysis sidebar */
@@ -904,6 +916,11 @@ body {
 
 .leaflet-container {
     transition: none !important;
+    /* Leaflet's own CSS defaults this to a Helvetica/Arial stack; without this
+       override, anything inside the map (legend, tooltips, popups, controls
+       that don't set their own font-family) falls back to that instead of
+       the site's Proxima Nova. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 #map-divider {
@@ -943,6 +960,9 @@ body {
     width: 200px;
     transition: all 0.3s ease;
     overflow: hidden;
+    /* Leaflet's own CSS sets .leaflet-container to a Helvetica/Arial stack,
+       which this control would otherwise inherit instead of the site font. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 .combined-control-toggle {
@@ -983,6 +1003,8 @@ body {
     transition: all 0.3s;
     text-align: left;
     margin-bottom: 5px;
+    /* <button> elements don't reliably inherit font-family from ancestors. */
+    font-family: 'Proxima Nova', Calibri, sans-serif;
 }
 
 .combined-control-button:hover {
@@ -1026,14 +1048,14 @@ body {
 
 .admin-label {
     /* Base styling for all admin labels */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Proxima Nova', Calibri, sans-serif;
     font-weight: 600;
     font-size: 12px;
     padding: 4px 8px;
     background-color: rgba(255, 255, 255, 0.85);
-    border: 1.5px solid #2c5f2d;
+    border: 1.5px solid #003974;
     border-radius: 4px;
-    color: #2c5f2d;
+    color: #003974;
     white-space: nowrap;
     text-align: center;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -1048,11 +1070,11 @@ body {
 
 .adm1-label {
     /* Specific styling for ADM1 region labels */
-    background-color: rgba(44, 95, 45, 0.08);
-    border-color: #4a8b3a;
-    color: #1a3d1c;
+    background-color: rgba(0, 57, 116, 0.08);
+    border-color: #0076B6;
+    color: #04294d;
     font-weight: 700;
-    box-shadow: 0 1px 4px rgba(44, 95, 45, 0.3), 
+    box-shadow: 0 1px 4px rgba(0, 57, 116, 0.3),
                 inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
@@ -1063,11 +1085,11 @@ body {
 
 /* When zoomed in (zoom >= 8) - labels appear more solid */
 .leaflet-container.zoom-in-8 .adm1-label {
-    background-color: rgba(44, 95, 45, 0.12);
+    background-color: rgba(0, 57, 116, 0.12);
     border-width: 2px;
     font-size: 13px;
     padding: 5px 10px;
-    box-shadow: 0 2px 8px rgba(44, 95, 45, 0.35);
+    box-shadow: 0 2px 8px rgba(0, 57, 116, 0.35);
 }
 
 /* When moderately zoomed (zoom 5-7) - semi-transparent, slightly smaller */
@@ -1081,7 +1103,7 @@ body {
 /* When zoomed out (zoom < 5) - minimal and transparent */
 .leaflet-container.zoom-out-min .adm1-label {
     background-color: rgba(255, 255, 255, 0.6);
-    border-color: #2c5f2d;
+    border-color: #003974;
     border-width: 1px;
     font-size: 10px;
     padding: 2px 5px;

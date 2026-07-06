@@ -163,12 +163,15 @@ function collectSepiConflictData(geojson) {
         if (!name || name === 'Unknown District') continue;
         const sepi = parseRankingValue(p[sepiKey]);
         if (sepi == null) continue;
-        const conflictVals = CONFLICT_YEARS
-            .map(y => parseRankingValue(p[`count_conflicts_events_per_1k_${y}`]))
-            .filter(v => v != null);
+        const conflictByYear = {};
+        CONFLICT_YEARS.forEach((y) => {
+            const v = parseRankingValue(p[`count_conflicts_events_per_1k_${y}`]);
+            if (v != null) conflictByYear[y] = v;
+        });
+        const conflictVals = Object.values(conflictByYear);
         if (conflictVals.length === 0) continue;
         const avgConflict = conflictVals.reduce((a, b) => a + b, 0) / conflictVals.length;
-        data.push({ name, sepi, avgConflictPer100k: avgConflict });
+        data.push({ name, sepi, avgConflictPer100k: avgConflict, conflictByYear });
     }
     return data;
 }
@@ -196,6 +199,33 @@ function aggregateConflictSeries(geojson) {
         events: CONFLICT_YEARS.map((y) => events[y]),
         fatalities: CONFLICT_YEARS.map((y) => fatalities[y])
     };
+}
+
+/** Same shape as aggregateConflictSeries(), but for a single district (no summation). */
+function districtConflictSeries(feature) {
+    const props = feature?.properties || {};
+    return {
+        years: CONFLICT_YEARS,
+        events: CONFLICT_YEARS.map((y) => parseRankingValue(props[`count_conflict_events_${y}`]) ?? 0),
+        fatalities: CONFLICT_YEARS.map((y) => parseRankingValue(props[`total_fatalities_${y}`]) ?? 0)
+    };
+}
+
+function buildDistrictFeatureIndex(geojson) {
+    const index = new Map();
+    for (const feature of geojson.features || []) {
+        index.set(getDistrictName(feature.properties), feature);
+    }
+    return index;
+}
+
+/** Cheaply re-point a conflict report at a different (or no) selected district,
+ * reusing the already-fetched geojson features — no network round-trip. */
+export function applyConflictReportDistrictSelection(report, districtName) {
+    const feature = districtName ? report.districtFeatureByName?.get(districtName) : null;
+    report.selectedDistrictName = feature ? districtName : null;
+    report.districtConflictSeries = feature ? districtConflictSeries(feature) : null;
+    return report;
 }
 
 function renderRegionTableHtml(rows, { bottom = false } = {}) {
@@ -410,13 +440,34 @@ export function renderConflictReportHTML(report) {
         conflictSeries,
         conflictLayer,
         conflictRanking,
-        districtCount
+        districtCount,
+        selectedDistrictName
     } = report;
 
     const pillarId = conflictLayer?.selectedAttribute || 'conflict_events';
     const year = conflictLayer?.year || DEFAULT_CONFLICT_YEAR;
     const metricName = conflictLayer?.name?.replace(/^Conflict:\s*/i, '') || PILLAR_CONFIG[pillarId]?.name || 'Conflict metric';
     const perCapita = pillarId.includes('_per_1k');
+
+    const chartsSectionHtml = selectedDistrictName
+        ? `
+            <div class="cr-section-banner">CONFLICT DATA · ${escapeHtml(selectedDistrictName.toUpperCase())}</div>
+            <p class="report-muted">Year-by-year conflict events and fatalities for ${escapeHtml(selectedDistrictName)} (2016-2025).</p>
+            <div class="report-chart-grid cr-chart-grid">
+                <div class="report-chart-cell">
+                    <label>Conflict events &amp; fatalities by year - ${escapeHtml(selectedDistrictName)}</label>
+                    <canvas id="report-conflict-region-chart" width="480" height="240"></canvas>
+                </div>
+            </div>`
+        : `
+            <div class="cr-section-banner">CONFLICT DATA · NATIONAL TRENDS</div>
+            <p class="report-muted">Totals aggregated from district-level ACLED fields (2016-2025). Click a region on the map to see its trend instead.</p>
+            <div class="report-chart-grid cr-chart-grid">
+                <div class="report-chart-cell">
+                    <label>Conflict events &amp; fatalities by year (national sum)</label>
+                    <canvas id="report-conflict-national-chart" width="480" height="240"></canvas>
+                </div>
+            </div>`;
 
     return `
         <div class="report-container country-report conflict-report">
@@ -426,18 +477,7 @@ export function renderConflictReportHTML(report) {
 
             <div class="report-body">
                 <div class="report-section cr-charts-section">
-                    <div class="cr-section-banner">CONFLICT DATA · NATIONAL TRENDS</div>
-                    <p class="report-muted">Totals aggregated from district-level ACLED fields (2016–2025).</p>
-                    <div class="report-chart-grid cr-chart-grid">
-                        <div class="report-chart-cell">
-                            <label>Conflict events by year (national sum)</label>
-                            <canvas id="report-conflict-events-chart" width="480" height="220"></canvas>
-                        </div>
-                        <div class="report-chart-cell">
-                            <label>Fatalities by year (national sum)</label>
-                            <canvas id="report-conflict-fatalities-chart" width="480" height="220"></canvas>
-                        </div>
-                    </div>
+                    ${chartsSectionHtml}
                 </div>
 
                 ${narrative?.mainActors?.length ? `
@@ -468,6 +508,16 @@ function renderSepiReportHTML(report) {
                 <div class="sepi-conflict-chart-section">
                     <div class="cr-section-banner">SEPI – CONFLICT EVENTS CORRELATION</div>
                     <canvas id="sepi-conflict-scatter" width="480" height="260" style="width:100%; max-width:100%; height:auto; border-radius:4px; display:block;"></canvas>
+                    <div class="sepi-conflict-chart-legend" style="display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-top:4px; font-size:10px; color:#777;">
+                        <span style="display:inline-flex; align-items:center; gap:4px;">
+                            <span style="width:9px; height:9px; border-radius:50%; background:#e05c2e; border:1.5px solid #b33a10; display:inline-block;"></span>
+                            Selected region's average conflict events per 100k (2016–2025)
+                        </span>
+                        <span style="display:inline-flex; align-items:center; gap:4px;">
+                            <span style="width:8px; height:8px; background:#fff; border:2px solid #7b1fa2; transform:rotate(45deg); display:inline-block;"></span>
+                            Selected region's conflict events per 100k for the chosen year
+                        </span>
+                    </div>
                 </div>
                 ${renderNarrativeHtml(narrative, report.regionRows)}
             </div>
@@ -505,7 +555,7 @@ export async function buildCountryReport({ country, activeLayers }) {
     };
 }
 
-export async function buildConflictReport({ country, activeLayers }) {
+export async function buildConflictReport({ country, activeLayers, selectedDistrictName = null }) {
     const geojsonPath = getSepiDistrictGeoJSONPathForAdm1Labels(country);
     const response = await fetch(geojsonPath);
     if (!response.ok) {
@@ -520,6 +570,8 @@ export async function buildConflictReport({ country, activeLayers }) {
     const conflictLayer = activeLayers?.get?.('conflict') || null;
     const pillarId = conflictLayer?.selectedAttribute || 'conflict_events';
     const year = Number(conflictLayer?.year) || DEFAULT_CONFLICT_YEAR;
+    const districtFeatureByName = buildDistrictFeatureIndex(geojson);
+    const selectedFeature = selectedDistrictName ? districtFeatureByName.get(selectedDistrictName) : null;
 
     return {
         country,
@@ -529,6 +581,9 @@ export async function buildConflictReport({ country, activeLayers }) {
         narrative,
         conflictContext: getConflictContextContent(country),
         conflictSeries: aggregateConflictSeries(geojson),
+        districtFeatureByName,
+        selectedDistrictName: selectedFeature ? selectedDistrictName : null,
+        districtConflictSeries: selectedFeature ? districtConflictSeries(selectedFeature) : null,
         conflictLayer: {
             ...(conflictLayer || {}),
             pillarId,
@@ -543,16 +598,23 @@ export function renderCountryReportHTML(report) {
     return renderSepiReportHTML(report);
 }
 
-function drawLineChart(canvasId, labels, values, options = {}) {
+/** Plots one or more series on a single shared y-axis (never a second scale), with
+ * a small color-swatch legend when there's more than one series. */
+function drawMultiLineChart(canvasId, labels, series, options = {}) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const width = canvas.width;
     const height = canvas.height;
     const padding = 44;
+    const legendY = 30;
+    const topPad = padding + legendY;
     const chartWidth = width - padding * 2;
-    const chartHeight = height - padding * 2;
-    const maxVal = Math.max(...values, 1);
+    const chartHeight = height - padding - topPad;
+    const maxVal = Math.max(...series.flatMap((s) => s.values), 1);
+    const highlightIdx = options.highlightYear != null
+        ? labels.findIndex((label) => String(label) === String(options.highlightYear))
+        : -1;
 
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = '#fff';
@@ -562,7 +624,7 @@ function drawLineChart(canvasId, labels, values, options = {}) {
     ctx.fillStyle = '#666';
     ctx.font = '11px "Proxima Nova", Calibri';
     for (let i = 0; i <= 4; i++) {
-        const y = padding + chartHeight - (i / 4) * chartHeight;
+        const y = topPad + chartHeight - (i / 4) * chartHeight;
         const val = (i / 4) * maxVal;
         ctx.beginPath();
         ctx.moveTo(padding, y);
@@ -572,50 +634,95 @@ function drawLineChart(canvasId, labels, values, options = {}) {
         ctx.fillText(Math.round(val).toLocaleString(), padding - 6, y + 4);
     }
 
-    ctx.strokeStyle = options.color || '#b71c1c';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    values.forEach((v, i) => {
-        const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
-        const y = padding + chartHeight - (v / maxVal) * chartHeight;
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-    });
-    ctx.stroke();
-
-    values.forEach((v, i) => {
-        const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
-        const y = padding + chartHeight - (v / maxVal) * chartHeight;
-        ctx.fillStyle = options.color || '#b71c1c';
+    series.forEach((s) => {
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#333';
-        ctx.fillText(String(labels[i]), x, height - 12);
+        s.values.forEach((v, i) => {
+            const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
+            const y = topPad + chartHeight - (v / maxVal) * chartHeight;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        s.values.forEach((v, i) => {
+            const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
+            const y = topPad + chartHeight - (v / maxVal) * chartHeight;
+            const isHighlighted = i === highlightIdx;
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.arc(x, y, isHighlighted ? 7 : 4, 0, Math.PI * 2);
+            ctx.fill();
+            if (isHighlighted) {
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#fff';
+                ctx.stroke();
+            }
+        });
+    });
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#333';
+    ctx.font = '11px "Proxima Nova", Calibri';
+    labels.forEach((label, i) => {
+        const x = padding + (i / Math.max(labels.length - 1, 1)) * chartWidth;
+        ctx.fillText(String(label), x, height - 12);
     });
 
     ctx.fillStyle = '#333';
     ctx.font = 'bold 12px "Proxima Nova", Calibri';
     ctx.textAlign = 'center';
-    ctx.fillText(options.title || '', width / 2, 18);
+    ctx.fillText(options.title || '', width / 2, 16);
+
+    // Legend: identity is never color-alone — each line is also directly labeled.
+    ctx.font = '11px "Proxima Nova", Calibri';
+    const itemWidths = series.map((s) => ctx.measureText(s.label).width + 18);
+    const gap = 16;
+    const totalWidth = itemWidths.reduce((a, b) => a + b, 0) + gap * (series.length - 1);
+    let lx = width / 2 - totalWidth / 2;
+    const ly = padding + 6;
+    series.forEach((s, i) => {
+        ctx.fillStyle = s.color;
+        ctx.fillRect(lx, ly - 7, 10, 10);
+        ctx.fillStyle = '#333';
+        ctx.textAlign = 'left';
+        ctx.fillText(s.label, lx + 14, ly + 2);
+        lx += itemWidths[i] + gap;
+    });
 }
 
-export function drawCountryReportCharts(report) {
-    if (report.mode !== 'conflict' || !report.conflictSeries) return;
+export function drawCountryReportCharts(report, { highlightYear } = {}) {
+    if (report.mode !== 'conflict') return;
 
+    if (report.selectedDistrictName && report.districtConflictSeries) {
+        const yearLabels = report.districtConflictSeries.years.map(String);
+        drawMultiLineChart(
+            'report-conflict-region-chart',
+            yearLabels,
+            [
+                { values: report.districtConflictSeries.events, color: '#b71c1c', label: 'Conflict events' },
+                { values: report.districtConflictSeries.fatalities, color: '#6a1b9a', label: 'Fatalities' }
+            ],
+            { title: `${report.selectedDistrictName} — conflict events & fatalities`, highlightYear }
+        );
+        return;
+    }
+
+    if (!report.conflictSeries) return;
     const yearLabels = report.conflictSeries.years.map(String);
-    drawLineChart('report-conflict-events-chart', yearLabels, report.conflictSeries.events, {
-        title: 'Conflict events (national sum)',
-        color: '#b71c1c'
-    });
-    drawLineChart('report-conflict-fatalities-chart', yearLabels, report.conflictSeries.fatalities, {
-        title: 'Fatalities (national sum)',
-        color: '#6a1b9a'
-    });
+    drawMultiLineChart(
+        'report-conflict-national-chart',
+        yearLabels,
+        [
+            { values: report.conflictSeries.events, color: '#b71c1c', label: 'Conflict events' },
+            { values: report.conflictSeries.fatalities, color: '#6a1b9a', label: 'Fatalities' }
+        ],
+        { title: 'National conflict events & fatalities', highlightYear }
+    );
 }
 
-export function drawSepiConflictScatter(canvasId, data, highlightedName) {
+export function drawSepiConflictScatter(canvasId, data, highlightedName, selectedYear) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -630,6 +737,9 @@ export function drawSepiConflictScatter(canvasId, data, highlightedName) {
     ctx.fillRect(0, 0, W, H);
 
     const xVals = data.map(d => d.avgConflictPer100k);
+    const highlighted = data.find(d => d.name === highlightedName);
+    const yearVal = selectedYear != null ? highlighted?.conflictByYear?.[selectedYear] : undefined;
+    if (yearVal != null) xVals.push(yearVal);
     const xMax = (Math.max(...xVals) || 1) * 1.1;
     const xMin = 0;
     const yMin = 0;
@@ -724,10 +834,14 @@ export function drawSepiConflictScatter(canvasId, data, highlightedName) {
     });
 
     // Highlighted dot on top with label
-    const hl = data.find(d => d.name === highlightedName);
+    const hl = highlighted;
     if (hl) {
         const hx = toX(hl.avgConflictPer100k);
         const hy = toY(hl.sepi);
+
+        // Average dot is drawn first so the selected-year diamond (drawn after,
+        // below) always renders on top of it — otherwise, when the two values
+        // are close, the solid average dot would fully cover the diamond.
         ctx.beginPath();
         ctx.arc(hx, hy, 7, 0, Math.PI * 2);
         ctx.fillStyle = '#e05c2e';
@@ -736,10 +850,60 @@ export function drawSepiConflictScatter(canvasId, data, highlightedName) {
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        const labelRight = hx > padL + plotW * 0.72;
+        // Label above the dot by default; flip below if there isn't room
+        // (dot too close to the top of the plot area).
+        const placeAbove = (hy - padT) > 16;
+        const labelY = placeAbove ? hy - 12 : hy + 18;
+        let labelAlign = 'center';
+        if (hx < padL + 30) labelAlign = 'left';
+        else if (hx > padL + plotW - 30) labelAlign = 'right';
+        const labelX = labelAlign === 'left' ? hx - 6 : labelAlign === 'right' ? hx + 6 : hx;
+
         ctx.fillStyle = '#b33a10';
         ctx.font = 'bold 11px "Proxima Nova", Calibri, sans-serif';
-        ctx.textAlign = labelRight ? 'right' : 'left';
-        ctx.fillText(hl.name, hx + (labelRight ? -10 : 10), hy + 4);
+        ctx.textAlign = labelAlign;
+        ctx.fillText(hl.name, labelX, labelY);
+
+        // Selected-year marker for the same region: a hollow diamond in a color
+        // (purple) distinct from both the average dot's red/orange and the
+        // other-region blue dots, so it stays visible even when it overlaps the
+        // average dot. Linked with a dashed connector and labeled with the year
+        // so it's unambiguous that it's a single-year value, not the multi-year
+        // average the filled dot represents.
+        if (yearVal != null) {
+            const yx = toX(yearVal);
+            const yy = hy;
+
+            ctx.save();
+            ctx.setLineDash([3, 3]);
+            ctx.strokeStyle = 'rgba(123, 31, 162, 0.5)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(hx, hy);
+            ctx.lineTo(yx, yy);
+            ctx.stroke();
+            ctx.restore();
+
+            const r = 6;
+            ctx.beginPath();
+            ctx.moveTo(yx, yy - r);
+            ctx.lineTo(yx + r, yy);
+            ctx.lineTo(yx, yy + r);
+            ctx.lineTo(yx - r, yy);
+            ctx.closePath();
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#7b1fa2';
+            ctx.stroke();
+
+            // Opposite vertical side from the region name label, so the two
+            // never collide when the diamond sits close to the average dot.
+            const yearLabelY = placeAbove ? yy + 16 : yy - 11;
+            ctx.fillStyle = '#7b1fa2';
+            ctx.font = 'bold 10px "Proxima Nova", Calibri, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(String(selectedYear), yx, yearLabelY);
+        }
     }
 }

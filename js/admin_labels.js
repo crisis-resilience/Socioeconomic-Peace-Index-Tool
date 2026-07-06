@@ -152,9 +152,11 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
                 updateBasemap(map, this.value);
             });
 
-            // Ensure default outline selection is applied on startup.
-            // This avoids requiring a manual dropdown change.
-            toggleCountryOutline(outlineSelect.value, map, countryOutlines);
+            // Note: outlines for all countries are already shown on the map at this point
+            // (main.js loads them before this control is created) so that every country
+            // stays clickable for switching. Don't call toggleCountryOutline() here — it
+            // would hide the non-selected outlines and disable click-to-switch until the
+            // user changes country another way.
             if (typeof window.hideDataCountryOutlineIfSepiDisplayed === 'function') {
                 window.hideDataCountryOutlineIfSepiDisplayed();
             }
