@@ -955,9 +955,19 @@ export class InfoPanel {
         }
 
         filtered.sort((a, b) => b.value - a.value);
-        const maxValue = Math.max(...filtered.map((r) => r.value), 1);
+        // Min-max normalize against the actual value range rather than assuming a
+        // 0 baseline — otherwise negative values (e.g. climate anomaly indices)
+        // all divide out to a negative percentage and get clamped to the same
+        // floor width, making every negative bar look identical regardless of
+        // how negative it is.
+        const allValues = filtered.map((r) => r.value);
+        const minValue = Math.min(...allValues);
+        const maxValue = Math.max(...allValues);
+        const range = maxValue - minValue;
         const html = filtered.map((row, idx) => {
-            const pct = Math.max(2, (row.value / maxValue) * 100);
+            const pct = range > 0
+                ? Math.max(2, ((row.value - minValue) / range) * 100)
+                : 100;
             return `
                 <div style="display:flex; align-items:center; gap:8px; margin: 0 0 6px 0; font-size: 11px;">
                     <div style="width:22px; color:#6c757d; text-align:right; flex-shrink:0;">${idx + 1}.</div>
