@@ -1,6 +1,6 @@
 // layer_manager.js - Updated with aligned popup styling
 
-import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, CONFLICT_COLOR_SCHEME, getPillarColorForPolarity, getPillarDescriptionForPolarity, conflictRawToNormalized, conflictLegendRawEdges, getCurrentCountry, isSubIndicatorPillar } from './layer_config.js';
+import { LAYER_CONFIG, PILLAR_CONFIG, COLOR_SCALES, COLOR_RAMPS, CONFLICT_COLOR_SCHEME, getPillarColorForPolarity, getPillarDescriptionForPolarity, conflictRawToNormalized, conflictLegendRawEdges, getCurrentCountry, isSubIndicatorPillar, getUnitShortSign } from './layer_config.js';
 import { loadTiff } from './zoom-adaptive-tiff-loader.js';
 import { SEPIManager } from './sepi_manager.js';
 import { loadVectorLayer, loadPointLayer, updateVectorLayerStyle, updatePointLayerStyle, populateAttributeSelector } from './vector_layers.js';
@@ -92,6 +92,11 @@ export class LayerManager {
         document.addEventListener('sepiOpacityChanged', (e) => {
             const opacity = e.detail.opacity;
             this.updateSEPIOpacity(opacity);
+        });
+
+        document.addEventListener('primaryPeaceDriverToggled', (e) => {
+            const enabled = Boolean(e.detail?.enabled);
+            this.sepiManager?.setPrimaryPeaceDriverEnabled?.(enabled);
         });
 
         document.addEventListener('primaryConflictDriverToggled', (e) => {
@@ -994,10 +999,14 @@ export class SimplifiedPillarManager {
         const isConflictData = pillarId?.startsWith('conflict_');
         const isSubIndicator = isSubIndicatorPillar(pillarId);
         const conflictDecimals = pillarId?.includes('_per_1k') ? 3 : 0;
+        const unitSign = (isSubIndicator || isConflictData) ? getUnitShortSign(config.unit) : '';
         const formattedValue = value !== undefined
-            ? (isSubIndicator
-                ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })
-                : Number(value).toFixed(isConflictData ? conflictDecimals : 3))
+            ? (() => {
+                const numText = isSubIndicator
+                    ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 })
+                    : Number(value).toFixed(isConflictData ? conflictDecimals : 3);
+                return unitSign ? `${numText} ${unitSign}` : numText;
+            })()
             : 'No data';
         const csvOverview = this.getAdm1OverviewEntry(properties, district);
         const districtDetails = csvOverview?.overview || this.districtInfo[district];
@@ -1026,7 +1035,7 @@ export class SimplifiedPillarManager {
             <div style="padding: 10px;">
                 <div style="background: ${valueBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${valueBorder};">
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
-                        <strong style="color: ${headerColor}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.name}:</strong>
+                        <strong style="color: ${headerColor}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.popupLabel || config.name}:</strong>
                         <span style="font-size: 16px; font-weight: bold; color: ${descText}; flex: 0 0 auto; text-align: right;">
                             ${formattedValue}
                         </span>
