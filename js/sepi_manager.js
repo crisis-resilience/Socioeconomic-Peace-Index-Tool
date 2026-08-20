@@ -245,18 +245,18 @@ export class SEPIManager {
         
         // Create chart HTML
         let chartHTML = `
-    <div class="sepi-breakdown-chart" style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #0076B6; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+    <div class="sepi-breakdown-chart" style="margin: 10px 0; padding: 10px; background: #f7f7f7; border-radius: 0; border: 1px solid #d4d6d8;">
         <h4 style="margin: 0 0 8px 0; color: #003974; font-size: 13px; font-weight: 600;"> SEPI Pillar Breakdown</h4>
 `;
-        
+
         pillars.forEach(pillar => {
             const percentage = Math.round(pillar.value * 100);
             const pillarColor = this.getColor(pillar.value);
 chartHTML += `
     <div class="pillar-bar" style="display: flex; align-items: center; margin-bottom: 8px; font-size: 12px;">
         <div class="pillar-label" style="width: 90px; flex-shrink: 0; font-weight: 500; color: #495057;">${pillar.name}:</div>
-        <div class="pillar-bar-container" style="flex: 1; height: 18px; background: #e9ecef; border-radius: 9px; margin: 0 8px; position: relative; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);">
-            <div class="pillar-bar-fill" style="width: ${percentage}%; height: 100%; border-radius: 9px; background: ${pillarColor}; transition: width 0.4s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></div>
+        <div class="pillar-bar-container" style="flex: 1; height: 18px; background: #edeff0; border-radius: 0; margin: 0 8px; position: relative; overflow: hidden;">
+            <div class="pillar-bar-fill" style="width: ${percentage}%; height: 100%; border-radius: 0; background: ${pillarColor}; transition: width 0.4s ease;"></div>
         </div>
         <div class="pillar-value" style="min-width: 35px; text-align: right; font-weight: 600; color: #0076B6; font-size: 11px;">${pillar.value.toFixed(2)}</div>
     </div>
@@ -433,12 +433,12 @@ chartHTML += `
      */
     _descBgStyle(value) {
         const v = Number(value);
-        if (value == null || isNaN(v)) return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
-        if (v >= 0.8) return { bg: '#d4edda', border: '#28a745', text: '#155724' };
-        if (v >= 0.6) return { bg: '#e2f0d8', border: '#5cb85c', text: '#2d6a4f' };
-        if (v >= 0.4) return { bg: '#fff9e0', border: '#ffc107', text: '#856404' };
-        if (v >= 0.2) return { bg: '#fde8d4', border: '#fd7e14', text: '#7d3500' };
-        return { bg: '#fde8e8', border: '#dc3545', text: '#721c24' };
+        if (value == null || isNaN(v)) return { bg: '#b8b8b8', text: '#000000' };
+        if (v >= 0.8) return { bg: '#2c7a2c', text: '#ffffff' };
+        if (v >= 0.6) return { bg: '#69b34c', text: '#ffffff' };
+        if (v >= 0.4) return { bg: '#efc64a', text: '#000000' };
+        if (v >= 0.2) return { bg: '#e26d28', text: '#ffffff' };
+        return { bg: '#c5312a', text: '#ffffff' };
     }
 
     createPopupContent(properties) {
@@ -455,7 +455,7 @@ chartHTML += `
         const sourceUrl = csvOverview?.sourceUrl || '';
         const sourceYear = this.extractYearHint(sourceUrl) || this.extractYearHint(districtDetails);
 
-        const { bg: descBg, border: descBorder, text: descText } = this._descBgStyle(sepiValue);
+        const { bg: descBg, text: descText } = this._descBgStyle(sepiValue);
 
         return `
             <div class="sepi-popup-header">
@@ -465,7 +465,7 @@ chartHTML += `
             <div style="padding: 10px;">
                 ${chartHTML}
 
-                <div style="background: ${descBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${descBorder};">
+                <div style="background: ${descBg}; padding: 8px; border-radius: 0; margin: 10px 0;">
                     <div style="text-align: center; font-size: 14px; font-weight: 600; color: ${descText};">
                         ${sepiValue != null ? this.getDescription(sepiValue) : 'No data'}
                     </div>

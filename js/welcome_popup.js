@@ -72,8 +72,8 @@ export class WelcomePopup {
         this.container.className = 'welcome-popup';
         this.container.style.cssText = `
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border-radius: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             width: 90%;
             max-width: 700px;
             max-height: 80vh;
@@ -81,14 +81,14 @@ export class WelcomePopup {
             font-family: 'Proxima Nova', Calibri, sans-serif;
             animation: welcomeSlideIn 0.4s ease-out;
         `;
-        
+
         // Create header
         const header = document.createElement('div');
         header.style.cssText = `
-            background: linear-gradient(135deg, #2c5f2d, #4a8b3a);
+            background: #006eb5;
             color: white;
             padding: 20px;
-            border-radius: 12px 12px 0 0;
+            border-radius: 0;
             position: relative;
         `;
         
@@ -125,61 +125,59 @@ export class WelcomePopup {
         
         content.innerHTML = `
             <div style="text-align: center; margin-bottom: 20px;">
-                <div style="font-size: 48px; margin-bottom: 10px;">📊</div>
-                <p style="font-size: 16px; color: #555; margin: 0;">
+                <p style="font-size: 16px; color: #232e3d; margin: 0;">
                     Interactive mapping platform for comprehensive socio-economic and peace analysis across Somalia
                 </p>
             </div>
-            
-            <div style="background: #f8f9fa; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
-                <h3 style="margin: 0 0 15px 0; color: #2c5f2d; font-size: 18px;">
-                    🎯 What is SEPI?
+
+            <div style="background: #f7f7f7; border-radius: 0; padding: 20px; margin-bottom: 20px;">
+                <h3 style="margin: 0 0 15px 0; color: #000000; font-size: 18px;">
+                    What is SEPI?
                 </h3>
-                <p style="margin: 0; color: #333; font-size: 14px;">
-                    The <strong>Socioeconomic Peace Index</strong> is a composite indicator that measures economic development, 
+                <p style="margin: 0; color: #232e3d; font-size: 14px;">
+                    The <strong>Socioeconomic Peace Index</strong> is a composite indicator that measures economic development,
                     social vulnerability, peace stability, and infrastructure accessibility across Somalia.
                 </p>
             </div>
-            
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
-                <div style="background: #e7f3ff; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff;">
-                    <h4 style="margin: 0 0 8px 0; color: #007bff; font-size: 14px;">🗺️ Explore</h4>
-                    <p style="margin: 0; font-size: 12px; color: #333;">
+                <div style="background: #fafafa; border: 1px solid #d4d6d8; padding: 15px; border-radius: 0;">
+                    <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 14px;">Explore</h4>
+                    <p style="margin: 0; font-size: 12px; color: #232e3d;">
                         Click on regions to view detailed SEPI scores and regional data
                     </p>
                 </div>
-                <div style="background: #f0f9ff; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
-                    <h4 style="margin: 0 0 8px 0; color: #0ea5e9; font-size: 14px;">🔧 Analyze</h4>
-                    <p style="margin: 0; font-size: 12px; color: #333;">
+                <div style="background: #fafafa; border: 1px solid #d4d6d8; padding: 15px; border-radius: 0;">
+                    <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 14px;">Analyze</h4>
+                    <p style="margin: 0; font-size: 12px; color: #232e3d;">
                         Use sidebar controls to overlay additional data layers
                     </p>
                 </div>
-                <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; border-left: 4px solid #22c55e;">
-                    <h4 style="margin: 0 0 8px 0; color: #22c55e; font-size: 14px;">📈 Compare</h4>
-                    <p style="margin: 0; font-size: 12px; color: #333;">
+                <div style="background: #fafafa; border: 1px solid #d4d6d8; padding: 15px; border-radius: 0;">
+                    <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 14px;">Compare</h4>
+                    <p style="margin: 0; font-size: 12px; color: #232e3d;">
                         Run analysis tools to compare different indicators
                     </p>
                 </div>
-                <div style="background: #fef7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #a855f7;">
-                    <h4 style="margin: 0 0 8px 0; color: #a855f7; font-size: 14px;">💡 Insights</h4>
-                    <p style="margin: 0; font-size: 12px; color: #333;">
+                <div style="background: #fafafa; border: 1px solid #d4d6d8; padding: 15px; border-radius: 0;">
+                    <h4 style="margin: 0 0 8px 0; color: #000000; font-size: 14px;">Insights</h4>
+                    <p style="margin: 0; font-size: 12px; color: #232e3d;">
                         Access analysis panel for deeper insights and reports
                     </p>
                 </div>
             </div>
-            
+
             <div style="text-align: center;">
                 <button class="welcome-start-btn" style="
-                    background: linear-gradient(135deg, #2c5f2d, #4a8b3a);
+                    background: #006eb5;
                     color: white;
                     border: none;
                     padding: 12px 32px;
-                    border-radius: 25px;
+                    border-radius: 0;
                     font-size: 16px;
                     font-weight: bold;
                     cursor: pointer;
-                    transition: transform 0.2s, box-shadow 0.2s;
-                    box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
+                    transition: background 0.2s;
                 ">
                     Start Exploring →
                 </button>
@@ -216,12 +214,10 @@ export class WelcomePopup {
         buttons.forEach(btn => {
             if (btn.classList.contains('welcome-start-btn')) {
                 btn.addEventListener('mouseover', () => {
-                    btn.style.transform = 'translateY(-2px)';
-                    btn.style.boxShadow = '0 6px 16px rgba(44, 95, 45, 0.4)';
+                    btn.style.background = '#3288ce';
                 });
                 btn.addEventListener('mouseout', () => {
-                    btn.style.transform = 'translateY(0)';
-                    btn.style.boxShadow = '0 4px 12px rgba(44, 95, 45, 0.3)';
+                    btn.style.background = '#006eb5';
                 });
             } else if (btn.classList.contains('welcome-close-btn')) {
                 btn.addEventListener('mouseover', () => {

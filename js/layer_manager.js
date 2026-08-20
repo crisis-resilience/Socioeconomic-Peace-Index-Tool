@@ -967,16 +967,16 @@ export class SimplifiedPillarManager {
      */
     _descBgStyle(value) {
         const v = Number(value);
-        if (value == null || isNaN(v)) return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
-        if (v >= 0.8) return { bg: '#d4edda', border: '#28a745', text: '#155724' };
-        if (v >= 0.6) return { bg: '#e2f0d8', border: '#5cb85c', text: '#2d6a4f' };
-        if (v >= 0.4) return { bg: '#fff9e0', border: '#ffc107', text: '#856404' };
-        if (v >= 0.2) return { bg: '#fde8d4', border: '#fd7e14', text: '#7d3500' };
-        return { bg: '#fde8e8', border: '#dc3545', text: '#721c24' };
+        if (value == null || isNaN(v)) return { bg: '#b8b8b8', text: '#000000' };
+        if (v >= 0.8) return { bg: '#2c7a2c', text: '#ffffff' };
+        if (v >= 0.6) return { bg: '#69b34c', text: '#ffffff' };
+        if (v >= 0.4) return { bg: '#efc64a', text: '#000000' };
+        if (v >= 0.2) return { bg: '#e26d28', text: '#ffffff' };
+        return { bg: '#c5312a', text: '#ffffff' };
     }
 
     _subDescBgStyle(value, polarity = 1) {
-        if (value == null || isNaN(value)) return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
+        if (value == null || isNaN(value)) return { bg: '#b8b8b8', text: '#000000' };
         const numericValue = Number(value);
         const breaks = this.subIndicatorBreaks || [0, 0, 0, 0];
         let idx = 0;
@@ -986,11 +986,11 @@ export class SimplifiedPillarManager {
         else if (numericValue >= breaks[0]) idx = 1;
         if (Number(polarity) === -1) idx = 4 - idx;
         const styles = [
-            { bg: '#fde8e8', border: '#dc3545', text: '#721c24' },
-            { bg: '#fde8d4', border: '#fd7e14', text: '#7d3500' },
-            { bg: '#fff9e0', border: '#ffc107', text: '#856404' },
-            { bg: '#e2f0d8', border: '#5cb85c', text: '#2d6a4f' },
-            { bg: '#d4edda', border: '#28a745', text: '#155724' },
+            { bg: '#c5312a', text: '#ffffff' },
+            { bg: '#e26d28', text: '#ffffff' },
+            { bg: '#efc64a', text: '#000000' },
+            { bg: '#69b34c', text: '#ffffff' },
+            { bg: '#2c7a2c', text: '#ffffff' },
         ];
         return styles[idx];
     }
@@ -1013,12 +1013,10 @@ export class SimplifiedPillarManager {
         const sourceUrl = csvOverview?.sourceUrl || '';
         const sourceYear = this.extractYearHint(sourceUrl) || this.extractYearHint(districtDetails);
 
-        // Use consistent color scheme
-        const headerColor = isConflictData ? '#dc3545' : '#003974';
         const valueColor = this.getIndicatorFillColor(value, config, pillarId);
 
         // Dynamic background, matching the same tier the map fill/legend uses.
-        const { bg: valueBg, border: valueBorder, text: descText } = isConflictData
+        const { bg: valueBg, text: descText } = isConflictData
             ? this._conflictDescBgStyle(value)
             : isSubIndicator
                 ? this._subDescBgStyle(value, config.polarity ?? 1)
@@ -1033,9 +1031,9 @@ export class SimplifiedPillarManager {
                 <button class="popup-header-close-btn" onclick="this.closest('.leaflet-popup').querySelector('.leaflet-popup-close-button').click()">&#x2715;</button>
             </div>
             <div style="padding: 10px;">
-                <div style="background: ${valueBg}; padding: 8px; border-radius: 6px; margin: 10px 0; border-left: 4px solid ${valueBorder};">
+                <div style="background: ${valueBg}; padding: 8px; border-radius: 0; margin: 10px 0;">
                     <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap;">
-                        <strong style="color: ${headerColor}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.popupLabel || config.name}:</strong>
+                        <strong style="color: ${descText}; font-size: 13px; flex: 1 1 150px; min-width: 0; overflow-wrap: anywhere;">${config.popupLabel || config.name}:</strong>
                         <span style="font-size: 16px; font-weight: bold; color: ${descText}; flex: 0 0 auto; text-align: right;">
                             ${formattedValue}
                         </span>
@@ -1458,13 +1456,11 @@ export class SimplifiedPillarManager {
      * bg/text are lightened/darkened tints of it, kept in sync automatically if
      * CONFLICT_COLOR_SCHEME's colors ever change. */
     _conflictDescBgStyle(value) {
-        const border = this.getConflictColorDynamic(value);
-        if (border === '#cccccc') return { bg: '#f8f9fa', border: '#6c757d', text: '#495057' };
-        return {
-            bg: this._mixHexWith(border, '#ffffff', 0.85),
-            border,
-            text: this._mixHexWith(border, '#000000', 0.45)
-        };
+        const color = this.getConflictColorDynamic(value);
+        if (color === '#cccccc') return { bg: '#b8b8b8', text: '#000000' };
+        const { r, g, b } = this._hexToRgb(color);
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        return { bg: color, text: luminance > 0.6 ? '#000000' : '#ffffff' };
     }
 
     /** Mix a hex color toward another (white for tints, black for shades) by `amount` [0..1]. */

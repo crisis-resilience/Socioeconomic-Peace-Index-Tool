@@ -340,7 +340,6 @@ function renderConflictContextSection(ctx) {
     return `
         <div class="cr-context-panel">
             <div class="cr-context-panel-header">
-                <span class="cr-context-panel-label">ACLED · 2016–2025</span>
                 <span class="cr-context-panel-title">Conflict context</span>
             </div>
             ${renderBlock(ctx.profile)}
