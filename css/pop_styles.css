@@ -119,10 +119,9 @@
 .sepi-breakdown-chart {
     margin: 10px;
     padding: 10px;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border-left: 4px solid #0076B6;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    background: #f7f7f7;
+    border-radius: 0;
+    border: 1px solid #d4d6d8;
 }
 
 .sepi-breakdown-chart h4 {
@@ -152,19 +151,17 @@
 .pillar-bar-container {
     flex: 1;
     height: 18px;
-    background: #e9ecef;
-    border-radius: 9px;
+    background: #edeff0;
+    border-radius: 0;
     margin: 0 8px;
     position: relative;
     overflow: hidden;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .pillar-bar-fill {
     height: 100%;
-    border-radius: 9px;
+    border-radius: 0;
     transition: width 0.4s ease;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
 .pillar-value {
@@ -254,8 +251,8 @@
 
 .welcome-popup {
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-radius: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     width: 90%;
     max-width: 700px;
     max-height: 80vh;
@@ -289,21 +286,19 @@
 }
 
 .welcome-start-btn {
-    background: linear-gradient(135deg, #2c5f2d, #4a8b3a);
+    background: #006eb5;
     color: white;
     border: none;
     padding: 12px 32px;
-    border-radius: 25px;
+    border-radius: 0;
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 12px rgba(44, 95, 45, 0.3);
+    transition: background 0.2s;
 }
 
 .welcome-start-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(44, 95, 45, 0.4);
+    background: #3288ce;
 }
 
 @keyframes welcomeSlideIn {

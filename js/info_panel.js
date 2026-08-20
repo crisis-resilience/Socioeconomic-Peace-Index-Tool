@@ -148,75 +148,75 @@ export class InfoPanel {
                 <section class="info-panel-tab-panel active" data-panel="welcome" role="tabpanel">
                     <div class="info-panel-section">
                         <div class="welcome-content">
-                            <div style="background:#f0f0ec; border:1px solid #d2d2ce; border-radius:8px; padding:10px 12px; margin-bottom:14px;">
-                                <div style="font-size:18px; font-weight:700; color:#2f2f2f;">SEPI Analysis Tool Guide</div>
+                            <div style="background:#006eb5; border-radius:0; padding:12px 14px; margin-bottom:14px;">
+                                <div style="font-size:18px; font-weight:700; color:#ffffff;">SEPI Analysis Tool Guide</div>
                             </div>
 
-                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">WHAT THE TOOL SHOWS</div>
-                            <p style="margin:0 0 8px; font-size:12px; line-height:1.5; color:#3e3e3e;">
+                            <div style="font-size:12px; font-weight:700; color:#000000; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:2px solid #006eb5; padding-bottom:5px;">WHAT THE TOOL SHOWS</div>
+                            <p style="margin:0 0 8px; font-size:12px; line-height:1.5; color:#232e3d;">
                                 The SEPI Analysis Tool maps the Socioeconomic Peace Index and its component pillars at the sub-national (Admin-1) level across three countries. SEPI measures structural socioeconomic conditions associated with conflict vulnerability, covering education, health, food security, poverty, and climate resilience.
                             </p>
-                            <p style="margin:0 0 14px; font-size:12px; line-height:1.5; color:#3e3e3e;">
+                            <p style="margin:0 0 14px; font-size:12px; line-height:1.5; color:#232e3d;">
                                 Scores run from 0 to 1, where higher values reflect stronger conditions and lower vulnerability.
                             </p>
 
-                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">HOW TO USE</div>
+                            <div style="font-size:12px; font-weight:700; color:#000000; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:2px solid #006eb5; padding-bottom:5px;">HOW TO USE</div>
                             <div style="position:relative; margin-bottom:14px;">
-                                <div style="position:absolute; left:16px; top:10px; bottom:10px; width:2px; background:#5f9be6;"></div>
-                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
-                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">1</span>
-                                    <div style="font-size:14px; font-weight:700; color:#343434;">Select a country</div>
-                                    <div style="font-size:12px; color:#555; margin-top:4px;">Use the country buttons in the left panel to choose Somalia, South Sudan, or Kenya.</div>
+                                <div style="position:absolute; left:16px; top:10px; bottom:10px; width:2px; background:#006eb5;"></div>
+                                <div style="position:relative; border:1px solid #d4d6d8; border-radius:0; background:#fafafa; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#006eb5; color:#ffffff; font-size:11px; line-height:18px; text-align:center; font-weight:700;">1</span>
+                                    <div style="font-size:14px; font-weight:700; color:#000000;">Select a country</div>
+                                    <div style="font-size:12px; color:#232e3d; margin-top:4px;">Use the country buttons in the left panel to choose Somalia, South Sudan, or Kenya.</div>
                                 </div>
-                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
-                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">2</span>
-                                    <div style="font-size:14px; font-weight:700; color:#343434;">Choose a layer</div>
-                                    <div style="font-size:12px; color:#555; margin-top:4px;">Select Overall Peace Index for the composite score, or one of the five pillar indices.</div>
+                                <div style="position:relative; border:1px solid #d4d6d8; border-radius:0; background:#fafafa; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#006eb5; color:#ffffff; font-size:11px; line-height:18px; text-align:center; font-weight:700;">2</span>
+                                    <div style="font-size:14px; font-weight:700; color:#000000;">Choose a layer</div>
+                                    <div style="font-size:12px; color:#232e3d; margin-top:4px;">Select Overall Peace Index for the composite score, or one of the five pillar indices.</div>
                                 </div>
-                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
-                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">3</span>
-                                    <div style="font-size:14px; font-weight:700; color:#343434;">Read the map</div>
-                                    <div style="font-size:12px; color:#555; margin-top:4px;">Use the legend to interpret region colours by score range. <span style="display:inline-block; margin-left:6px; padding:1px 6px; border-radius:10px; background:#f7d9d9; color:#9a2f2f; font-size:11px;">Red = deprivation</span> <span style="display:inline-block; margin-left:4px; padding:1px 6px; border-radius:10px; background:#d9efdc; color:#2f7b38; font-size:11px;">Green = resilience</span></div>
+                                <div style="position:relative; border:1px solid #d4d6d8; border-radius:0; background:#fafafa; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#006eb5; color:#ffffff; font-size:11px; line-height:18px; text-align:center; font-weight:700;">3</span>
+                                    <div style="font-size:14px; font-weight:700; color:#000000;">Read the map</div>
+                                    <div style="font-size:12px; color:#232e3d; margin-top:4px;">Use the legend to interpret region colours by score range. <span style="display:inline-block; margin-left:6px; padding:1px 6px; border-radius:10px; background:#ffbcb7; color:#721c24; font-size:11px; font-weight:700;">Red = deprivation</span> <span style="display:inline-block; margin-left:4px; padding:1px 6px; border-radius:10px; background:#b8ecb6; color:#155724; font-size:11px; font-weight:700;">Green = resilience</span></div>
                                 </div>
-                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px; margin-bottom:8px;">
-                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">4</span>
-                                    <div style="font-size:14px; font-weight:700; color:#343434;">Click a region</div>
-                                    <div style="font-size:12px; color:#555; margin-top:4px;">Open district details with the SEPI score, pillar scores, and district overview.</div>
+                                <div style="position:relative; border:1px solid #d4d6d8; border-radius:0; background:#fafafa; padding:10px 12px 10px 46px; margin-bottom:8px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#006eb5; color:#ffffff; font-size:11px; line-height:18px; text-align:center; font-weight:700;">4</span>
+                                    <div style="font-size:14px; font-weight:700; color:#000000;">Click a region</div>
+                                    <div style="font-size:12px; color:#232e3d; margin-top:4px;">Open district details with the SEPI score, pillar scores, and district overview.</div>
                                 </div>
-                                <div style="position:relative; border:1px solid #d8d8d8; border-radius:8px; background:#f7f7f7; padding:10px 12px 10px 46px;">
-                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#dce9fa; color:#3f79c5; font-size:11px; line-height:18px; text-align:center; font-weight:700;">5</span>
-                                    <div style="font-size:14px; font-weight:700; color:#343434;">Drill into sub-indicators</div>
-                                    <div style="font-size:12px; color:#555; margin-top:4px;">Select any indicator listed under a pillar to map it directly and inspect district values.</div>
+                                <div style="position:relative; border:1px solid #d4d6d8; border-radius:0; background:#fafafa; padding:10px 12px 10px 46px;">
+                                    <span style="position:absolute; left:9px; top:12px; width:18px; height:18px; border-radius:50%; background:#006eb5; color:#ffffff; font-size:11px; line-height:18px; text-align:center; font-weight:700;">5</span>
+                                    <div style="font-size:14px; font-weight:700; color:#000000;">Drill into sub-indicators</div>
+                                    <div style="font-size:12px; color:#232e3d; margin-top:4px;">Select any indicator listed under a pillar to map it directly and inspect district values.</div>
                                 </div>
                             </div>
 
-                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">THE FIVE PILLARS</div>
+                            <div style="font-size:12px; font-weight:700; color:#000000; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:2px solid #006eb5; padding-bottom:5px;">THE FIVE PILLARS</div>
                             <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
                                 <div style="width:160px; height:160px; border-radius:50%; background: conic-gradient(#1f9d75 0% 20%, #7b72d8 20% 40%, #de6130 40% 60%, #bd7a10 60% 80%, #3a8ad8 80% 100%); position:relative; flex-shrink:0;">
-                                    <div style="position:absolute; inset:42px; border-radius:50%; background:#f7f7f7; display:flex; align-items:center; justify-content:center; text-align:center; font-size:12px; font-weight:700; color:#666; line-height:1.2;">Overall<br>SEPI</div>
+                                    <div style="position:absolute; inset:42px; border-radius:50%; background:#f7f7f7; display:flex; align-items:center; justify-content:center; text-align:center; font-size:12px; font-weight:700; color:#232e3d; line-height:1.2;">Overall<br>SEPI</div>
                                 </div>
-                                <div style="font-size:12px; color:#444; line-height:1.5;">
-                                    <div><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#1f9d75; margin-right:8px;"></span><strong>Education</strong><br><span style="padding-left:18px; color:#666;">Attendance, literacy, school access</span></div>
-                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#7b72d8; margin-right:8px;"></span><strong>Food security</strong><br><span style="padding-left:18px; color:#666;">IPC Phase 3+ population fraction</span></div>
-                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#de6130; margin-right:8px;"></span><strong>Poverty reduction</strong><br><span style="padding-left:18px; color:#666;">Headcount, expenditure, income</span></div>
-                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#bd7a10; margin-right:8px;"></span><strong>Health access</strong><br><span style="padding-left:18px; color:#666;">Facilities per population, access share</span></div>
-                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#3a8ad8; margin-right:8px;"></span><strong>Climate resilience</strong><br><span style="padding-left:18px; color:#666;">NDVI, PDSI, FAPAR, soil moisture</span></div>
+                                <div style="font-size:12px; color:#232e3d; line-height:1.5;">
+                                    <div><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#1f9d75; margin-right:8px;"></span><strong>Education</strong><br><span style="padding-left:18px; color:#55606e;">Attendance, literacy, school access</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#7b72d8; margin-right:8px;"></span><strong>Food security</strong><br><span style="padding-left:18px; color:#55606e;">IPC Phase 3+ population fraction</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#de6130; margin-right:8px;"></span><strong>Poverty reduction</strong><br><span style="padding-left:18px; color:#55606e;">Headcount, expenditure, income</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#bd7a10; margin-right:8px;"></span><strong>Health access</strong><br><span style="padding-left:18px; color:#55606e;">Facilities per population, access share</span></div>
+                                    <div style="margin-top:4px;"><span style="display:inline-block; width:10px; height:10px; border-radius:2px; background:#3a8ad8; margin-right:8px;"></span><strong>Climate resilience</strong><br><span style="padding-left:18px; color:#55606e;">NDVI, PDSI, FAPAR, soil moisture</span></div>
                                 </div>
                             </div>
-                            <div style="background:#efefeb; border-left:4px solid #a5a394; color:#555; font-size:12px; line-height:1.45; padding:8px 10px; border-radius:4px; margin-bottom:12px;">
+                            <div style="background:#f7f7f7; color:#232e3d; font-size:12px; line-height:1.45; padding:10px 12px; border-radius:0; margin-bottom:12px;">
                                 The overall score is a geometric mean of all five pillars. A very low score on any one pillar significantly depresses the overall score.
                             </div>
 
-                            <div style="font-size:12px; font-weight:700; color:#6d6d6d; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:1px solid #d9d9d9; padding-bottom:5px;">SCORE RANGES</div>
-                            <div style="font-size:12px; color:#444; line-height:1.55;">
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.0 - 0.2</strong>Very Low</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.2 - 0.4</strong>Low</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.4 - 0.6</strong>Moderate</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.6 - 0.8</strong>High</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.8 - 1.0</strong>Very High</div>
-                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:3px; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">No data</strong></div>
+                            <div style="font-size:12px; font-weight:700; color:#000000; letter-spacing:0.06em; margin:6px 0 8px; border-bottom:2px solid #006eb5; padding-bottom:5px;">SCORE RANGES</div>
+                            <div style="font-size:12px; color:#232e3d; line-height:1.55;">
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:0; background:#c5312a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.0 - 0.2</strong>Very Low</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:0; background:#e26d28; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.2 - 0.4</strong>Low</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:0; background:#efc64a; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.4 - 0.6</strong>Moderate</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:0; background:#69b34c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.6 - 0.8</strong>High</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:0; background:#2c7a2c; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">0.8 - 1.0</strong>Very High</div>
+                                <div><span style="display:inline-block; width:14px; height:14px; border-radius:0; background:#b8b8b8; margin-right:8px; vertical-align:middle;"></span><strong style="margin-right:8px; display:inline-block;">No data</strong></div>
                             </div>
-                            <div style="background:#efe7d7; border-left:4px solid #b89c67; color:#5b4f36; font-size:12px; line-height:1.4; padding:8px 10px; border-radius:4px; margin-top:10px;">
+                            <div style="background:#f7f7f7; color:#232e3d; font-size:12px; line-height:1.4; padding:10px 12px; border-radius:0; margin-top:10px;">
                                 Scores are within-country only and not comparable across countries.
                             </div>
 
@@ -264,20 +264,15 @@ export class InfoPanel {
                         <div class="layers-list" id="layers-list">
                             <p class="no-layers-message">No layers currently active</p>
                         </div>
-                        <div id="district-overview-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #ffc107; border-radius: 8px; background: #fff8e1; border-left: 4px solid #ffc107;">
-                            <h5 id="district-overview-name" style="margin: 0 0 6px 0; color: #856404; font-size: 13px; font-weight: 600;"></h5>
-                            <div id="district-overview-content" style="font-size: 12px; color: #555; line-height: 1.5;"></div>
-                            <div id="district-overview-source" style="margin-top: 6px; font-size: 11px; color: #856404;"></div>
+                        <div id="district-overview-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #d4d6d8; border-radius: 0; background: #f7f7f7;">
+                            <h5 id="district-overview-name" style="margin: 0 0 6px 0; color: #000000; font-size: 13px; font-weight: 600;"></h5>
+                            <div id="district-overview-content" style="font-size: 12px; color: #232e3d; line-height: 1.5;"></div>
+                            <div id="district-overview-source" style="margin-top: 6px; font-size: 11px; color: #55606e;"></div>
                         </div>
-                        <div id="sepi-ranking-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #dee2e6; border-radius: 8px; background: #f8f9fa;">
-                            <h5 style="margin: 0 0 8px 0;">SEPI District Ranking</h5>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #555;">Ranked from highest to lowest Overall Peace Index score.</p>
+                        <div id="sepi-ranking-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #d4d6d8; border-radius: 0; background: #f7f7f7;">
+                            <h5 style="margin: 0 0 8px 0; color: #000000;">SEPI District Ranking</h5>
+                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #55606e;">Ranked from highest to lowest Overall Peace Index score.</p>
                             <div id="sepi-ranking-chart"></div>
-                        </div>
-                        <div id="conflict-timeline-panel" style="display:none; margin-top: 12px; padding: 12px; border: 1px solid #dee2e6; border-radius: 8px; background: #f8f9fa;">
-                            <h5 style="margin: 0 0 8px 0;">Conflict Temporal Evolution</h5>
-                            <p style="margin: 0 0 10px 0; font-size: 12px; color: #555;">Year-by-year trend for the active conflict metric.</p>
-                            <canvas id="conflict-timeline-chart" width="520" height="240" style="width: 100%; max-width: 100%; height: auto; border: 1px solid #e5e5e5; background: #fff; border-radius: 6px;"></canvas>
                         </div>
                     </div>
                 </section>
@@ -970,12 +965,12 @@ export class InfoPanel {
                 : 100;
             return `
                 <div style="display:flex; align-items:center; gap:8px; margin: 0 0 6px 0; font-size: 11px;">
-                    <div style="width:22px; color:#6c757d; text-align:right; flex-shrink:0;">${idx + 1}.</div>
-                    <div style="width:120px; color:#343a40; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
-                    <div style="flex:1; height:14px; background:#e9ecef; border-radius:7px; overflow:hidden;">
-                        <div style="width:${pct}%; height:100%; background:#60a5fa;"></div>
+                    <div style="width:22px; color:#55606e; text-align:right; flex-shrink:0;">${idx + 1}.</div>
+                    <div style="width:120px; color:#000000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0;" title="${escapeHtml(row.name)}">${escapeHtml(row.name)}</div>
+                    <div style="flex:1; height:14px; background:#edeff0; border-radius:0; overflow:hidden;">
+                        <div style="width:${pct}%; height:100%; background:#006eb5;"></div>
                     </div>
-                    <div style="width:40px; text-align:right; color:#2563eb; font-weight:600; flex-shrink:0;">${row.value.toFixed(2)}</div>
+                    <div style="width:40px; text-align:right; color:#006eb5; font-weight:600; flex-shrink:0;">${row.value.toFixed(2)}</div>
                 </div>
             `;
         }).join('');
@@ -1081,7 +1076,7 @@ export class InfoPanel {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, width, height);
 
-        ctx.fillStyle = '#2f3b47';
+        ctx.fillStyle = '#232e3d';
         ctx.font = 'bold 12px "Proxima Nova", Calibri, sans-serif';
         const titleSuffix = timelineData.districtName ? ` • ${timelineData.districtName}` : ` • ${timelineData.aggregationLabel}`;
         ctx.fillText(`${timelineData.metricName}${titleSuffix}`, leftPad, 16);
@@ -1107,7 +1102,7 @@ export class InfoPanel {
             const overallX = hasDistrict ? gx - barWidth - 2 : gx - barWidth / 2;
             const overallY = topPad + chartH - overallHeight;
 
-            ctx.fillStyle = '#60a5fa';
+            ctx.fillStyle = '#006eb5';
             ctx.fillRect(overallX, overallY, barWidth, overallHeight);
 
             if (hasDistrict) {
@@ -1115,17 +1110,17 @@ export class InfoPanel {
                 const districtHeight = (districtValue / yMax) * chartH;
                 const districtX = gx + 2;
                 const districtY = topPad + chartH - districtHeight;
-                ctx.fillStyle = '#93c5fd';
+                ctx.fillStyle = '#a2daf3';
                 ctx.fillRect(districtX, districtY, barWidth, districtHeight);
             }
 
-            ctx.fillStyle = '#555';
+            ctx.fillStyle = '#55606e';
             ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(String(year), gx, topPad + chartH + 16);
         });
 
-        ctx.strokeStyle = '#333';
+        ctx.strokeStyle = '#232e3d';
         ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(leftPad, topPad);
@@ -1133,21 +1128,21 @@ export class InfoPanel {
         ctx.lineTo(leftPad + chartW, topPad + chartH);
         ctx.stroke();
 
-        ctx.fillStyle = '#444';
+        ctx.fillStyle = '#55606e';
         ctx.font = '11px "Proxima Nova", Calibri, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText('0', 6, topPad + chartH + 4);
         ctx.fillText(`${yMax.toFixed(yMax >= 10 ? 0 : 2)}`, 6, topPad + 4);
 
         ctx.textAlign = 'left';
-        ctx.fillStyle = '#60a5fa';
+        ctx.fillStyle = '#006eb5';
         ctx.fillRect(leftPad, height - 14, 10, 10);
-        ctx.fillStyle = '#555';
+        ctx.fillStyle = '#55606e';
         ctx.fillText(timelineData.aggregationLabel || 'Overall', leftPad + 14, height - 5);
         if (hasDistrict) {
-            ctx.fillStyle = '#93c5fd';
+            ctx.fillStyle = '#a2daf3';
             ctx.fillRect(leftPad + 170, height - 14, 10, 10);
-            ctx.fillStyle = '#555';
+            ctx.fillStyle = '#55606e';
             ctx.fillText(timelineData.districtName || 'Selected district', leftPad + 184, height - 5);
         }
     }

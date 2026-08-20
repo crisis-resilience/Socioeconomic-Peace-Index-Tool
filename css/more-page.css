@@ -1,14 +1,14 @@
 /* About SEPI (more.html) content styles */
 
 .more-page h1 {
-    color: #343a40;
+    color: #000000;
     margin-bottom: 1rem;
 }
 
 .more-page .lead {
     font-size: 1.05rem;
     line-height: 1.65;
-    color: #495057;
+    color: #232e3d;
 }
 
 .more-page .content-section {
@@ -16,9 +16,9 @@
 }
 
 .more-page .content-section > h2 {
-    color: #2b6cb0;
+    color: #000000;
     font-size: 1.5rem;
-    border-bottom: 2px solid #5b9bd5;
+    border-bottom: 2px solid #006eb5;
     padding-bottom: 10px;
     margin-bottom: 20px;
 }
@@ -36,8 +36,8 @@
 .sepi-method-step {
     flex: 1 1 0;
     min-width: 180px;
-    border: 2px solid #5b9bd5;
-    border-radius: 12px;
+    border: 2px solid #006eb5;
+    border-radius: 0;
     padding: 16px 14px;
     background: #fff;
     position: relative;
@@ -53,7 +53,7 @@
     height: 0;
     border-top: 10px solid transparent;
     border-bottom: 10px solid transparent;
-    border-left: 12px solid #5b9bd5;
+    border-left: 12px solid #006eb5;
     z-index: 2;
 }
 
@@ -61,7 +61,7 @@
     margin: 0 0 12px;
     font-size: 0.8rem;
     font-weight: 700;
-    color: #2b6cb0;
+    color: #006eb5;
     text-transform: uppercase;
     letter-spacing: 0.02em;
     line-height: 1.3;
@@ -72,7 +72,7 @@
     padding-left: 18px;
     font-size: 0.88rem;
     line-height: 1.5;
-    color: #343a40;
+    color: #232e3d;
 }
 
 .sepi-method-pillars {
@@ -85,13 +85,13 @@
 }
 
 .sepi-method-pillars li {
-    background: #e8f4fc;
-    border: 1px solid #5b9bd5;
-    border-radius: 6px;
+    background: #e2edf8;
+    border: 1px solid #006eb5;
+    border-radius: 0;
     padding: 6px 10px;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #2b6cb0;
+    color: #006eb5;
     text-align: center;
 }
 
@@ -99,7 +99,7 @@
     text-align: center;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #343a40;
+    color: #000000;
     line-height: 1.5;
     margin: 0;
 }
@@ -112,14 +112,14 @@
 }
 
 .sepi-method-extra .extra-step {
-    border: 1px solid #dee2e6;
-    border-radius: 8px;
+    border: 1px solid #d4d6d8;
+    border-radius: 0;
     padding: 14px 16px;
-    background: #f8f9fa;
+    background: #f7f7f7;
 }
 
 .sepi-method-extra .extra-step strong {
-    color: #2b6cb0;
+    color: #006eb5;
 }
 
 /* Data table */
@@ -132,18 +132,18 @@
 .more-page th,
 .more-page td {
     padding: 12px 15px;
-    border: 1px solid #dee2e6;
+    border: 1px solid #d4d6d8;
     text-align: left;
     vertical-align: top;
 }
 
 .more-page thead {
-    background-color: #2b6cb0;
+    background-color: #006eb5;
     color: #fff;
 }
 
 .more-page tbody tr:nth-child(even) {
-    background-color: #f8f9fa;
+    background-color: #f7f7f7;
 }
 
 .more-page .indicators-table {
@@ -155,33 +155,34 @@
 }
 
 .more-page .polarity-note {
-    background: #fff8e6;
-    border-left: 4px solid #f0ad4e;
+    background: #f7f7f7;
+    border: 1px solid #d4d6d8;
     padding: 14px 16px;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0;
     margin-top: 16px;
     font-size: 0.95rem;
     line-height: 1.55;
+    color: #232e3d;
 }
 
 /* Conflict / ACLED section */
 .conflict-data-section {
     background: #fff;
-    color: #212529;
-    border-radius: 12px;
+    color: #232e3d;
+    border-radius: 0;
     padding: 28px 24px 32px;
     margin-top: 12px;
-    border: 1px solid #e9ecef;
+    border: 1px solid #d4d6d8;
 }
 
 .conflict-data-section > h2 {
-    color: #212529 !important;
-    border-bottom-color: #dee2e6 !important;
+    color: #000000 !important;
+    border-bottom-color: #d4d6d8 !important;
     margin-top: 0;
 }
 
 .conflict-intro {
-    color: #495057;
+    color: #232e3d;
     font-size: 0.98rem;
     line-height: 1.6;
     margin-bottom: 24px;
@@ -196,12 +197,12 @@
 }
 
 .conflict-card {
-    background: #f0f2f5;
-    color: #212529;
-    border-radius: 10px;
+    background: #f7f7f7;
+    color: #232e3d;
+    border-radius: 0;
     padding: 20px 18px;
     line-height: 1.55;
-    border: 1px solid #e2e6ea;
+    border: 1px solid #d4d6d8;
 }
 
 .conflict-card h3 {
@@ -217,13 +218,13 @@
 }
 
 .conflict-card-wide {
-    background: #f0f2f5;
-    color: #212529;
-    border-radius: 10px;
+    background: #f7f7f7;
+    color: #232e3d;
+    border-radius: 0;
     padding: 22px 20px;
     margin-bottom: 20px;
     line-height: 1.55;
-    border: 1px solid #e2e6ea;
+    border: 1px solid #d4d6d8;
 }
 
 .conflict-card-wide h3 {
@@ -239,24 +240,24 @@
 }
 
 .conflict-note {
-    background: #f5e8c8;
-    border: 2px solid #c4a574;
-    border-radius: 10px;
+    background: #f7f7f7;
+    border: 1px solid #d4d6d8;
+    border-radius: 0;
     padding: 18px 20px;
-    color: #3d3428;
+    color: #232e3d;
     font-size: 0.95rem;
     line-height: 1.55;
 }
 
 .conflict-note strong {
-    color: #2c2416;
+    color: #000000;
 }
 
 /* FAQ */
 .more-page .faq-item {
     margin-bottom: 28px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #d4d6d8;
 }
 
 .more-page .faq-item:last-child {
@@ -264,7 +265,7 @@
 }
 
 .more-page .faq-item h3 {
-    color: #2b6cb0;
+    color: #006eb5;
     font-size: 1.1rem;
     margin-bottom: 10px;
 }
@@ -272,20 +273,21 @@
 .more-page .faq-item p {
     margin: 0;
     line-height: 1.65;
-    color: #495057;
+    color: #232e3d;
 }
 
 .more-page a {
-    color: #2b6cb0;
+    color: #006eb5;
 }
 
 .more-page .cite-block {
-    background: #f8f9fa;
-    border-radius: 8px;
+    background: #f7f7f7;
+    border: 1px solid #d4d6d8;
+    border-radius: 0;
     padding: 16px 20px;
-    border-left: 4px solid #5b9bd5;
     font-size: 0.95rem;
     line-height: 1.6;
+    color: #232e3d;
 }
 
 @media (max-width: 900px) {
