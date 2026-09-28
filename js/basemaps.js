@@ -10,12 +10,16 @@ export const basemaps = {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }),
 
-    // Carto basemaps (reliable sources)
-    cartoLight: L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
-    }),
+    // Esri Light Gray Canvas (no API key needed; replaces Carto Light, which now requires a key)
+    lightGray: L.layerGroup([
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles © Esri — Esri, HERE, Garmin, © OpenStreetMap contributors, and the GIS User Community',
+            maxZoom: 16
+        }),
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}', {
+            maxZoom: 16
+        })
+    ]),
 
     // Esri basemaps (very reliable)
     esriWorldImagery: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
@@ -44,7 +48,7 @@ export const basemaps = {
 // List of basemaps for the selector dropdown
 export const basemapOptions = [
     { value: 'osm', label: 'OpenStreetMap' },
-    { value: 'cartoLight', label: 'Carto Light' },
+    { value: 'lightGray', label: 'Light Gray' },
     { value: 'esriWorldImagery', label: 'ESRI Satellite Imagery' },
     { value: 'osmHOT', label: 'Humanitarian' },
     // { value: 'stadiaMaps', label: 'Stadia Maps' },
@@ -56,7 +60,7 @@ export const basemapOptions = [
  * @param {Object} map - Leaflet map instance
  */
 export function addDefaultBasemap(map) {
-    basemaps.cartoLight.addTo(map);
+    basemaps.lightGray.addTo(map);
 }
 
 /**
@@ -92,7 +96,7 @@ export const BasemapControl = L.Control.extend({
         });
 
         // Set initial selected value
-        select.value = 'cartoLight';  // Match the default basemap
+        select.value = 'lightGray';  // Match the default basemap
 
         // Handle basemap change
         L.DomEvent.on(select, 'change', function () {

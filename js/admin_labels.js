@@ -83,7 +83,7 @@ function createCombinedMapControl(map, labelLayers, countryOutlines, compareMap)
             const leftMapSelect = L.DomUtil.create('select', 'basemap-select', contentContainer);
             
             // Add basemap options
-            addBasemapOptions(leftMapSelect, 'cartoLight');
+            addBasemapOptions(leftMapSelect, 'lightGray');
             
             // Right map selection (only if compareMap exists)
             if (compareMap) {
